@@ -1,5 +1,4 @@
 
-source/feeds/temp.rss
-source/feeds/**
+source/feeds/*.rss
 source/crssr
 
