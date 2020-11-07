@@ -18,3 +18,10 @@ Run the shell script "build.sh" in the source directory.
 ## Libraries used: 
   * cobweb-pipes - https://sourceforge.net/p/gnucobol/contrib/HEAD/tree/trunk/tools/cobweb/cobweb-pipes/
   
+  
+## Current Limitations:
+RSS Feeds must be properly formatted application/rss+xml. Some RSS feeds will minify the data into a single line. This application cannot currently handle RSS feeds that are minified and do not have a new line after each tag. 
+
+Example of a properly formatted RSS feed: https://www.rssboard.org/files/sample-rss-2.xml
+
+  
