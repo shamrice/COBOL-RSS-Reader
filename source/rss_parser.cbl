@@ -1,10 +1,10 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      *> Last Updated: 2020-11-06
+      * Last Modified: 2020-11-07
       * Purpose: Parses raw RSS output into RSS records.
-      * Tectonics:
-      *>     cobc -x rss_reader.cbl rss_parser.cbl cobweb-pipes.cob -o crssr
+      * Tectonics: ./build.sh
+      *     cobc -x crssr.cbl rss_parser.cbl rss_reader.cbl cobweb-pipes.cob -o crssr
       ******************************************************************
 
        replace ==:BUFFER-SIZE:== by ==32768==.
