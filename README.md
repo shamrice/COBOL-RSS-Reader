@@ -2,6 +2,19 @@
 
 Command line RSS reader written in GnuCOBOL
 
-Current version is barely functional and code quality terrible... use at your own risk. :) 
+Project just started... not much to see so far.
 
-Libraries used: cobweb-pipes - https://sourceforge.net/p/gnucobol/contrib/HEAD/tree/trunk/tools/cobweb/cobweb-pipes/
+## Building 
+Run the shell script "build.sh" in the source directory.
+
+## Running
+* Download and parse an RSS feed: 
+  ```./crssr [url of rss feed]```
+* Display parsed feeds:
+  ``` ./crssr ```
+* Display usage help:
+  ``` ./crssr --help ```
+
+## Libraries used: 
+  * cobweb-pipes - https://sourceforge.net/p/gnucobol/contrib/HEAD/tree/trunk/tools/cobweb/cobweb-pipes/
+  
