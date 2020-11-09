@@ -379,8 +379,7 @@
        save-parsed-record.
 
            display "Checking if entry exists in RSS list data."
-          
-      *     go to generate-crap   
+           
       *> make sure file exists... 
            open extend rss-list-file close rss-list-file
 
@@ -409,7 +408,6 @@
 
            display "Saving parsed RSS data to disk...".
 
-
            open output rss-output-file    
                write rss-output-record from ws-rss-record
                end-write
@@ -422,10 +420,11 @@
            move ws-feed-id to ws-rss-feed-id
            move "./feeds/out1.dat" to ws-rss-dat-file-name
 
-           open output rss-list-file
+           open i-o rss-list-file
                write rss-list-record from ws-rss-list-record
-                   invalid key display "invalid key for record."
-                   not invalid key display "saved record to idx file"
+                   invalid key 
+                       display "RSS Feed already exists in list."
+                   not invalid key display "Saved RSS Feed to idx file"
                end-write
            close rss-list-file
 
