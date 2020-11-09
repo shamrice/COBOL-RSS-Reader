@@ -52,7 +52,7 @@
 
        77 is-valid-param                       pic a value 'N'.
 
-       78 newline                              value x"0a".
+       78 new-line                              value x"0a".
        78 program-version                      value 0.01.
 
        78 wget                                 value "wget -O ".
@@ -64,7 +64,7 @@
        main-procedure.
 
            display
-               newline "COBOL RSS Reader v" program-version newline
+               new-line "COBOL RSS Reader v" program-version new-line
                "-----------------------------------------------"
            end-display
 
@@ -98,7 +98,7 @@
 
            display
                "Downloading RSS Feed: " function trim(rss-feed-url)
-               newline
+               new-line
            end-display.
 
       *> Build WGET command...
@@ -120,7 +120,7 @@
                    display "Download success. Status=" download-status
                else
                    display
-                   newline
+                   new-line
                    "Error downloading RSS feed. Status=" download-status
                    end-display
                end-if
@@ -131,8 +131,8 @@
 
            display
                "CRSSR is a command line RSS reader written in COBOL."
-               newline newline
-               "Usage: crssr [url of rss feed]" newline
+               new-line new-line
+               "Usage: crssr [url of rss feed]" new-line
            end-display.
 
 
