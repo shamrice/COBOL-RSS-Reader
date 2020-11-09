@@ -52,8 +52,9 @@
        01 eof-sw                                   pic a value 'N'.
            88 eof                                   value 'Y'.
            88 not-eof                               value 'N'.
-
-       78 ws-rss-input-file-name             value "./feeds/out1.dat".
+       
+      *> Temp placeholder. Will dynamically pull based on list file.
+       78 ws-rss-input-file-name    value "./feeds/rss_00001.dat".
 
 
 

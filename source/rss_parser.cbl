@@ -110,7 +110,7 @@
 
        78 new-line                                 value x"0a".
 
-       78 ws-rss-output-file-name            value "./feeds/out1.dat".
+       77 ws-rss-output-file-name   pic x(21) value "./feeds/UNSET.dat".
        78 ws-rss-list-file-name              value "./feeds/list.dat".
        78 ws-rss-last-id-file-name           value "./feeds/lastid.dat".
 
@@ -404,7 +404,28 @@
                display "Using existing id: " ws-rss-feed-id
                move ws-rss-feed-id to ws-feed-id
            end-if
-         
+
+
+           display "Updating/Adding record to RSS list data."
+           
+           move ws-feed-link to ws-rss-link
+           move ws-feed-id to ws-rss-feed-id
+
+           move function concatenate(
+               "./feeds/rss_", ws-feed-id, ".dat")
+               to ws-rss-dat-file-name
+
+           move ws-rss-dat-file-name to ws-rss-output-file-name
+
+           open i-o rss-list-file
+               write rss-list-record from ws-rss-list-record
+                   invalid key 
+                       display "RSS Feed already exists in list."
+                   not invalid key 
+                       display "Saved new RSS Feed to idx file"
+               end-write
+           close rss-list-file
+
 
            display "Saving parsed RSS data to disk...".
 
@@ -412,21 +433,6 @@
                write rss-output-record from ws-rss-record
                end-write
            close rss-output-file
-
-           display "Updating/Adding record to RSS list data."
-
-           
-           move ws-feed-link to ws-rss-link
-           move ws-feed-id to ws-rss-feed-id
-           move "./feeds/out1.dat" to ws-rss-dat-file-name
-
-           open i-o rss-list-file
-               write rss-list-record from ws-rss-list-record
-                   invalid key 
-                       display "RSS Feed already exists in list."
-                   not invalid key display "Saved RSS Feed to idx file"
-               end-write
-           close rss-list-file
 
            exit paragraph.
 
