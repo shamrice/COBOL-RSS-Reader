@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2020-11-09
+      * Last Modified: 2020-11-10
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       *     cobc -x crssr.cbl rss_parser.cbl rss_reader.cbl cobweb-pipes.cob -o crssr
@@ -22,71 +22,27 @@
                assign to dynamic ls-file-name
                organization is line sequential.
 
-               select optional rss-output-file
-               assign to dynamic ws-rss-output-file-name
-               organization is line sequential.
-
-               select optional rss-list-file
-               assign to dynamic ws-rss-list-file-name
-               organization is indexed
-               access is dynamic
-               record key is rss-link
-               alternate record key is rss-feed-id.
-
-               select optional rss-last-id-file
-               assign to dynamic ws-rss-last-id-file-name
-               organization is line sequential.              
+               copy "./copybooks/filecontrol/rss_content_file.cbl".
+               copy "./copybooks/filecontrol/rss_list_file.cbl".
+               copy "./copybooks/filecontrol/rss_last_id_file.cbl".       
                
 
        data division.
        file section.
            FD temp-rss-file.
-           01 temp-rss-file-raw                    pic x(:BUFFER-SIZE:).
+           01 temp-rss-file-raw                 pic x(:BUFFER-SIZE:).
 
-           FD rss-output-file.
-           01 rss-output-record.
-               05 feed-id                       pic 9(5) values zeros.
-               05 feed-title                    pic x(255) value spaces.
-               05 feed-link                     pic x(255) value spaces.
-               05 feed-desc                     pic x(255) value spaces.
-               05 items                         occurs 30 times.
-                   10 item-exists               pic a value 'N'.
-                   10 item-title                pic x(255) value spaces.
-                   10 item-link                 pic x(255) value spaces.
-                   10 item-guid                 pic x(255) value spaces.
-                   10 item-pub-date             pic x(255) value spaces.
-                   10 item-desc                 pic x(511) value spaces.
-               
-           FD rss-list-file.
-           01 rss-list-record.               
-               05 rss-feed-id                  pic 9(5) value zeros.
-               05 rss-dat-file-name            pic x(255) value spaces.
-               05 rss-link                     pic x(255) value spaces.
+           copy "./copybooks/filedescriptor/fd_rss_content_file.cbl".
+           copy "./copybooks/filedescriptor/fd_rss_list_file.cbl".
+           copy "./copybooks/filedescriptor/fd_rss_last_id_file.cbl".
 
-           FD rss-last-id-file.
-           01 rss-last-id-record               pic 9(5) value zeros.
                               
        working-storage section.
-
-       01 ws-rss-record.
-           05 ws-feed-id                       pic 9(5) value zeros.
-           05 ws-feed-title                    pic x(255) value spaces.
-           05 ws-feed-link                     pic x(255) value spaces.
-           05 ws-feed-desc                     pic x(255) value spaces.
-           05 ws-items                         occurs 30 times.
-               10 ws-item-exists               pic a value 'N'.
-               10 ws-item-title                pic x(255) value spaces.
-               10 ws-item-link                 pic x(255) value spaces.
-               10 ws-item-guid                 pic x(255) value spaces.
-               10 ws-item-pub-date             pic x(255) value spaces.
-               10 ws-item-desc                 pic x(511) value spaces.
-                          
-       01 ws-rss-list-record.           
-           05 ws-rss-feed-id                  pic 9(5) value zeros.
-           05 ws-rss-dat-file-name            pic x(255) value spaces.
-           05 ws-rss-link                     pic x(255) value spaces.
-
-       01 ws-last-id-record                   pic 9(5) value zeros.                         
+       
+       copy "./copybooks/wsrecord/ws-rss-record.cbl".
+       copy "./copybooks/wsrecord/ws-rss-list-record.cbl".
+       copy "./copybooks/wsrecord/ws-last-id-record.cbl".
+     
 
        01 eof-sw                                   pic a value 'N'.
            88 eof                                   value 'Y'.
@@ -110,7 +66,7 @@
 
        78 new-line                                 value x"0a".
 
-       77 ws-rss-output-file-name   pic x(21) value "./feeds/UNSET.dat".
+       77 ws-rss-content-file-name  pic x(21) value "./feeds/UNSET.dat".
        78 ws-rss-list-file-name              value "./feeds/list.dat".
        78 ws-rss-last-id-file-name           value "./feeds/lastid.dat".
 
@@ -415,7 +371,7 @@
                "./feeds/rss_", ws-feed-id, ".dat")
                to ws-rss-dat-file-name
 
-           move ws-rss-dat-file-name to ws-rss-output-file-name
+           move ws-rss-dat-file-name to ws-rss-content-file-name
 
            open i-o rss-list-file
                write rss-list-record from ws-rss-list-record
@@ -429,10 +385,10 @@
 
            display "Saving parsed RSS data to disk...".
 
-           open output rss-output-file    
-               write rss-output-record from ws-rss-record
+           open output rss-content-file    
+               write rss-content-record from ws-rss-record
                end-write
-           close rss-output-file
+           close rss-content-file
 
            exit paragraph.
 

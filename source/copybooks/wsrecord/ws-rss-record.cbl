@@ -1,0 +1,20 @@
+      ******************************************************************
+      * Author: Erik Eriksen
+      * Create Date: 2020-11-10
+      * Last Modified: 2020-11-10
+      * Purpose: Working storage definition of RSS content files defined
+      *          in the rss_content_file file descriptor.
+      * Tectonics: ./build.sh
+      ******************************************************************
+       01 ws-rss-record.
+           05 ws-feed-id                       pic 9(5) value zeros.
+           05 ws-feed-title                    pic x(255) value spaces.
+           05 ws-feed-link                     pic x(255) value spaces.
+           05 ws-feed-desc                     pic x(255) value spaces.
+           05 ws-items                         occurs 30 times.
+               10 ws-item-exists               pic a value 'N'.
+               10 ws-item-title                pic x(255) value spaces.
+               10 ws-item-link                 pic x(255) value spaces.
+               10 ws-item-guid                 pic x(255) value spaces.
+               10 ws-item-pub-date             pic x(255) value spaces.
+               10 ws-item-desc                 pic x(511) value spaces.
