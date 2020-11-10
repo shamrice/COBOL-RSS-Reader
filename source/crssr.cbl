@@ -5,8 +5,6 @@
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
-      *> or: cobc -x crssr.cbl rss_parser.cbl rss_reader.cbl cobweb-pipes.cob -o crssr
-      *> or: cobc -x -DWIN_NO_POSIX crssr.cbl rss_reader.cbl cobweb-pipes.cob -g -debug
       *>*****************************************************************
 
        replace ==:BUFFER-SIZE:== by ==32768==.
@@ -81,7 +79,7 @@
 
            if command-arguments = spaces then
                move 'Y' to is-valid-param
-               call "rss-reader"
+               call "rss-reader-menu"
            end-if
 
            if is-valid-param = 'N' then

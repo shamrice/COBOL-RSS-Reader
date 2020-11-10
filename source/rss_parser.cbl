@@ -4,7 +4,6 @@
       * Last Modified: 2020-11-10
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
-      *     cobc -x crssr.cbl rss_parser.cbl rss_reader.cbl cobweb-pipes.cob -o crssr
       ******************************************************************
 
        replace ==:BUFFER-SIZE:== by ==32768==.
@@ -429,6 +428,6 @@
                end-write
            close rss-last-id-file
 
-           exit paragraph.
+           exit paragraph.       
 
-       exit program.
+       end program rss-parser.

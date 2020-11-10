@@ -4,10 +4,9 @@
       * Last Modified: 2020-11-10
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
-      *    cobc -x crssr.cbl rss_parser.cbl rss_reader.cbl cobweb-pipes.cob -o crssr
       ******************************************************************
        identification division.
-       program-id. rss-reader.
+       program-id. rss-reader-menu.
 
        environment division.
        
@@ -122,5 +121,4 @@
 
            exit paragraph.           
 
-       exit program.
-
+       end program rss-reader-menu.
