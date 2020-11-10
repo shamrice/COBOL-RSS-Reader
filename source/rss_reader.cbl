@@ -79,7 +79,7 @@
        
        01 ws-last-id-record                   pic 9(5) value zeros.   
 
-       77 counter                             pic 9(5) value zeros.
+       77 counter                             pic 9(5) value 1.
 
        78 new-line                                 value x"0a".
 
@@ -92,20 +92,20 @@
 
        procedure division.
        main-procedure.
-            display "In RSS reader."
+           display "In RSS reader."
 
-           open input rss-input-file
-               perform until eof
-                   read rss-input-file into ws-rss-record
-                       at end move 'Y' to eof-sw
-                   not at end
-                       display function trim(ws-feed-title)
-                       display function trim(item-title(1))
-                   end-read
-               end-perform
-           close rss-input-file
+      *     open input rss-input-file
+      *         perform until eof
+      *             read rss-input-file into ws-rss-record
+      *                 at end move 'Y' to eof-sw
+      *             not at end
+      *                 display function trim(ws-feed-title)
+      *                 display function trim(item-title(1))
+      *             end-read
+      *         end-perform
+      *     close rss-input-file
 
-           display "End debug" new-line new-line
+      *     display "End debug" new-line new-line
 
            perform load-highest-rss-record
 
@@ -118,6 +118,9 @@
        load-highest-rss-record.
                       
            move 'N' to eof-sw
+
+      * make sure file exists... 
+           open extend rss-last-id-file close rss-last-id-file
 
            open input rss-last-id-file
                perform until eof
@@ -132,7 +135,9 @@
 
        display-current-feeds.
 
-           display "Current Feeds: "
+           display "Current Feeds: "   
+      * make sure file exists... 
+           open extend rss-list-file close rss-list-file
 
            open input rss-list-file
                
