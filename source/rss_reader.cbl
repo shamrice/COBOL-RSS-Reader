@@ -15,23 +15,23 @@
 
        input-output section.
            file-control.               
-               copy "./copybooks/filecontrol/rss_content_file.cbl".
-               copy "./copybooks/filecontrol/rss_list_file.cbl".
-               copy "./copybooks/filecontrol/rss_last_id_file.cbl".
+               copy "./copybooks/filecontrol/rss_content_file.cpy".
+               copy "./copybooks/filecontrol/rss_list_file.cpy".
+               copy "./copybooks/filecontrol/rss_last_id_file.cpy".
 
        data division.
        file section.
 
-           copy "./copybooks/filedescriptor/fd_rss_content_file.cbl".
-           copy "./copybooks/filedescriptor/fd_rss_list_file.cbl".
-           copy "./copybooks/filedescriptor/fd_rss_last_id_file.cbl".
+           copy "./copybooks/filedescriptor/fd_rss_content_file.cpy".
+           copy "./copybooks/filedescriptor/fd_rss_list_file.cpy".
+           copy "./copybooks/filedescriptor/fd_rss_last_id_file.cpy".
 
        working-storage section.
 
-       copy "./copybooks/wsrecord/ws-rss-record.cbl".
-       copy "./copybooks/wsrecord/ws-rss-list-record.cbl".
-       copy "./copybooks/wsrecord/ws-last-id-record.cbl".
-       
+       copy "./copybooks/wsrecord/ws-rss-record.cpy".
+       copy "./copybooks/wsrecord/ws-rss-list-record.cpy".
+       copy "./copybooks/wsrecord/ws-last-id-record.cpy".
+
        01 eof-sw                                   pic a value 'N'.
            88 eof                                   value 'Y'.
            88 not-eof                               value 'N'.
@@ -47,7 +47,9 @@
        78 ws-rss-list-file-name     value "./feeds/list.dat".
        78 ws-rss-last-id-file-name           value "./feeds/lastid.dat".
 
+       copy "screenio.cpy".
 
+       screen section.
 
        procedure division.
        main-procedure.

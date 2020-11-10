@@ -22,9 +22,9 @@
                assign to dynamic ls-file-name
                organization is line sequential.
 
-               copy "./copybooks/filecontrol/rss_content_file.cbl".
-               copy "./copybooks/filecontrol/rss_list_file.cbl".
-               copy "./copybooks/filecontrol/rss_last_id_file.cbl".       
+               copy "./copybooks/filecontrol/rss_content_file.cpy".
+               copy "./copybooks/filecontrol/rss_list_file.cpy".
+               copy "./copybooks/filecontrol/rss_last_id_file.cpy".       
                
 
        data division.
@@ -32,16 +32,16 @@
            FD temp-rss-file.
            01 temp-rss-file-raw                 pic x(:BUFFER-SIZE:).
 
-           copy "./copybooks/filedescriptor/fd_rss_content_file.cbl".
-           copy "./copybooks/filedescriptor/fd_rss_list_file.cbl".
-           copy "./copybooks/filedescriptor/fd_rss_last_id_file.cbl".
+           copy "./copybooks/filedescriptor/fd_rss_content_file.cpy".
+           copy "./copybooks/filedescriptor/fd_rss_list_file.cpy".
+           copy "./copybooks/filedescriptor/fd_rss_last_id_file.cpy".
 
                               
        working-storage section.
        
-       copy "./copybooks/wsrecord/ws-rss-record.cbl".
-       copy "./copybooks/wsrecord/ws-rss-list-record.cbl".
-       copy "./copybooks/wsrecord/ws-last-id-record.cbl".
+       copy "./copybooks/wsrecord/ws-rss-record.cpy".
+       copy "./copybooks/wsrecord/ws-rss-list-record.cpy".
+       copy "./copybooks/wsrecord/ws-last-id-record.cpy".
      
 
        01 eof-sw                                   pic a value 'N'.
