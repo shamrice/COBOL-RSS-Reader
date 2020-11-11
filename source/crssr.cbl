@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2020-11-07
+      *> Last Updated: 2020-11-11
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -51,7 +51,7 @@
        77 is-valid-param                       pic a value 'N'.
 
        78 new-line                              value x"0a".
-       78 program-version                      value 0.01.
+       78 program-version                      value 0.03.
 
        78 wget                                 value "wget -O ".
 

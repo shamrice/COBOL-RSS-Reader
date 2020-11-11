@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2020-11-10
+      * Last Modified: 2020-11-11
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -13,63 +13,69 @@
        configuration section.
 
        input-output section.
-           file-control.               
-               copy "./copybooks/filecontrol/rss_content_file.cpy".
+           file-control.                              
                copy "./copybooks/filecontrol/rss_list_file.cpy".
                copy "./copybooks/filecontrol/rss_last_id_file.cpy".
 
        data division.
        file section.
-
-           copy "./copybooks/filedescriptor/fd_rss_content_file.cpy".
+           
            copy "./copybooks/filedescriptor/fd_rss_list_file.cpy".
            copy "./copybooks/filedescriptor/fd_rss_last_id_file.cpy".
 
        working-storage section.
-
-       copy "./copybooks/wsrecord/ws-rss-record.cpy".
+       
+       copy "screenio.cpy".
        copy "./copybooks/wsrecord/ws-rss-list-record.cpy".
        copy "./copybooks/wsrecord/ws-last-id-record.cpy".
-
-       01 eof-sw                                   pic a value 'N'.
-           88 eof                                   value 'Y'.
-           88 not-eof                               value 'N'.
        
-       
+       01 ws-func-key                          pic 9(4).
+          88 func-f1                           value 1001.
+          88 func-f2                           value 1002.
+          88 func-f9                           value 1009.
+          88 func-f10                          value 1010.
 
-       77 counter                             pic 9(5) value 1.
+       01 ws-accept-func-key                   pic x.
 
-       78 new-line                                 value x"0a".
+       01 eof-sw                               pic a value 'N'.
+           88 eof                              value 'Y'.
+           88 not-eof                          value 'N'.     
 
-      *> Temp placeholder. Will dynamically pull based on list file.
-       78 ws-rss-content-file-name    value "./feeds/rss_00001.dat".
-       78 ws-rss-list-file-name     value "./feeds/list.dat".
+       77 ws-selected-feed-file-name           pic x(255) value spaces.
+
+       77 ws-counter                           pic 9(5) value 1.
+
+       78 new-line                             value x"0a".
+      
+       78 ws-rss-list-file-name              value "./feeds/list.dat".
        78 ws-rss-last-id-file-name           value "./feeds/lastid.dat".
 
-       copy "screenio.cpy".
-
+       
        screen section.
+
+       copy "./screens/rss_list_screen.cpy".
 
        procedure division.
        main-procedure.
            display "In RSS reader."
 
-      *     open input rss-content-file
-      *         perform until eof
-      *             read rss-content-file into ws-rss-record
-      *                 at end move 'Y' to eof-sw
-      *             not at end
-      *                 display function trim(ws-feed-title)
-      *                 display function trim(item-title(1))
-      *             end-read
-      *         end-perform
-      *     close rss-content-file
-
-      *     display "End debug" new-line new-line
 
            perform load-highest-rss-record
 
            perform display-current-feeds
+
+           display "Calling view feed for debugging: "
+           move "./feeds/rss_00002.dat" to ws-selected-feed-file-name
+           call "rss-reader-view-feed" using by content                  
+               ws-selected-feed-file-name
+           end-call
+
+      * Testing screen placeholders.
+      *     display header-screen
+      *     display main-function-screen
+      *     accept main-function-screen
+      *     display "Value entered: " ws-accept-func-key
+
 
            goback.
 
@@ -101,13 +107,13 @@
 
            open input rss-list-file
                
-               perform until counter > ws-last-id-record   
-                   display "Checking RSS Feed ID: " counter                       
-                   move counter to rss-feed-id
+               perform until ws-counter > ws-last-id-record   
+                   display "Checking RSS Feed ID: " ws-counter                       
+                   move ws-counter to rss-feed-id
                    read rss-list-file into ws-rss-list-record
                        key is rss-feed-id
                        invalid key 
-                           display "RSS Feed ID Not Found: " counter
+                           display "RSS Feed ID Not Found: " ws-counter
                        not invalid key 
                            display "RSS Feed ID: " ws-rss-feed-id
                            display "  Data file: " ws-rss-dat-file-name
@@ -115,7 +121,7 @@
 
                    end-read       
                    display spaces
-                   add 1 to counter                   
+                   add 1 to ws-counter                   
                end-perform
            close rss-list-file
 
