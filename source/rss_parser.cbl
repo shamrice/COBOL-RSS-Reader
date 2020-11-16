@@ -69,6 +69,10 @@
        78  ws-rss-list-file-name              value "./feeds/list.dat".
        78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
 
+       01  remove-space-field.
+           03  rsf-leading-space       pic x.
+           03  rsf-rest                pic x(100).
+
        linkage section.
            01 ls-file-name                       pic x(255).
 
@@ -257,36 +261,33 @@
 
        remove-tags-in-record.
            display new-line "Removing rss/xml tags from parsed record.."
-           display new-line "TODO: Broken. Fix this. Nothing removed."
-      * Does not currently work. Will break viewing to screen!
-           exit paragraph.
-           
-           inspect ws-rss-record replacing
-               all "<title>" by low-values
-               all "</title>" by low-values
-               all "<link>" by low-values
-               all "</link>" by low-values
-               all "<guid>" by low-values
-               all '<guid isPermaLink="false">' by low-values
-               all '<guid isPermaLink="true">' by low-values
-               all "</guid>" by low-values
-               all "<pubDate>" by low-values
-               all "</pubDate>" by low-values
-               all "<description>" by low-values
-               all "</description>" by low-values
-               all "&lt;br /&gt;" by low-values
-               all "&lt;br&gt;" by low-values
-               all "&lt;a" by low-values
-               all "target=&quot;_blank&quot;" by low-values
-               all "href=&quot;" by low-values
-               all "&quot;&gt;" by low-values
-               all "&lt;/a&gt;" by low-values
-               all "&lt;h1&gt;" by low-values
-               all "&lt;/h1&gt;" by low-values
-               all "&lt;hr /&gt;" by low-values
-               all "&#39;" by low-values
-               all "&lt;/h2&gt;" by low-values
-               all "&lt;h2&gt;" by low-values
+
+           inspect ws-rss-record replacing all 
+                "<title>" by spaces
+                "</title>" by spaces
+                "<link>" by spaces
+                "</link>" by spaces
+                "<guid>" by spaces
+                '<guid isPermaLink="false">' by spaces
+                '<guid isPermaLink="true">' by spaces
+                "</guid>" by spaces
+                "<pubDate>" by spaces
+                "</pubDate>" by spaces
+                "<description>" by spaces
+                "</description>" by spaces
+                "&lt;br /&gt;" by spaces
+                "&lt;br&gt;" by spaces
+                "&lt;a" by spaces
+                "target=&quot;_blank&quot;" by spaces
+                "href=&quot;" by spaces
+                "&quot;&gt;" by spaces
+                "&lt;/a&gt;" by spaces
+                "&lt;h1&gt;" by spaces
+                "&lt;/h1&gt;" by spaces
+                "&lt;hr /&gt;" by spaces
+                "&#39;" by spaces
+                "&lt;/h2&gt;" by spaces
+                "&lt;h2&gt;" by spaces
 
       *> TODO : new lines should eventually have a space instead of just low-values.
 
@@ -304,7 +305,7 @@
 
            display "Items:" new-line "------"
            move 1 to counter
-           perform until counter = 30
+           perform until counter > ws-max-rss-items
                if ws-item-exists(counter) = 'Y' then
                    display
                        "Item title: "
