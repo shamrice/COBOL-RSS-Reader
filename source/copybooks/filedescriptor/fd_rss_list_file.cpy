@@ -8,7 +8,8 @@
       * Tectonics: ./build.sh
       ******************************************************************
            FD rss-list-file.
-           01 rss-list-record.               
+           01  rss-list-record.               
                05 rss-feed-id                  pic 9(5) value zeros.
-               05 rss-dat-file-name            pic x(255) value spaces.
-               05 rss-link                     pic x(255) value spaces.
+               05 rss-title                    pic x(128) value spaces.               
+               05 rss-dat-file-name            pic x(128) value spaces.
+               05 rss-link                     pic x(256) value spaces.

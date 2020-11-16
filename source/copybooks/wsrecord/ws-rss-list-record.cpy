@@ -6,7 +6,9 @@
       *          descriptor
       * Tectonics: ./build.sh
       ******************************************************************
-       01 ws-rss-list-record.           
-           05 ws-rss-feed-id                  pic 9(5) value zeros.
-           05 ws-rss-dat-file-name            pic x(255) value spaces.
-           05 ws-rss-link                     pic x(255) value spaces.
+       01  ws-rss-list-record.           
+           05  ws-rss-feed-id                  pic 9(5) value zeros.           
+           05  ws-rss-title                    pic x(128) value spaces.           
+           05  ws-rss-dat-file-name            pic x(128) value spaces.
+           05  ws-rss-link                     pic x(256) value spaces.
+           

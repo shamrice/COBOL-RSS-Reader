@@ -51,7 +51,7 @@
        77 is-valid-param                       pic a value 'N'.
 
        78 new-line                              value x"0a".
-       78 program-version                      value 0.03.
+       78 program-version                      value 0.04.
 
        78 wget                                 value "wget -O ".
 

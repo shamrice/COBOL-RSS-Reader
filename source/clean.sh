@@ -2,6 +2,7 @@
 
 echo cleaning up build files....
 
+rm ./crssr
 rm *.c
 rm *.h
 rm *.i

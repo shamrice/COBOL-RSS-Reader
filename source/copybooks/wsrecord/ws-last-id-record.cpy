@@ -6,4 +6,4 @@
       *          descriptor.
       * Tectonics: ./build.sh
       ******************************************************************
-       01 ws-last-id-record                   pic 9(5) value zeros.
+       01  ws-last-id-record                   pic 9(5) value zeros.

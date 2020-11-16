@@ -43,31 +43,31 @@
        copy "./copybooks/wsrecord/ws-last-id-record.cpy".
      
 
-       01 eof-sw                                   pic a value 'N'.
+       01  eof-sw                                   pic a value 'N'.
            88 eof                                   value 'Y'.
            88 not-eof                               value 'N'.
 
-       77 is-desc-single-line                      pic a value 'N'.
-       77 in-description                           pic a value 'N'.
-       77 in-items                                 pic a value 'N'.
-       77 item-idx                                 pic 99 value 1.
+       77  is-desc-single-line                      pic a value 'N'.
+       77  in-description                           pic a value 'N'.
+       77  in-items                                 pic a value 'N'.
+       77  item-idx                                 pic 99 value 1.
 
-       77 desc-temp                            pic x(255) value spaces.
+       77  desc-temp                            pic x(255) value spaces.
 
-       77 raw-buffer                               pic x(:BUFFER-SIZE:).
-       77 counter                                  pic 99 value 1.
+       77  raw-buffer                              pic x(:BUFFER-SIZE:).
+       77  counter                                 pic 99 value 1.
 
-       77 search-count                             pic 9 value zero.
+       77  search-count                            pic 9 value zero.
 
-       77 next-rss-id                              pic 9(5) value zeros.
-       77 temp-id                                  pic 9(5) value zeros.
-       77 id-found                                 pic a values 'N'.
+       77  next-rss-id                             pic 9(5) value zeros.
+       77  temp-id                                 pic 9(5) value zeros.
+       77  id-found                                pic a values 'N'.
 
-       78 new-line                                 value x"0a".
+       78  new-line                                 value x"0a".
 
-       77 ws-rss-content-file-name  pic x(21) value "./feeds/UNSET.dat".
-       78 ws-rss-list-file-name              value "./feeds/list.dat".
-       78 ws-rss-last-id-file-name           value "./feeds/lastid.dat".
+       77  ws-rss-content-file-name pic x(21) value "./feeds/UNSET.dat".
+       78  ws-rss-list-file-name              value "./feeds/list.dat".
+       78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
 
        linkage section.
            01 ls-file-name                       pic x(255).
@@ -257,7 +257,10 @@
 
        remove-tags-in-record.
            display new-line "Removing rss/xml tags from parsed record.."
-
+           display new-line "TODO: Broken. Fix this. Nothing removed."
+      * Does not currently work. Will break viewing to screen!
+           exit paragraph.
+           
            inspect ws-rss-record replacing
                all "<title>" by low-values
                all "</title>" by low-values
@@ -363,14 +366,24 @@
 
            display "Updating/Adding record to RSS list data."
            
-           move ws-feed-link to ws-rss-link
+           
            move ws-feed-id to ws-rss-feed-id
+           
 
            move function concatenate(
                "./feeds/rss_", ws-feed-id, ".dat")
                to ws-rss-dat-file-name
 
-           move ws-rss-dat-file-name to ws-rss-content-file-name
+           move function trim(ws-rss-dat-file-name)
+           to ws-rss-content-file-name
+           
+           move function trim(ws-feed-title) 
+           to ws-rss-title
+           
+           move function trim(ws-feed-link)
+           to ws-rss-link
+
+           display ws-rss-list-record
 
            open i-o rss-list-file
                write rss-list-record from ws-rss-list-record

@@ -12,4 +12,4 @@
                organization is indexed
                access is dynamic
                record key is rss-link
-               alternate record key is rss-feed-id.
+               alternate record key is rss-feed-id.               
