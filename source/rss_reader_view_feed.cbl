@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-11-11
+      * Last Modified: 2020-11-16
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       * Tectonics: ./build.sh
       ******************************************************************
@@ -27,26 +27,39 @@
        copy "screenio.cpy".
        copy "./copybooks/wsrecord/ws-rss-record.cpy".
        
-       01 eof-sw                                   pic a value 'N'.
-           88 eof                                   value 'Y'.
-           88 not-eof                               value 'N'.
-                   
-       78 new-line                                 value x"0a".
+       01  accept-item1                              pic x value space.
 
+       01  eof-sw                                    pic a value 'N'.
+           88  eof                                   value 'Y'.
+           88  not-eof                               value 'N'.
+
+       77  empty-line                           pic x(80) value spaces. 
+      
       * Value set based on file name passed in linkage section.
-       77 ws-rss-content-file-name    pic x(255) value spaces.
+       77  ws-rss-content-file-name            pic x(255) value spaces.
+      
+       78  new-line                                  value x"0a".
+      
        
        linkage section.
-           01 ls-rss-content-file-name         pic x(255).
+           01  ls-rss-content-file-name         pic x(255).
 
        screen section.
+       
+       copy "./screens/rss_info_screen.cpy".
+       copy "./screens/blank_screen.cpy".
 
        procedure division using ls-rss-content-file-name.
        main-procedure.
+
+           display blank-screen 
+
            display "viewing: " function trim(ls-rss-content-file-name)
            if not ls-rss-content-file-name = spaces then 
                move ls-rss-content-file-name to ws-rss-content-file-name
                perform view-feed-data
+
+               accept rss-info-screen
            else 
                display "ERROR: No feed file passed to feed viewer."
            end-if

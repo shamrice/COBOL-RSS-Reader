@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-11-10
+      * Last Modified: 2020-11-16
       * Purpose: File description for RSS content files.
       * Tectonics: ./build.sh
       ******************************************************************

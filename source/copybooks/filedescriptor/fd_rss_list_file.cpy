@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-11-10
+      * Last Modified: 2020-11-16
       * Purpose: File description for file that maintains the 
       *          connection between the id, feed url and RSS content
       *          file name for each RSS feed.

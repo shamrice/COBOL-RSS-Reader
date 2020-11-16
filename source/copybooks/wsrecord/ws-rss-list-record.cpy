@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-11-10
+      * Last Modified: 2020-11-16
       * Purpose: Working storage definition for rss_list_record file
       *          descriptor
       * Tectonics: ./build.sh

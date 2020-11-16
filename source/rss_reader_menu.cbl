@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2020-11-11
+      * Last Modified: 2020-11-16
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -79,10 +79,11 @@
            05  ws-display-list-url             pic x(50) value spaces.
 
        77  ws-selected-feed-file-name           pic x(255) value spaces.
+       77  ws-selected-id                       pic 9(5) value zeros.
 
        77  ws-counter                           pic 9(5) value 1.
 
-       77  empty-line                           pic x(80). 
+       77  empty-line                           pic x(80) value spaces. 
 
        78  new-line                             value x"0a".
        
@@ -99,24 +100,11 @@
        main-procedure.
            display "In RSS reader."
 
-           
-
            perform load-highest-rss-record 
            perform set-rss-menu-items  
   
-      *     display "Calling view feed for debugging: "
-      *     move "./feeds/rss_00001.dat" to ws-selected-feed-file-name
-           
-      *     call "rss-reader-view-feed" using by content                  
-      *         ws-selected-feed-file-name
-      *     end-call
-
            display "done loading rss menu items." 
-
-           display "disp text= " ws-display-text(1)  
-
-      *     display rss-list-screen
-        
+       
       *   The cursor position is not within an item on the screen, so the 
       *   first item in the menu will be accepted first. 
                    
@@ -134,6 +122,17 @@
         
            if key1 equal 0 then
                display "chosen an option: " cursor-line
+
+               compute ws-selected-id = cursor-line - 2
+               if ws-selected-id <= ws-last-id-record then
+                   
+                   perform set-selected-feed-file-name
+
+                   call "rss-reader-view-feed" using by content                  
+                      ws-selected-feed-file-name
+                   end-call
+               end-if
+
  
            else 
                if key1 equal "1" and fkey-10 then
@@ -164,6 +163,7 @@
            close rss-last-id-file
 
            exit paragraph.
+
 
 
        set-rss-menu-items.
@@ -210,6 +210,32 @@
            close rss-list-file      
         
            display "Done setting rss menu items"
+
+           exit paragraph.
+
+
+
+       set-selected-feed-file-name.
+           open input rss-list-file
+               display "Getting file name for Feed ID: " ws-counter                       
+               
+               move ws-selected-id to rss-feed-id
+               read rss-list-file into ws-rss-list-record
+                   key is rss-feed-id
+                   invalid key 
+                       move spaces 
+                       to ws-selected-feed-file-name
+
+                   not invalid key 
+                           
+                       display "FOUND: " ws-rss-dat-file-name                           
+                   
+                       move ws-rss-dat-file-name
+                       to ws-selected-feed-file-name                             
+               
+               end-read       
+
+           close rss-list-file 
 
            exit paragraph.
 
