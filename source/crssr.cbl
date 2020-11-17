@@ -51,7 +51,7 @@
        77 is-valid-param                       pic a value 'N'.
 
        78 new-line                              value x"0a".
-       78 program-version                      value 0.06.
+       78 program-version                      value 0.07.
 
        78 wget                                 value "wget -O ".
 
@@ -85,14 +85,15 @@
            if command-arguments = spaces then
                move 'Y' to is-valid-param
                call "rss-reader-menu"
+
+      *        TODO : re-enable this when not debugging.
+               display blank-screen
            end-if
 
            if is-valid-param = 'N' then
                perform print-help
            end-if
-      
-      *    TODO : re-enable this when not debugging.
-           display blank-screen
+     
 
            stop run.
 

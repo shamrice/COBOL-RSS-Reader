@@ -342,6 +342,16 @@
       *> make sure file exists... 
            open extend rss-list-file close rss-list-file
 
+           if ws-feed-link = spaces then
+               display 
+                   "RSS Feed Link in parsed response is empty. Feed "
+                   "data cannot be saved. Please check the url and try "
+                   "again."
+               end-display
+               exit paragraph
+           end-if
+                   
+
       * set idx search value
            move ws-feed-link to rss-link
 
