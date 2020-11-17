@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2020-11-16
+      * Last Modified: 2020-11-17
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -353,7 +353,7 @@
                    
 
       * set idx search value
-           move ws-feed-link to rss-link
+           move function trim(ws-feed-link) to rss-link
 
            open input rss-list-file
                read rss-list-file into ws-rss-list-record
