@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2020-11-16
+      * Last Modified: 2020-11-17
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -87,7 +87,7 @@
 
        78  new-line                             value x"0a".
        
-       77  ws-rss-content-file-name     pic x(255) value spaces.
+       77  ws-rss-content-file-name          pic x(255) value spaces.
        78  ws-rss-list-file-name             value "./feeds/list.dat".
        78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
 
@@ -96,7 +96,9 @@
 
        copy "./screens/rss_list_screen.cpy".
 
+
        procedure division.
+
        main-procedure.
            display "In RSS reader."
 
@@ -107,42 +109,40 @@
        
       *   The cursor position is not within an item on the screen, so the 
       *   first item in the menu will be accepted first. 
+           move 0 to cursor-line, cursor-col   
+
+           perform until key1 = "1"
+                                  
+               move 0 to ws-selected-id
+               move space to key1
+               move spaces to ws-selected-feed-file-name
                    
-           move 0 to cursor-line, cursor-col. 
-           
-      *   The user moves the cursor with the arrow keys to the 
-      *   desired menu item (to show, schedule, cancel, or print 
-      *   appointments) and selects the item by pressing <Return>. 
-      *   If the user wishes to exit without selecting an option, 
-      *   the user can press the F10 function key. 
+               accept rss-list-screen
+               display "key1=" key1
         
-           accept rss-list-screen            
-        
-           display "key1=" key1
-        
-           if key1 equal 0 then
-               display "chosen an option: " cursor-line
+               if key1 equal 0 then
 
-               compute ws-selected-id = cursor-line - 2
-               if ws-selected-id <= ws-last-id-record then
-                   
-                   perform set-selected-feed-file-name
+                   compute ws-selected-id = cursor-line - 2
+                   if ws-selected-id <= ws-last-id-record then
 
-                   call "rss-reader-view-feed" using by content                  
-                      ws-selected-feed-file-name
-                   end-call
-               end-if
+                       perform set-selected-feed-file-name
 
+                       call "rss-reader-view-feed" using by content                  
+                           ws-selected-feed-file-name
+                       end-call
+                   end-if
  
-           else 
-               if key1 equal "1" and fkey-10 then
-                   display 
-                       "You pressed the F10 key; exiting..." 
-                       line 22
-                   end-display
+               else 
+                   if key1 equal "1" and fkey-10 then
+                       display 
+                           "You pressed the F10 key; exiting..." 
+                           line 22
+                       end-display
+                   end-if
                end-if
-           end-if
-                
+            
+           end-perform           
+
            goback.
 
 

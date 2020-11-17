@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-11-16
+      * Last Modified: 2020-11-17
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       * Tectonics: ./build.sh
       ******************************************************************
@@ -33,14 +33,15 @@
            88  eof                                   value 'Y'.
            88  not-eof                               value 'N'.
 
-       77  empty-line                           pic x(80) value spaces. 
+       77  empty-line                                pic x(80) 
+                                                     value spaces. 
       
       * Value set based on file name passed in linkage section.
-       77  ws-rss-content-file-name            pic x(255) value spaces.
+       77  ws-rss-content-file-name                  pic x(255) 
+                                                     value spaces.
       
        78  new-line                                  value x"0a".
-      
-       
+
        linkage section.
            01  ls-rss-content-file-name         pic x(255).
 
@@ -55,6 +56,7 @@
            display blank-screen 
 
            display "viewing: " function trim(ls-rss-content-file-name)
+
            if not ls-rss-content-file-name = spaces then 
                move ls-rss-content-file-name to ws-rss-content-file-name
                perform view-feed-data
@@ -62,7 +64,14 @@
                accept rss-info-screen
            else 
                display "ERROR: No feed file passed to feed viewer."
+               move spaces to ws-rss-record
+               move "File name passed was empty" to ws-feed-title
+               accept rss-info-screen
            end-if
+
+           move spaces to ws-rss-content-file-name
+           move spaces to ls-rss-content-file-name
+           move  'N' to eof-sw
            goback.
 
 

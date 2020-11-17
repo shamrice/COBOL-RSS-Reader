@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2020-11-16
+      *> Last Updated: 2020-11-17
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -51,9 +51,14 @@
        77 is-valid-param                       pic a value 'N'.
 
        78 new-line                              value x"0a".
-       78 program-version                      value 0.05.
+       78 program-version                      value 0.06.
 
        78 wget                                 value "wget -O ".
+
+
+       screen section.
+
+       copy "./screens/blank_screen.cpy".
 
 
        procedure division.
@@ -85,8 +90,10 @@
            if is-valid-param = 'N' then
                perform print-help
            end-if
+      
+      *    TODO : re-enable this when not debugging.
+           display blank-screen
 
-      *> TODO : No args should display current rss feed.
            stop run.
 
 
