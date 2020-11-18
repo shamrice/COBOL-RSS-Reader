@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2020-11-17
+      *> Last Updated: 2020-11-18
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -51,15 +51,12 @@
        77 is-valid-param                       pic a value 'N'.
 
        78 new-line                              value x"0a".
-       78 program-version                      value 0.07.
+       78 program-version                      value 0.08.
 
        78 wget                                 value "wget -O ".
 
 
-       screen section.
-
-       copy "./screens/blank_screen.cpy".
-
+       screen section.       
 
        procedure division.
 
@@ -85,9 +82,6 @@
            if command-arguments = spaces then
                move 'Y' to is-valid-param
                call "rss-reader-menu"
-
-      *        TODO : re-enable this when not debugging.
-               display blank-screen
            end-if
 
            if is-valid-param = 'N' then

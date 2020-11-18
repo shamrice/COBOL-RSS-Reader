@@ -95,12 +95,15 @@
        screen section.
 
        copy "./screens/rss_list_screen.cpy".
+       copy "./screens/blank_screen.cpy".
 
 
        procedure division.
 
        main-procedure.
            display "In RSS reader."
+      *    TODO: Ask user if they would like to update current feeds on
+      *          start. If so, iterate through list, calling rss-parser.         
 
            perform load-highest-rss-record 
            perform set-rss-menu-items  
@@ -141,7 +144,10 @@
                    end-if
                end-if
             
-           end-perform           
+           end-perform       
+
+      *    TODO : re-enable this when not debugging.
+           display blank-screen    
 
            goback.
 

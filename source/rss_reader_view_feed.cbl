@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-11-17
+      * Last Modified: 2020-11-18
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       * Tectonics: ./build.sh
       ******************************************************************
@@ -72,6 +72,9 @@
            move spaces to ws-rss-content-file-name
            move spaces to ls-rss-content-file-name
            move  'N' to eof-sw
+
+           display blank-screen 
+
            goback.
 
 
