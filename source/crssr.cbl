@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2020-11-18
+      *> Last Updated: 2020-12-19
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -50,8 +50,10 @@
 
        77 is-valid-param                       pic a value 'N'.
 
-       78 new-line                              value x"0a".
-       78 program-version                      value 0.08.
+       78 new-line                             value x"0a".
+       78 program-version                      value 0.09.
+       78 web-url  value "https://github.com/shamrice/COBOL-RSS-Reader".
+       78 build-date                           value "2020-12-19".
 
        78 wget                                 value "wget -O ".
 
@@ -65,7 +67,10 @@
 
            display
                new-line "COBOL RSS Reader v" program-version new-line
-               "-----------------------------------------------"
+               "-----------------------------------------------" 
+               new-line "By: Erik Eriksen"
+               new-line "Web: " web-url
+               new-line "Build Date: " build-date new-line 
            end-display
 
            accept command-arguments from command-line end-accept
@@ -130,9 +135,12 @@
        print-help.
 
            display
-               "CRSSR is a command line RSS reader written in COBOL."
-               new-line new-line
-               "Usage: crssr [url of rss feed]" new-line
+               "CRSSR is a console RSS reader application written in "
+               "COBOL." new-line new-line
+               "Add new feed:" new-line
+               "  Usage: crssr [url of rss feed]" new-line new-line
+               "Run application with no arguments to start application "
+               "in interactive mode." new-line
            end-display.
 
 
