@@ -1,8 +1,8 @@
 # COBOL RSS Reader - crssr
 
-Command line RSS reader written in GnuCOBOL
+Console RSS reader application written in GnuCOBOL
 
-Project just started... not much to see so far.
+Project is still in it's early stage so not all functionality is fully implemented yet.
 
 ## Building 
 Run the shell script "build.sh" in the source directory.
@@ -21,7 +21,7 @@ Run the shell script "build.sh" in the source directory.
 ## Build/Run Prerequisites 
   * GnuCOBOL installed
   * wget installed
-  * Linux(?) - I haven't tried build or run on Windows or Mac.
+  * Linux(?) - Build script is written for Linux but can be modified to compile on other operating systems if needed.
   
 ## Current Limitations:
 RSS Feeds must be properly formatted application/rss+xml. Some RSS feeds will minify the data into a single line. This application cannot currently handle RSS feeds that are minified and do not have a new line after each tag. 
