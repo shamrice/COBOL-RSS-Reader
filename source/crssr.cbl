@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2020-12-19
+      *> Last Updated: BUILD_DATE
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -51,9 +51,9 @@
        77 is-valid-param                       pic a value 'N'.
 
        78 new-line                             value x"0a".
-       78 program-version                      value 0.09.
-       78 web-url  value "https://github.com/shamrice/COBOL-RSS-Reader".
-       78 build-date                           value "2020-12-19".
+       78 program-version                      value __APP_VERSION.
+       78 web-url  value __SOURCE_URL.
+       78 build-date                           value __BUILD_DATE.
 
        78 wget                                 value "wget -O ".
 
