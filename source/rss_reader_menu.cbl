@@ -13,12 +13,8 @@
        configuration section.
 
       *   The SPECIAL-NAMES paragraph that follows provides for the 
-      *   capturing of the F10 function key and for positioning of the 
-      *   cursor.        
+      *   capturing of the positioning of the cursor and key input.        
        special-names.
- 
-           symbolic characters
-               fkey-10-val are 11         
            cursor is cursor-position        
            crt status is crt-status.
 
@@ -48,28 +44,15 @@
            05  cursor-line    pic 99. 
            05  cursor-col     pic 99. 
         
-      *   Normal termination of the ACCEPT statement will result in a value 
-      *   of '0' in KEY1.  When the user presses F10, the value in KEY1 will 
-      *   be '1' and FKEY-10 will be true.       
-
-      *   CRT status has four bit code of what key was pressed. Not what
-      *   is stated above... need to rework this section of code.  
+      *   CRT status has four digit value of what key was pressed.  
+      *   screenio.cpy has values in form of COB-SCR-<KEY> defined. 
        01  crt-status. 
            05  key1             pic x. 
            05  key2             pic x. 
-               88  fkey-10      value fkey-10-val. 
            05  filler           pic x. 
            05  filler           pic x.
-        
-      * not used
-       01  ws-func-key                           pic 9(4).
-           88  func-f1                           value 1001.
-           88  func-f2                           value 1002.
-           88  func-f9                           value 1009.
-           88  func-f10                          value 1010.
 
-       01  ws-accept-func-key                   pic x.
-
+      * Input from screen accept.  
        01  accept-item1                         pic x value space.
 
        01  eof-sw                               pic a value 'N'.
@@ -124,8 +107,7 @@
            perform until exit-true
                                   
                move 0 to ws-selected-id
-               move space to key2
-               move space to key1
+               move spaces to crt-status
                move spaces to ws-selected-feed-file-name
                    
                accept rss-list-screen
@@ -133,7 +115,7 @@
         
                evaluate true 
                
-                   when key1 = "0" 
+                   when key1 = COB-SCR-OK
                       compute ws-selected-id = cursor-line - 2
                        if ws-selected-id <= ws-last-id-record then
 
@@ -144,9 +126,11 @@
                            end-call
                        end-if
 
-                   when crt-status = 1010
+                 
+
+                   when crt-status = COB-SCR-F10
                        display 
-                           "You pressed the F10 key; exiting..." 
+                           "Exiting..." 
                            line 22
                        end-display
                        move 'Y' to exit-sw
