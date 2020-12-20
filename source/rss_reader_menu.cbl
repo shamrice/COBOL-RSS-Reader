@@ -68,6 +68,9 @@
            05  ws-display-list-title           pic x(20) value spaces.
            05  ws-display-list-url             pic x(50) value spaces.
 
+       77 rss-temp-filename                    pic x(255)
+                                               value "./feeds/temp.rss".
+
        77  ws-selected-feed-file-name           pic x(255) value spaces.
        77  ws-selected-id                       pic 9(5) value zeros.
 
@@ -126,12 +129,26 @@
                            end-call
                        end-if
 
-                 
+                   when crt-status = COB-SCR-F5
+                       display "Refreshing RSS feeds..." 
+                           line 23 column 30
+
+      *  TODO : need to move wget code to own callable program. 
+      *         Currently cannot refresh feeds from web with code.
+      *         Also needs to iterate through feed urls in files.
+      *         Processing moved to its own paragraph.                                
+                       call "rss-parser" 
+                           using by content rss-temp-filename
+
+                       display "RSS feeds refreshed.   " 
+                           line 23 column 30
+
+                       perform main-procedure                                    
 
                    when crt-status = COB-SCR-F10
                        display 
-                           "Exiting..." 
-                           line 22
+                           "Exiting...                 " 
+                           line 23 column 30
                        end-display
                        move 'Y' to exit-sw
                    
