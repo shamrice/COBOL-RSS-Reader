@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2020-11-17
+      * Last Modified: 2020-12-19
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -50,7 +50,10 @@
         
       *   Normal termination of the ACCEPT statement will result in a value 
       *   of '0' in KEY1.  When the user presses F10, the value in KEY1 will 
-      *   be '1' and FKEY-10 will be true.         
+      *   be '1' and FKEY-10 will be true.       
+
+      *   CRT status has four bit code of what key was pressed. Not what
+      *   is stated above... need to rework this section of code.  
        01  crt-status. 
            05  key1             pic x. 
            05  key2             pic x. 
@@ -58,8 +61,8 @@
            05  filler           pic x. 
            05  filler           pic x.
         
-
-       01  ws-func-key                          pic 9(4).
+      * not used
+       01  ws-func-key                           pic 9(4).
            88  func-f1                           value 1001.
            88  func-f2                           value 1002.
            88  func-f9                           value 1009.
@@ -72,6 +75,10 @@
        01  eof-sw                               pic a value 'N'.
            88  eof                              value 'Y'.
            88  not-eof                          value 'N'.     
+
+       01  exit-sw                              pic a value 'N'.
+           88  exit-true                        value 'Y'.
+           88  exit-false                       value 'N'.
 
       * String to display on menu screen.
        01  ws-display-text                     occurs 17 times. 
@@ -114,40 +121,42 @@
       *   first item in the menu will be accepted first. 
            move 0 to cursor-line, cursor-col   
 
-           perform until key1 = "1"
+           perform until exit-true
                                   
                move 0 to ws-selected-id
+               move space to key2
                move space to key1
                move spaces to ws-selected-feed-file-name
                    
                accept rss-list-screen
-               display "key1=" key1
+               display crt-status
         
-               if key1 equal 0 then
+               evaluate true 
+               
+                   when key1 = "0" 
+                      compute ws-selected-id = cursor-line - 2
+                       if ws-selected-id <= ws-last-id-record then
 
-                   compute ws-selected-id = cursor-line - 2
-                   if ws-selected-id <= ws-last-id-record then
+                           perform set-selected-feed-file-name
 
-                       perform set-selected-feed-file-name
+                           call "rss-reader-view-feed" using by content                  
+                               ws-selected-feed-file-name
+                           end-call
+                       end-if
 
-                       call "rss-reader-view-feed" using by content                  
-                           ws-selected-feed-file-name
-                       end-call
-                   end-if
- 
-               else 
-                   if key1 equal "1" and fkey-10 then
+                   when crt-status = 1010
                        display 
                            "You pressed the F10 key; exiting..." 
                            line 22
                        end-display
-                   end-if
-               end-if
-            
+                       move 'Y' to exit-sw
+                   
+               end-evaluate
+    
            end-perform       
 
       *    TODO : re-enable this when not debugging.
-           display blank-screen    
+      *     display blank-screen    
 
            goback.
 
