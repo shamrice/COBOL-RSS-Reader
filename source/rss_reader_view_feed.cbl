@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-11-18
+      * Last Modified: 2020-12-21
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       * Tectonics: ./build.sh
       ******************************************************************
@@ -33,6 +33,8 @@
            88  eof                                   value 'Y'.
            88  not-eof                               value 'N'.
 
+       77  ws-counter                                pic 99 value zeros.
+
        77  empty-line                                pic x(80) 
                                                      value spaces. 
       
@@ -52,6 +54,7 @@
 
        procedure division using ls-rss-content-file-name.
        main-procedure.
+           perform reset-screen-items
 
            display blank-screen 
 
@@ -90,6 +93,22 @@
                end-perform
            close rss-content-file
 
+           exit paragraph.
+
+
+       reset-screen-items.
+           move 1 to ws-counter
+           perform until ws-counter = ws-max-rss-items
+               move 'N' to ws-item-exists(ws-counter)
+               move spaces to ws-item-title(ws-counter)
+               move spaces to ws-item-link(ws-counter)
+               move spaces to ws-item-guid(ws-counter)
+               move spaces to ws-item-pub-date(ws-counter)
+               move spaces to ws-item-desc(ws-counter)
+
+               add 1 to ws-counter
+           end-perform
+           
            exit paragraph.
 
        end program rss-reader-view-feed.

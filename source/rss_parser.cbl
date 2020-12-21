@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2020-11-17
+      * Last Modified: 2020-12-21
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -54,7 +54,7 @@
 
        77  desc-temp                            pic x(255) value spaces.
 
-       77  raw-buffer                              pic x(:BUFFER-SIZE:).
+       77  raw-buffer                 pic x(:BUFFER-SIZE:) value spaces.
        77  counter                                 pic 99 value 1.
 
        77  search-count                            pic 9 value zero.
@@ -74,12 +74,20 @@
            03  rsf-rest                pic x(100).
 
        linkage section.
-           01 ls-file-name                       pic x(255).
+           01  ls-file-name                       pic x(255).
+           01  ls-feed-url                        pic x(256).
 
-       procedure division using ls-file-name.
+       procedure division using ls-file-name ls-feed-url.
 
        main-procedure.
            display "File name to parse: " ls-file-name
+           display "Source feed url: " ls-feed-url
+
+      * Values persist between follow up calls to subprogram. need clear
+           move 'N' to eof-sw
+           move spaces to raw-buffer
+           move 1 to item-idx
+           perform reset-ws-items         
 
            display "Parsing RSS feed..."
            open input temp-rss-file
@@ -152,8 +160,8 @@
            if search-count > 0 then
                display "Found link: " function trim(raw-buffer)
                if in-items = 'N' then
-                   display "feed link"
-                   move function trim(raw-buffer) to ws-feed-link
+                   display "feed site link"
+                   move function trim(raw-buffer) to ws-feed-site-link
                else
                    display "item link"
                    move function trim(raw-buffer)
@@ -299,7 +307,7 @@
 
            display new-line "RSS Feed Info" new-line "-------------"
            display "Feed Title: " function trim(ws-feed-title)
-           display "Feed Link: " function trim(ws-feed-link)
+           display "Feed Site URL: " function trim(ws-feed-site-link)
            display "Feed Description: " function trim(ws-feed-desc)
            display new-line
 
@@ -342,7 +350,7 @@
       *> make sure file exists... 
            open extend rss-list-file close rss-list-file
 
-           if ws-feed-link = spaces then
+           if ws-feed-site-link = spaces then
                display 
                    "RSS Feed Link in parsed response is empty. Feed "
                    "data cannot be saved. Please check the url and try "
@@ -352,8 +360,8 @@
            end-if
                    
 
-      * set idx search value
-           move function trim(ws-feed-link) to rss-link
+      * set idx search value is RSS feed url
+           move function trim(ls-feed-url) to rss-link
 
            open input rss-list-file
                read rss-list-file into ws-rss-list-record
@@ -391,8 +399,10 @@
            move function trim(ws-feed-title) 
            to ws-rss-title
            
-           move function trim(ws-feed-link)
+           move function trim(ls-feed-url)
            to ws-rss-link
+
+           display "ws-rss-link: " ws-rss-link
 
            display ws-rss-list-record
 
@@ -452,6 +462,21 @@
                end-write
            close rss-last-id-file
 
-           exit paragraph.       
+           exit paragraph. 
+
+       reset-ws-items.
+           move 1 to counter
+           perform until counter = ws-max-rss-items
+               move 'N' to ws-item-exists(counter)
+               move spaces to ws-item-title(counter)
+               move spaces to ws-item-link(counter)
+               move spaces to ws-item-guid(counter)
+               move spaces to ws-item-pub-date(counter)
+               move spaces to ws-item-desc(counter)
+
+               add 1 to counter
+           end-perform
+           
+           exit paragraph.                 
 
        end program rss-parser.

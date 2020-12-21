@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-19
-      * Last Modified: 2020-12-19
+      * Last Modified: 2020-12-21
       * Purpose: Screen definition for rss_reader_view_item program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -22,7 +22,7 @@
                    foreground-color cob-color-black background-color 7.
                    15 line 2 pic x(80) from empty-line.                   
                    15 line 2 column 2 pic x(28) from ws-feed-title.
-                   15 line 2 column 30 pic x(40) from ws-feed-link.
+                   15 line 2 column 30 pic x(40) from ws-feed-site-link.
 
                10  sub-header-line
                    foreground-color cob-color-black background-color 7.

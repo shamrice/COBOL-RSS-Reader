@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-11-16
+      * Last Modified: 2020-11-21
       * Purpose: File description for RSS content files.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -9,7 +9,7 @@
            01  rss-content-record.
                05  feed-id                      pic 9(5) values zeros.
                05  feed-title                   pic x(128) value spaces.
-               05  feed-link                    pic x(256) value spaces.
+               05  feed-site-link               pic x(256) value spaces.
                05  feed-desc                    pic x(256) value spaces.
                05  items                        occurs 30 times.
                    10  item-exists              pic a value 'N'.

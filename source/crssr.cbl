@@ -48,7 +48,7 @@
       *> No where near perfect... but will at least check if user has some url in their input.
            if command-arguments(1:4) = "http" or "HTTP" then
                move 'Y' to is-valid-param
-               call "rss-downloader" using by content command-arguments
+               call "rss-downloader" using by content command-arguments           
            end-if
 
            if command-arguments = spaces then

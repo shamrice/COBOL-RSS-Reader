@@ -31,7 +31,7 @@
 
        working-storage section.
 
-       01 raw-buffer                           pic x(:BUFFER-SIZE:).
+       01 raw-buffer                  pic x(:BUFFER-SIZE:) value spaces.
 
 
       *> a file pointer
@@ -43,7 +43,7 @@
        77 download-cmd                         pic x(:BUFFER-SIZE:).
        77 download-status                      pic 9 value 9.
 
-       77 rss-feed-url                         pic x(2048).
+       77 rss-feed-url                         pic x(256) value spaces.
        77 rss-temp-filename                    pic x(255)
                                                value "./feeds/temp.rss".
 
@@ -53,18 +53,19 @@
       
 
        linkage section.
-           01 ls-feed-url                      pic x(2048).
+           01 ls-feed-url                      pic x(256).
 
        procedure division using ls-feed-url.
 
        main-procedure.
-       
+
+           move spaces to download-cmd
            move spaces to rss-feed-url
            move 9 to download-status
            move spaces to raw-buffer
 
            display
-               new-line "Downloading RSS feed: " ls-feed-url
+               new-line "URL Passed to downloader: " ls-feed-url
                new-line 
            end-display
 
@@ -73,7 +74,10 @@
                move ls-feed-url to rss-feed-url
                perform download-rss-feed               
                if download-status is zero then
-                   call "rss-parser" using by content rss-temp-filename
+                   display "Download complete. Attempting to parse data"
+                   call "rss-parser" 
+                       using by content rss-temp-filename rss-feed-url
+                   end-call
                else 
                    display 
                        "Error downloading RSS feed. Status: "
@@ -83,7 +87,7 @@
            else 
                display "Cannot download RSS Feed. Url is invalid." 
                display new-line
-           end-if
+           end-if           
 
            goback.
 

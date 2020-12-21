@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2020-12-19
+      * Last Modified: 2020-12-21
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -95,8 +95,6 @@
 
        main-procedure.
            display "In RSS reader."
-      *    TODO: Ask user if they would like to update current feeds on
-      *          start. If so, iterate through list, calling rss-parser.         
 
            perform load-highest-rss-record 
            perform set-rss-menu-items  
@@ -133,17 +131,9 @@
                        display "Refreshing RSS feeds..." 
                            line 23 column 30
 
-      *  TODO : need to move wget code to own callable program. 
-      *         Currently cannot refresh feeds from web with code.
-      *         Also needs to iterate through feed urls in files.
-      *         Processing moved to its own paragraph.                                
-                       call "rss-parser" 
-                           using by content rss-temp-filename
-
-                       display "RSS feeds refreshed.   " 
-                           line 23 column 30
-
-                       perform main-procedure                                    
+      * Refresh feed just reloads as feeds are refreshed at load time.                                      
+                       perform set-rss-menu-items  
+       
 
                    when crt-status = COB-SCR-F10
                        display 
@@ -217,18 +207,25 @@
                                "disp=" 
                                ws-display-text(ws-counter) 
                            end-display
+
+
+                           display "Refreshing feed: " ws-rss-link
+                           
+                           call "rss-downloader" using by content 
+                               ws-rss-link 
+                           end-call
                      
                    end-read       
                    display spaces
                    add 1 to ws-counter                                  
    
                end-perform
+
            close rss-list-file      
         
            display "Done setting rss menu items"
 
            exit paragraph.
-
 
 
        set-selected-feed-file-name.
