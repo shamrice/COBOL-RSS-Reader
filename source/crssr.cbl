@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: BUILD_DATE
+      *> Last Updated: 2020-12-21
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -78,10 +78,13 @@
       *> No where near perfect... but will at least check if user has some url in their input.
            if command-arguments(1:4) = "http" or "HTTP" then
                move 'Y' to is-valid-param
-               perform download-rss-feed
-               if download-status is zero then
-                   call "rss-parser" using by content rss-temp-filename
-               end-if
+               
+               call "rss-downloader" using by content command-arguments
+
+      *         perform download-rss-feed
+      *         if download-status is zero then
+      *             call "rss-parser" using by content rss-temp-filename
+      *         end-if
            end-if
 
            if command-arguments = spaces then
@@ -97,39 +100,39 @@
            stop run.
 
 
-       download-rss-feed.
+      * download-rss-feed.
 
-           move command-arguments to rss-feed-url
+      *     move command-arguments to rss-feed-url
 
-           display
-               "Downloading RSS Feed: " function trim(rss-feed-url)
-               new-line
-           end-display.
+      *     display
+      *         "Downloading RSS Feed: " function trim(rss-feed-url)
+      *         new-line
+      *     end-display.
 
       *> Build WGET command...
-           move function concatenate(
-               wget,
-               function trim(rss-temp-filename), SPACE,
-               function trim(rss-feed-url), SPACE)
-           to download-cmd
+      *     move function concatenate(
+      *         wget,
+      *         function trim(rss-temp-filename), SPACE,
+      *         function trim(rss-feed-url), SPACE)
+      *     to download-cmd
 
-           display function trim(download-cmd)
+      *     display function trim(download-cmd)
 
 
       *> open pipe and execute download cmd.
-           move pipe-open(download-cmd, "r") to pipe-record
+      *     move pipe-open(download-cmd, "r") to pipe-record
 
-           if pipe-return not equal 255 then
-               move pipe-close(pipe-record) to download-status
-               if download-status is zero then
-                   display "Download success. Status=" download-status
-               else
-                   display
-                   new-line
-                   "Error downloading RSS feed. Status=" download-status
-                   end-display
-               end-if
-           end-if.
+      *     if pipe-return not equal 255 then
+      *         move pipe-close(pipe-record) to download-status
+      *         if download-status is zero then
+      *             display "Download success. Status=" download-status
+      *         else
+      *             display
+      *             new-line
+      *             "Error downloading RSS feed. Status=" download-status
+      *             end-display
+      *         end-if
+      *     end-if.
 
 
        print-help.
@@ -142,7 +145,5 @@
                "Run application with no arguments to start application "
                "in interactive mode." new-line
            end-display.
-
-
 
        end program cobol-rss-reader.
