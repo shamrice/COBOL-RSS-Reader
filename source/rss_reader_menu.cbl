@@ -133,8 +133,8 @@
 
       * Refresh feed just reloads as feeds are refreshed at load time.                                      
                        perform set-rss-menu-items  
+                       display blank-screen
        
-
                    when crt-status = COB-SCR-F10
                        display 
                            "Exiting...                 " 
