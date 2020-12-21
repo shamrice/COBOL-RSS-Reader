@@ -96,6 +96,9 @@
        main-procedure.
            display "In RSS reader."
 
+      *    TODO : should have some sort of refreshing notification at
+      *           start up.                  
+
            perform load-highest-rss-record 
            perform set-rss-menu-items  
   
@@ -208,7 +211,7 @@
                                ws-display-text(ws-counter) 
                            end-display
 
-
+      *    TODO : Only refresh if flag set to true.
                            display "Refreshing feed: " ws-rss-link
                            
                            call "rss-downloader" using by content 
