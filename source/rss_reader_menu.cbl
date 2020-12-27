@@ -76,6 +76,7 @@
 
        77  ws-counter                           pic 9(5) value 1.
 
+       77  ws-loading-msg                       pic x(70) value spaces.
        77  empty-line                           pic x(80) value spaces. 
 
        78  new-line                             value x"0a".
@@ -89,7 +90,7 @@
 
        copy "./screens/rss_list_screen.cpy".
        copy "./screens/blank_screen.cpy".
-
+       copy "./screens/loading_screen.cpy".
 
        procedure division.
 
@@ -99,14 +100,18 @@
       *    TODO : should have some sort of refreshing notification at
       *           start up.                  
 
+           move "Loading and refreshing RSS feeds..." to ws-loading-msg
+
+           display loading-screen
            perform load-highest-rss-record 
            perform set-rss-menu-items  
+           display blank-screen
   
            display "done loading rss menu items." 
        
       *   The cursor position is not within an item on the screen, so the 
       *   first item in the menu will be accepted first. 
-           move 0 to cursor-line, cursor-col   
+           move 0 to cursor-line, cursor-col              
 
            perform until exit-true
                                   
