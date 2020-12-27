@@ -48,7 +48,7 @@
                                                value "./feeds/temp.rss".
 
        78 new-line                             value x"0a".
-       78 wget                                 value "wget -O ".
+       78 wget                                 value "wget -q -O ".
 
       
 

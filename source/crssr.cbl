@@ -1,6 +1,6 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
-      *> Create Date: 2020-11-05
+      *> Create Date: 202__APP_VERSION-05
       *> Last Updated: 2020-12-27
       *> Purpose: Application entry point
       *> Tectonics:
@@ -49,11 +49,17 @@
       *> No where near perfect... but will at least check if user has some url in their input.
            if command-arguments(1:4) = "http" or "HTTP" then
                move 'Y' to is-valid-param
-               call "rss-downloader" using by content command-arguments        
+               display 
+                   "Downloading and parsing RSS feed: " 
+                   function trim(command-arguments)
+               end-display
+               call "rss-downloader" using by content command-arguments 
+               display "Downloading and parsing complete."       
            end-if
 
            if command-arguments = spaces then
                move 'Y' to is-valid-param
+               display "Launching application in interactive mode..."
                call "rss-reader-menu"
            end-if
 
@@ -61,6 +67,7 @@
                perform print-help
            end-if
      
+           display "End program."
            stop run.
 
        print-help.

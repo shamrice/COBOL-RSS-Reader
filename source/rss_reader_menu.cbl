@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2020-12-21
+      * Last Modified: 2020-12-27
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -95,7 +95,7 @@
        procedure division.
 
        main-procedure.
-           display "In RSS reader."
+           call "logger" using "In RSS reader."
 
       *    TODO : should have some sort of refreshing notification at
       *           start up.                  
@@ -107,7 +107,7 @@
            perform set-rss-menu-items  
            display blank-screen
   
-           display "done loading rss menu items." 
+           call "logger" using "done loading rss menu items." 
        
       *   The cursor position is not within an item on the screen, so the 
       *   first item in the menu will be accepted first. 
@@ -192,7 +192,9 @@
                perform until ws-counter > ws-last-id-record 
                              or ws-counter > 17
                                                                  
-                   display "Checking RSS Feed ID: " ws-counter                       
+                   call "logger" using function concatenate(
+                       "Checking RSS Feed ID: ", ws-counter)
+                   end-call                      
                    move ws-counter to rss-feed-id
                    read rss-list-file into ws-rss-list-record
                        key is rss-feed-id
@@ -202,8 +204,12 @@
 
                        not invalid key 
                            
-                           display "FOUND: " ws-rss-list-record
-                           display "title=" ws-rss-title                           
+                           call "logger" using function concatenate( 
+                               "FOUND: ", ws-rss-list-record)
+                           end-call
+                           call "logger" using function concatenate(
+                               "title=", ws-rss-title)
+                           end-call                           
                        
                            move ws-rss-title
                            to ws-display-list-title(ws-counter)                           
@@ -211,34 +217,38 @@
                            move ws-rss-link
                            to ws-display-list-url(ws-counter)                           
 
-                           display 
-                               "disp=" 
-                               ws-display-text(ws-counter) 
-                           end-display
+                           call "logger" using function concatenate( 
+                               "disp=",
+                               ws-display-text(ws-counter))
+                           end-call
 
       *    TODO : Only refresh if flag set to true.
-                           display "Refreshing feed: " ws-rss-link
+                           call "logger" using function concatenate(
+                               "Refreshing feed: ", ws-rss-link)
+                           end-call
                            
                            call "rss-downloader" using by content 
                                ws-rss-link 
                            end-call
                      
                    end-read       
-                   display spaces
+                  
                    add 1 to ws-counter                                  
    
                end-perform
 
            close rss-list-file      
         
-           display "Done setting rss menu items"
+           call "logger" using "Done setting rss menu items"
 
            exit paragraph.
 
 
        set-selected-feed-file-name.
            open input rss-list-file
-               display "Getting file name for Feed ID: " ws-counter                       
+               call "logger" using function concatenate( 
+                   "Getting file name for Feed ID: ", ws-counter)
+               end-call                      
                
                move ws-selected-id to rss-feed-id
                read rss-list-file into ws-rss-list-record
@@ -249,7 +259,9 @@
 
                    not invalid key 
                            
-                       display "FOUND: " ws-rss-dat-file-name                           
+                       call "logger" using function concatenate(
+                           "FOUND: ", ws-rss-dat-file-name)
+                       end-call                           
                    
                        move ws-rss-dat-file-name
                        to ws-selected-feed-file-name                             
@@ -263,7 +275,7 @@
 
        display-current-feeds.
 
-           display "Current Feeds: "   
+           call "logger" using "Current Feeds: "   
       * make sure file exists... 
            open extend rss-list-file close rss-list-file
 
@@ -272,20 +284,31 @@
            open input rss-list-file
                
                perform until ws-counter > ws-last-id-record   
-                   display "Checking RSS Feed ID: " ws-counter                       
+                   call "logger" using function concatenate(
+                       "Checking RSS Feed ID: ", ws-counter)
+                   end-call                  
                    move ws-counter to rss-feed-id
                    read rss-list-file into ws-rss-list-record
                        key is rss-feed-id
                        invalid key 
-                           display "RSS Feed ID Not Found: " ws-counter
+                           call "logger" using function concatenate(
+                               "RSS Feed ID Not Found: ", ws-counter)
+                           end-call
                        not invalid key 
-                           display "RSS Feed ID: " ws-rss-feed-id
-                           display " Feed Title: " ws-rss-title
-                           display "  Data file: " ws-rss-dat-file-name
-                           display "   Feed URL: " ws-rss-link
-
+                           call "logger" using function concatenate(
+                               "RSS Feed ID: ", ws-rss-feed-id)
+                           end-call
+                           call "logger" using function concatenate(
+                               " Feed Title: ", ws-rss-title)
+                           end-call
+                           call "logger" using function concatenate(
+                               "  Data file: ", ws-rss-dat-file-name)
+                           end-call
+                           call "logger" using function concatenate(
+                               "   Feed URL: ", ws-rss-link)
+                           end-call
                    end-read       
-                   display spaces
+                
                    add 1 to ws-counter                   
                end-perform
            close rss-list-file

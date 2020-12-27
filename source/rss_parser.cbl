@@ -98,7 +98,7 @@
                    read temp-rss-file into raw-buffer
                        at end move 'Y' to eof-sw
                    not at end
-                       display function trim(raw-buffer)
+                       call "logger" using function trim(raw-buffer)
 
                        perform parse-buffer-line
 
@@ -477,7 +477,7 @@
                    read rss-last-id-file into ws-last-id-record
                        at end move 'Y' to eof-sw
                    not at end
-                       display ws-last-id-record
+                       call "logger" using ws-last-id-record
                        if ws-last-id-record is numeric then 
                            move ws-last-id-record to next-rss-id
                        end-if 

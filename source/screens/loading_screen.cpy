@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-21
-      * Last Modified: 2020-12-21
+      * Last Modified: 2020-12-27
       * Purpose: Screen definition for showing loading messaging.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -29,4 +29,4 @@
  
                10  spacer-line
                    foreground-color cob-color-black background-color 7.
-                   15  line 11 pic x(80) from empty-line.                   
+                   15  line 13 pic x(80) from empty-line.                   
