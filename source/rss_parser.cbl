@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2020-12-21
+      * Last Modified: 2020-12-27
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -80,8 +80,11 @@
        procedure division using ls-file-name ls-feed-url.
 
        main-procedure.
-           display "File name to parse: " ls-file-name
-           display "Source feed url: " ls-feed-url
+
+           call "logger" using function concatenate(
+               "File name to parse: ", function trim(ls-file-name),
+               " Source feed url: ", function trim(ls-feed-url))
+           end-call
 
       * Values persist between follow up calls to subprogram. need clear
            move 'N' to eof-sw
@@ -89,7 +92,7 @@
            move 1 to item-idx
            perform reset-ws-items         
 
-           display "Parsing RSS feed..."
+           call "logger" using "Parsing RSS feed..."
            open input temp-rss-file
                perform until eof
                    read temp-rss-file into raw-buffer
@@ -121,7 +124,9 @@
            inspect raw-buffer tallying search-count for all "</item>"
 
            if search-count > 0 then
-               display "Found item end: " function trim(raw-buffer)
+               call "logger" using function concatenate(
+                   "Found item end: ", function trim(raw-buffer))
+               end-call
                move 'N' to in-items
                add 1 to item-idx
            end-if
@@ -132,7 +137,9 @@
            inspect raw-buffer tallying search-count for all "<item>"
 
            if search-count > 0 then
-               display "Found item start: " function trim(raw-buffer)
+               call "logger" using function concatenate(
+                   "Found item start: ", function trim(raw-buffer))
+               end-call
                move 'Y' to in-items
                move 'Y' to ws-item-exists(item-idx)
            end-if
@@ -142,12 +149,14 @@
            inspect raw-buffer tallying search-count for all "<title>"
 
            if search-count > 0 then
-               display "Found title: " function trim(raw-buffer)
+               call "logger" using function concatenate(
+                   "Found title: ", function trim(raw-buffer))
+               end-call
                if in-items = 'N' then
-                   display "feed title"
+                   call "logger" using "feed title"
                    move function trim(raw-buffer) to ws-feed-title
                else
-                   display "item title"
+                   call "logger" using "item title"
                    move function trim(raw-buffer)
                    to ws-item-title(item-idx)
                end-if
@@ -158,12 +167,14 @@
            inspect raw-buffer tallying search-count for all "<link>"
 
            if search-count > 0 then
-               display "Found link: " function trim(raw-buffer)
+               call "logger" using function concatenate(
+                   "Found link: ", function trim(raw-buffer))
+               end-call
                if in-items = 'N' then
-                   display "feed site link"
+                   call "logger" using "feed site link"
                    move function trim(raw-buffer) to ws-feed-site-link
                else
-                   display "item link"
+                   call "logger" using "item link"
                    move function trim(raw-buffer)
                    to ws-item-link(item-idx)
                end-if
@@ -174,7 +185,9 @@
            inspect raw-buffer tallying search-count for all "<pubDate>"
 
            if search-count > 0 then
-               display "Found pub date: " function trim(raw-buffer)
+               call "logger" using function concatenate(
+                   "Found pub date: ", function trim(raw-buffer))
+               end-call
                if in-items = 'Y' then
                    move function trim(raw-buffer)
                    to ws-item-pub-date(item-idx)
@@ -191,8 +204,10 @@
 
            if search-count > 0 then
                if in-items = 'Y' then
-                   display "Found guid: " function trim(raw-buffer)
-                   display "item guid"
+                   call "logger" using function concatenate(
+                       "Found guid: " function trim(raw-buffer))
+                   end-call 
+                   
                    move function trim(raw-buffer)
                    to ws-item-guid(item-idx)
                end-if
@@ -206,16 +221,16 @@
                for all "<description>" "</description>"
 
            if search-count = 2 then
-               display
-                   "Found single line desc: "
-                   function trim(raw-buffer)
-               end-display
+               call "logger" using function concatenate(
+                   "Found single line desc: ",
+                   function trim(raw-buffer))
+               end-call
                move 'Y' to is-desc-single-line
                if in-items = 'N' then
-                   display "feed desc single"
+                   call "logger" using "feed desc single"
                    move function trim(raw-buffer) to ws-feed-desc
                else
-                   display "item desc single"
+                   call "logger" using "item desc single"
                    move function trim(raw-buffer)
                    to ws-item-desc(item-idx)
                end-if
@@ -229,21 +244,23 @@
                tallying search-count for all "<description>"
 
                if search-count > 0 then
-                   display "start of multiline description"
+                   call "logger" using "start of multiline description"
                    move 'Y' to in-description
                    move spaces to desc-temp
                end-if
 
                if in-description = 'Y' then
-                   display "Found desc: " function trim(raw-buffer)
+                   call "logger" using function concatenate(
+                       "Found desc: " function trim(raw-buffer))
+                   end-call 
                    if in-items = 'N' then
-                       display "feed description"
+                       call "logger" using "feed description"
                        move function concatenate(
                            function trim(ws-feed-desc),
                            function trim(raw-buffer))
                        to ws-feed-desc
                    else
-                       display "item desc"
+                       call "logger" using "item desc"
                        move function concatenate(
                            function trim(ws-item-desc(item-idx)),
                            function trim(raw-buffer))
@@ -257,7 +274,7 @@
                tallying search-count for all "</description>"
 
                if search-count > 0 then
-                   display "end multi line description"
+                   call "logger" using "end multi line description"
                    move 'N' to in-description
                end-if
 
@@ -268,7 +285,9 @@
 
 
        remove-tags-in-record.
-           display new-line "Removing rss/xml tags from parsed record.."
+           call "logger" using 
+               "Removing rss/xml tags from parsed record..."
+           end-call
 
            inspect ws-rss-record replacing all 
                 "<title>" by spaces
@@ -305,37 +324,41 @@
 
        print-parsed-record.
 
-           display new-line "RSS Feed Info" new-line "-------------"
-           display "Feed Title: " function trim(ws-feed-title)
-           display "Feed Site URL: " function trim(ws-feed-site-link)
-           display "Feed Description: " function trim(ws-feed-desc)
-           display new-line
-
-           display "Items:" new-line "------"
+           call "logger" using "RSS Feed Info:"
+           call "logger" using function concatenate( 
+               "Feed Title: ", function trim(ws-feed-title))
+           end-call
+           call "logger" using function concatenate(
+               "Feed Site URL: ", function trim(ws-feed-site-link))
+           end-call
+           call "logger" using function concatenate(
+               "Feed Description: ", function trim(ws-feed-desc))
+           end-call
+           
+           call "logger" using "Feed Items:"
            move 1 to counter
            perform until counter > ws-max-rss-items
                if ws-item-exists(counter) = 'Y' then
-                   display
-                       "Item title: "
-                       function trim(ws-item-title(counter))
-                   end-display
-                   display
-                       "Item link: "
-                       function trim(ws-item-link(counter))
-                   end-display
-                   display
-                       "Item guid: "
-                       function trim(ws-item-guid(counter))
-                   end-display
-                   display
-                       "Item date: "
-                       function trim(ws-item-pub-date(counter))
-                   end-display
-                   display
-                       "Item desc: "
-                       function trim(ws-item-desc(counter))
-                   end-display
-                   display new-line
+                   call "logger" using function concatenate(
+                       "Item title: ",
+                       function trim(ws-item-title(counter)))
+                   end-call
+                   call "logger" using function concatenate(
+                       "Item link: ",
+                       function trim(ws-item-link(counter)))
+                   end-call
+                   call "logger" using function concatenate(
+                       "Item guid: ",
+                       function trim(ws-item-guid(counter)))
+                   end-call
+                   call "logger" using function concatenate(
+                       "Item date: ",
+                       function trim(ws-item-pub-date(counter)))
+                   end-call
+                   call "logger" using function concatenate(
+                       "Item desc: ",
+                       function trim(ws-item-desc(counter)))
+                   end-call
                end-if
                add 1 to counter
            end-perform
@@ -345,17 +368,19 @@
 
        save-parsed-record.
 
-           display "Checking if entry exists in RSS list data."
-           
+           call "logger" using 
+               "Checking if entry exists in RSS list data."
+           end-call
+
       *> make sure file exists... 
            open extend rss-list-file close rss-list-file
 
            if ws-feed-site-link = spaces then
-               display 
-                   "RSS Feed Link in parsed response is empty. Feed "
-                   "data cannot be saved. Please check the url and try "
-                   "again."
-               end-display
+               call "logger" using function concatenate( 
+                   "RSS Feed Link in parsed response is empty. Feed ",
+                   "data cannot be saved. Please check the url and try",
+                   " again.")
+               end-call
                exit paragraph
            end-if
                    
@@ -367,9 +392,13 @@
                read rss-list-file into ws-rss-list-record
                    key is rss-link
                    invalid key 
-                       display "RSS Feed URL Not Found: " rss-link
+                       call "logger" using function concatenate(
+                           "RSS Feed URL Not Found: ", rss-link)
+                       end-call
                    not invalid key 
-                       display "Found:" ws-rss-list-record
+                       call "logger" using function concatenate(
+                           "Found:", ws-rss-list-record)
+                       end-call
                        move 'Y' to id-found
                end-read       
            close rss-list-file
@@ -378,12 +407,14 @@
                perform set-new-feed-id
                move next-rss-id to ws-feed-id
            else 
-               display "Using existing id: " ws-rss-feed-id
+               call "logger" using function concatenate(
+                   "Using existing id: ", ws-rss-feed-id)
+               end-call
                move ws-rss-feed-id to ws-feed-id
            end-if
 
 
-           display "Updating/Adding record to RSS list data."
+           call "logger" using "Updating/Adding record to RSS list data"
            
            
            move ws-feed-id to ws-rss-feed-id
@@ -402,21 +433,27 @@
            move function trim(ls-feed-url)
            to ws-rss-link
 
-           display "ws-rss-link: " ws-rss-link
+           call "logger" using function concatenate(
+               "ws-rss-link: ", ws-rss-link)
+           end-call
 
-           display ws-rss-list-record
+           call "logger" using ws-rss-list-record
 
            open i-o rss-list-file
                write rss-list-record from ws-rss-list-record
                    invalid key 
-                       display "RSS Feed already exists in list."
+                       call "logger" using 
+                           "RSS Feed already exists in list."
+                       end-call 
                    not invalid key 
-                       display "Saved new RSS Feed to idx file"
+                       call "logger" using 
+                           "Saved new RSS Feed to idx file"
+                       end-call 
                end-write
            close rss-list-file
 
 
-           display "Saving parsed RSS data to disk...".
+           call "logger" using "Saving parsed RSS data to disk...".
 
            open output rss-content-file    
                write rss-content-record from ws-rss-record
@@ -428,7 +465,7 @@
 
        set-new-feed-id.
            
-           display "Getting last id saved."
+           call "logger" using "Getting last id saved."
 
              *> make sure file exists... 
            open extend rss-last-id-file close rss-last-id-file
@@ -449,13 +486,18 @@
                end-perform
            close rss-last-id-file
 
-           display "last RSS ID found: " next-rss-id
+           call "logger" using function concatenate(
+               "last RSS ID found: ", next-rss-id)
+           end-call 
            add 1 to next-rss-id
-           display "Next new RSS ID: " next-rss-id
+           call "logger" using function concatenate(
+               "Next new RSS ID: ", next-rss-id)
+           end-call
 
-           display 
-               "Saving new RSS ID " next-rss-id " to last id data file."
-           end-display
+           call "logger" using function concatenate( 
+               "Saving new RSS ID ", next-rss-id, 
+               " to last id data file.")
+           end-call
 
            open output rss-last-id-file
                write rss-last-id-record from next-rss-id
