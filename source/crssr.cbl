@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2020-12-21
+      *> Last Updated: 2020-12-27
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -13,6 +13,9 @@
        environment division.
 
        configuration section.
+
+       repository.
+           function logger.
 
        data division.
 
@@ -28,8 +31,6 @@
        78 web-url  value __SOURCE_URL.
        78 build-date                           value __BUILD_DATE.
 
-       78 wget                                 value "wget -O ".
-
 
        procedure division.
 
@@ -44,11 +45,11 @@
            end-display
 
            accept command-arguments from command-line end-accept
-
+          
       *> No where near perfect... but will at least check if user has some url in their input.
            if command-arguments(1:4) = "http" or "HTTP" then
                move 'Y' to is-valid-param
-               call "rss-downloader" using by content command-arguments           
+               call "rss-downloader" using by content command-arguments        
            end-if
 
            if command-arguments = spaces then
