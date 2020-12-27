@@ -10,7 +10,7 @@
 
 echo Building COBOL RSS Reader...
 
-APP_VERSION=0.10
+APP_VERSION=0.11
 SOURCE_URL=\"https\\:\\/\\/github.com\\/shamrice\\/COBOL-RSS-Reader\"
 CUR_BUILD_DATE=\"$(date +%Y-%m-%d)\"
 
