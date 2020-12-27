@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Last updated: 2020-12-19
+# Last updated: 2020-12-27
 #
 # Builds sets placeholder values in source code based on variables at start of script 
 # and compiles the application. Once compilation step is completed, placeholders are 
@@ -10,7 +10,7 @@
 
 echo Building COBOL RSS Reader...
 
-APP_VERSION=0.11
+APP_VERSION=\"v0.12\"
 SOURCE_URL=\"https\\:\\/\\/github.com\\/shamrice\\/COBOL-RSS-Reader\"
 CUR_BUILD_DATE=\"$(date +%Y-%m-%d)\"
 

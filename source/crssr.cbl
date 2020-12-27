@@ -1,6 +1,6 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
-      *> Create Date: 202__APP_VERSION-05
+      *> Create Date: 2020-11-05
       *> Last Updated: 2020-12-27
       *> Purpose: Application entry point
       *> Tectonics:
@@ -37,7 +37,7 @@
        main-procedure.
 
            display
-               new-line "COBOL RSS Reader v" program-version new-line
+               new-line "COBOL RSS Reader " program-version new-line
                "-----------------------------------------------" 
                new-line "By: Erik Eriksen"
                new-line "Web: " web-url

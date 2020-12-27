@@ -97,12 +97,9 @@
        main-procedure.
            call "logger" using "In RSS reader."
 
-      *    TODO : should have some sort of refreshing notification at
-      *           start up.                  
-
            move "Loading and refreshing RSS feeds..." to ws-loading-msg
-
            display loading-screen
+
            perform load-highest-rss-record 
            perform set-rss-menu-items  
            display blank-screen
@@ -139,6 +136,10 @@
                        display "Refreshing RSS feeds..." 
                            line 23 column 30
 
+                       move "Loading and refreshing RSS feeds..." 
+                           to ws-loading-msg
+                       display loading-screen
+
       * Refresh feed just reloads as feeds are refreshed at load time.                                      
                        perform set-rss-menu-items  
                        display blank-screen
@@ -154,9 +155,7 @@
     
            end-perform       
 
-      *    TODO : re-enable this when not debugging.
-      *     display blank-screen    
-
+           display blank-screen    
            goback.
 
 
