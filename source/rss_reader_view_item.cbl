@@ -54,6 +54,8 @@
        procedure division using ls-rss-content-file-name.
        main-procedure.
 
+      * TODO : Add actual implementation here. Below is a placeholder.
+
            display blank-screen 
 
            display "viewing: " function trim(ls-rss-content-file-name)
