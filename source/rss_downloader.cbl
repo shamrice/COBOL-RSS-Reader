@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-12-21
-      *> Last Updated: 2020-12-21
+      *> Last Updated: 2020-12-27
       *> Purpose: Downloads given RSS feed url and calls rss_parser
       *> Tectonics:
       *>     ./build.sh
@@ -63,41 +63,45 @@
            move spaces to rss-feed-url
            move 9 to download-status
            move spaces to raw-buffer
-
-           display
-               new-line "URL Passed to downloader: " ls-feed-url
-               new-line 
-           end-display
+           
+           call "logger" using 
+               function concatenate("URL passed to downloader: ", 
+               ls-feed-url)
+           end-call
 
       *> No where near perfect... but will at least somewhat check if url.
            if ls-feed-url(1:4) = "http" or "HTTP" then               
                move ls-feed-url to rss-feed-url
                perform download-rss-feed               
                if download-status is zero then
-                   display "Download complete. Attempting to parse data"
+                   call "logger" using 
+                       "Download complete. Attempting to parse data"
+                   end-call
                    call "rss-parser" 
                        using by content rss-temp-filename rss-feed-url
                    end-call
                else 
-                   display 
-                       "Error downloading RSS feed. Status: "
-                       download-status new-line
-                   end-display
+
+                   call "logger" using function concatenate(
+                       "Error downloading RSS feed. Status: ",
+                       download-status new-line)
+                   end-call
                end-if
            else 
-               display "Cannot download RSS Feed. Url is invalid." 
-               display new-line
+               call "logger" 
+                   using "Cannot download RSS Feed. Url is invalid." 
+               end-call
            end-if           
 
            goback.
 
 
        download-rss-feed.
-
-           display
-               "Downloading RSS Feed: " function trim(rss-feed-url)
-               new-line
-           end-display.
+           
+           call "logger" using 
+               function concatenate(
+               "Downloading RSS Feed: ", function trim(rss-feed-url))
+           end-call.
 
       *> Build WGET command...
            move function concatenate(
@@ -106,7 +110,7 @@
                function trim(rss-feed-url), SPACE)
            to download-cmd
 
-           display function trim(download-cmd)
+           call "logger" using function trim(download-cmd)
 
 
       *> open pipe and execute download cmd.
@@ -115,12 +119,15 @@
            if pipe-return not equal 255 then
                move pipe-close(pipe-record) to download-status
                if download-status is zero then
-                   display "Download success. Status=" download-status
+
+                   call "logger" using function concatenate(
+                       "Download success. Status=", download-status)
+                   end-call
                else
-                   display
-                   new-line
-                   "Error downloading RSS feed. Status=" download-status
-                   end-display
+                   call "logger" using function concatenate(
+                       "Error downloading RSS feed. Status=", 
+                       download-status)
+                   end-call
                end-if
            end-if.
 
