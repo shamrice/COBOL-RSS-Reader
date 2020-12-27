@@ -11,6 +11,9 @@
        environment division.
        
        configuration section.
+       special-names.
+           cursor is cursor-position        
+           crt status is crt-status.
 
        input-output section.
            file-control.               
@@ -18,26 +21,40 @@
 
        data division.
        file section.
-
            copy "./copybooks/filedescriptor/fd_rss_content_file.cpy".
           
-
        working-storage section.
 
        copy "screenio.cpy".
        copy "./copybooks/wsrecord/ws-rss-record.cpy".
-       
-       01  accept-item1                              pic x value space.
+            
+       01  cursor-position. 
+           05  cursor-line    pic 99. 
+           05  cursor-col     pic 99. 
+        
+       01  crt-status. 
+           05  key1             pic x. 
+           05  key2             pic x. 
+           05  filler           pic x. 
+           05  filler           pic x.
+
+
+       01  ws-accept-item                            pic x value space.
 
        01  eof-sw                                    pic a value 'N'.
            88  eof                                   value 'Y'.
            88  not-eof                               value 'N'.
 
+       01  exit-sw                                   pic a value 'N'.
+           88  exit-true                             value 'Y'.
+           88  exit-false                            value 'N'.
+
        77  ws-counter                                pic 99 value zeros.
 
        77  empty-line                                pic x(80) 
                                                      value spaces. 
-      
+       77  ws-selected-id                       pic 9(5) value zeros.
+
       * Value set based on file name passed in linkage section.
        77  ws-rss-content-file-name                  pic x(255) 
                                                      value spaces.
@@ -65,8 +82,7 @@
            if not ls-rss-content-file-name = spaces then 
                move ls-rss-content-file-name to ws-rss-content-file-name
                perform view-feed-data
-
-               accept rss-info-screen
+               perform handle-user-input
            else 
                call "logger" using 
                    "ERROR: No feed file passed to feed viewer."
@@ -78,13 +94,55 @@
 
            move spaces to ws-rss-content-file-name
            move spaces to ls-rss-content-file-name
-           move  'N' to eof-sw
+           move 'N' to eof-sw
+           move 'N' to exit-sw
+           move 2 to cursor-line 
 
            display blank-screen 
 
            goback.
+  
+       handle-user-input.
 
+           perform until exit-true
 
+               accept rss-info-screen
+
+               evaluate true 
+              
+      * TODO : move key handling to their own paragraph. 
+      *        also actually call view item sub program for id.         
+                   when key1 = COB-SCR-OK
+                      compute ws-selected-id = cursor-line - 3
+                       if ws-selected-id <= ws-max-rss-items then
+                           if ws-item-exists(ws-selected-id) = 'Y' then
+
+                               call "logger" using function concatenate(
+                                   "Selected item ID to view is: ", 
+                                   ws-selected-id)
+                               end-call
+
+                               call "logger" using function concatenate(
+                                   "Item: ", ws-items(ws-selected-id))
+                               end-call
+                            else 
+                               call "logger" using function concatenate(
+                                   "selected item does not exist:",
+                                   ws-selected-id)
+                               end-call 
+                            end-if
+                       end-if
+
+              
+                   when crt-status = COB-SCR-F10
+                       move 'Y' to exit-sw
+                       
+               end-evaluate
+           end-perform
+
+           exit paragraph.
+
+      * TODO : possibly rename this to load feed data.
        view-feed-data.
            open input rss-content-file
                perform until eof

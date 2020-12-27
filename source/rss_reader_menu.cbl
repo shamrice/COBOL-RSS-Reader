@@ -117,7 +117,7 @@
                move spaces to ws-selected-feed-file-name
                    
                accept rss-list-screen
-               display crt-status
+      *         display crt-status
         
                evaluate true 
                

@@ -28,7 +28,7 @@
        copy "screenio.cpy".
        copy "./copybooks/wsrecord/ws-rss-record.cpy".
        
-       01  accept-item1                              pic x value space.
+       01  ws-accept-item                            pic x value space.
 
        01  eof-sw                                    pic a value 'N'.
            88  eof                                   value 'Y'.
