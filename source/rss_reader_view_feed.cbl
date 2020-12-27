@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-12-21
+      * Last Modified: 2020-12-27
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       * Tectonics: ./build.sh
       ******************************************************************
@@ -58,7 +58,9 @@
 
            display blank-screen 
 
-           display "viewing: " function trim(ls-rss-content-file-name)
+           call "logger" using function concatenate(
+               "viewing: ", function trim(ls-rss-content-file-name))
+           end-call
 
            if not ls-rss-content-file-name = spaces then 
                move ls-rss-content-file-name to ws-rss-content-file-name
@@ -66,7 +68,9 @@
 
                accept rss-info-screen
            else 
-               display "ERROR: No feed file passed to feed viewer."
+               call "logger" using 
+                   "ERROR: No feed file passed to feed viewer."
+               end-call
                move spaces to ws-rss-record
                move "File name passed was empty" to ws-feed-title
                accept rss-info-screen
@@ -87,8 +91,10 @@
                    read rss-content-file into ws-rss-record
                        at end move 'Y' to eof-sw
                    not at end
-                       display function trim(ws-feed-title)
-                       display function trim(item-title(1))
+                       call "logger" using function concatenate(
+                           "Viewing feed data items for feed: ",
+                           function trim(ws-feed-title))
+                       end-call
                    end-read
                end-perform
            close rss-content-file
