@@ -3,4 +3,6 @@ source/feeds/*.rss
 source/feeds/*.dat
 source/feeds/*.dat.*
 source/crssr
+source/*.log
+
 
