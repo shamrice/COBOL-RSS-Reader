@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2020-12-27
+      * Last Modified: 2020-12-28
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -68,6 +68,10 @@
            05  ws-display-list-title           pic x(20) value spaces.
            05  ws-display-list-url             pic x(50) value spaces.
 
+       01  refresh-items-sw                    pic a value 'Y'.
+           88  is-refresh-items                value 'Y'.
+           88  not-refresh-items               value 'N'.
+
        77 rss-temp-filename                    pic x(255)
                                                value "./feeds/temp.rss".
 
@@ -85,6 +89,9 @@
        78  ws-rss-list-file-name             value "./feeds/list.dat".
        78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
 
+       linkage section.
+
+       01  ls-refresh-on-start                  pic a.
        
        screen section.
 
@@ -92,12 +99,19 @@
        copy "./screens/blank_screen.cpy".
        copy "./screens/loading_screen.cpy".
 
-       procedure division.
+       procedure division using ls-refresh-on-start.
 
        main-procedure.
            call "logger" using "In RSS reader."
 
-           move "Loading and refreshing RSS feeds..." to ws-loading-msg
+           if ls-refresh-on-start = 'Y' then 
+               move "Loading and refreshing RSS feeds..." 
+                   to ws-loading-msg
+               move 'Y' to refresh-items-sw
+           else 
+               move "Loading RSS feeds..." to ws-loading-msg
+               move 'N' to refresh-items-sw
+           end-if
            display loading-screen
 
            perform load-highest-rss-record 
@@ -117,7 +131,6 @@
                move spaces to ws-selected-feed-file-name
                    
                accept rss-list-screen
-      *         display crt-status
         
                evaluate true 
                
@@ -130,6 +143,7 @@
                            call "rss-reader-view-feed" using by content                  
                                ws-selected-feed-file-name
                            end-call
+                           cancel "rss-reader-view-feed"
                        end-if
 
                    when crt-status = COB-SCR-F5
@@ -140,7 +154,7 @@
                            to ws-loading-msg
                        display loading-screen
 
-      * Refresh feed just reloads as feeds are refreshed at load time.                                      
+                       move 'Y' to refresh-items-sw
                        perform set-rss-menu-items  
                        display blank-screen
        
@@ -220,16 +234,18 @@
                                "disp=",
                                ws-display-text(ws-counter))
                            end-call
-
-      *    TODO : Only refresh if flag set to true.
-                           call "logger" using function concatenate(
-                               "Refreshing feed: ", ws-rss-link)
-                           end-call
                            
-                           call "rss-downloader" using by content 
-                               ws-rss-link 
-                           end-call
-                     
+      *                Only refresh items if switch is set.                     
+                           if is-refresh-items then 
+                               call "logger" using function concatenate(
+                                   "Refreshing feed: ", ws-rss-link)
+                               end-call
+                           
+                               call "rss-downloader" using by content 
+                                   ws-rss-link 
+                               end-call
+                           end-if
+                   
                    end-read       
                   
                    add 1 to ws-counter                                  

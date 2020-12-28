@@ -70,8 +70,9 @@
        copy "./screens/blank_screen.cpy".
 
        procedure division using ls-rss-content-file-name.
+       
        main-procedure.
-           perform reset-screen-items
+      *     perform reset-screen-items
 
            display blank-screen 
 
@@ -92,11 +93,11 @@
                accept rss-info-screen
            end-if
 
-           move spaces to ws-rss-content-file-name
-           move spaces to ls-rss-content-file-name
-           move 'N' to eof-sw
-           move 'N' to exit-sw
-           move 2 to cursor-line 
+      *     move spaces to ws-rss-content-file-name
+      *     move spaces to ls-rss-content-file-name
+      *     move 'N' to eof-sw
+      *     move 'N' to exit-sw
+      *     move 2 to cursor-line 
 
            display blank-screen 
 
