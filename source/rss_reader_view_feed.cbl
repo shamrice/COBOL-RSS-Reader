@@ -133,6 +133,13 @@
                        "Item: ", ws-items(ws-selected-id))
                    end-call
 
+                   call "rss-reader-view-item" using by content 
+                       ws-feed-title,
+                       ws-feed-site-link,
+                       ws-items(ws-selected-id)
+                   end-call
+                   cancel "rss-reader-view-item"
+
                else 
                    call "logger" using function concatenate(
                        "selected item does not exist:",
