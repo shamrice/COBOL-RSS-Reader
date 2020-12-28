@@ -14,37 +14,22 @@
        configuration section.
 
        input-output section.
-      *     file-control.               
-      *         copy "./copybooks/filecontrol/rss_content_file.cpy".
 
        data division.
        file section.
 
-      *     copy "./copybooks/filedescriptor/fd_rss_content_file.cpy".
-          
-
        working-storage section.
 
        copy "screenio.cpy".
-      * copy "./copybooks/wsrecord/ws-rss-record.cpy".
        
        01  ws-accept-item                            pic x value space.
 
-      * 01  eof-sw                                    pic a value 'N'.
-      *     88  eof                                   value 'Y'.
-      *     88  not-eof                               value 'N'.
-
        77  empty-line                                pic x(80) 
                                                      value spaces. 
-      
-      * Value set based on file name passed in linkage section.
-      * 77  ws-rss-content-file-name                  pic x(255) 
-      *                                               value spaces.
-      
+            
        78  new-line                                  value x"0a".
 
        linkage section.
-      *     01  ls-rss-content-file-name              pic x(255).
 
        01  ls-feed-title                             pic x(128).
 
@@ -70,8 +55,6 @@
 
        main-procedure.
 
-      * TODO : Add actual implementation here. Below is a placeholder.
-
            display blank-screen 
 
            call "logger" using function concatenate(
@@ -79,8 +62,8 @@
            end-call 
 
            accept rss-item-screen
-           display blank-screen 
 
+           display blank-screen 
            goback.
 
        end program rss-reader-view-item.
