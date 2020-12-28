@@ -1,19 +1,23 @@
 #!/bin/bash
 
 #
-# Last updated: 2020-12-27
+# Last updated: 2020-12-28
 #
 # Builds sets placeholder values in source code based on variables at start of script 
 # and compiles the application. Once compilation step is completed, placeholders are 
 # set back to original placeholder values.
 #
 
-echo Building COBOL RSS Reader...
-
-APP_VERSION=\"v0.13\"
+APP_VERSION=\"v0.14\"
 SOURCE_URL=\"https\\:\\/\\/github.com\\/shamrice\\/COBOL-RSS-Reader\"
 CUR_BUILD_DATE=\"$(date +%Y-%m-%d)\"
 
+echo 
+echo Building COBOL RSS Reader
+echo --------------------------
+echo Version: $APP_VERSION 
+echo Build Date: $CUR_BUILD_DATE
+echo 
 echo Replacing placeholders in source with values for build process.
 sed -i "s/__APP_VERSION/$APP_VERSION/" crssr.cbl
 sed -i "s/__SOURCE_URL/$SOURCE_URL/" crssr.cbl
@@ -27,4 +31,6 @@ sed -i "s/$APP_VERSION/__APP_VERSION/" crssr.cbl
 sed -i "s/$SOURCE_URL/__SOURCE_URL/" crssr.cbl
 sed -i "s/$CUR_BUILD_DATE/__BUILD_DATE/" crssr.cbl
 
+echo
 echo Done.
+echo
