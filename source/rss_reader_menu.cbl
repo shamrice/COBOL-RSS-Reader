@@ -103,7 +103,8 @@
 
        main-procedure.
            call "logger" using "In RSS reader."
-
+      
+      * Set switch to refresh items based on refresh parameter.
            if ls-refresh-on-start = 'Y' then 
                move "Loading and refreshing RSS feeds..." 
                    to ws-loading-msg
@@ -114,10 +115,9 @@
            end-if
            display loading-screen
 
-           perform load-highest-rss-record 
+      * Load and set RSS feeds into feed menu records 
            perform set-rss-menu-items  
-           display blank-screen
-  
+
            call "logger" using "done loading rss menu items." 
        
       *   The cursor position is not within an item on the screen, so the 
@@ -147,17 +147,14 @@
                        end-if
 
                    when crt-status = COB-SCR-F5
-                       display "Refreshing RSS feeds..." 
-                           line 23 column 30
-
+                       
                        move "Loading and refreshing RSS feeds..." 
                            to ws-loading-msg
                        display loading-screen
 
                        move 'Y' to refresh-items-sw
                        perform set-rss-menu-items  
-                       display blank-screen
-       
+      
                    when crt-status = COB-SCR-F10
                        display 
                            "Exiting...                 " 
@@ -173,7 +170,7 @@
            goback.
 
 
-
+      * Called from set-rss-menu-items paragraph.
        load-highest-rss-record.
                       
            move 'N' to eof-sw
@@ -194,6 +191,8 @@
 
 
        set-rss-menu-items.
+
+           perform load-highest-rss-record
 
       * make sure file exists... 
            open extend rss-list-file close rss-list-file
@@ -286,48 +285,5 @@
            close rss-list-file 
 
            exit paragraph.
-
-
-       display-current-feeds.
-
-           call "logger" using "Current Feeds: "   
-      * make sure file exists... 
-           open extend rss-list-file close rss-list-file
-
-           move 1 to ws-counter
-
-           open input rss-list-file
-               
-               perform until ws-counter > ws-last-id-record   
-                   call "logger" using function concatenate(
-                       "Checking RSS Feed ID: ", ws-counter)
-                   end-call                  
-                   move ws-counter to rss-feed-id
-                   read rss-list-file into ws-rss-list-record
-                       key is rss-feed-id
-                       invalid key 
-                           call "logger" using function concatenate(
-                               "RSS Feed ID Not Found: ", ws-counter)
-                           end-call
-                       not invalid key 
-                           call "logger" using function concatenate(
-                               "RSS Feed ID: ", ws-rss-feed-id)
-                           end-call
-                           call "logger" using function concatenate(
-                               " Feed Title: ", ws-rss-title)
-                           end-call
-                           call "logger" using function concatenate(
-                               "  Data file: ", ws-rss-dat-file-name)
-                           end-call
-                           call "logger" using function concatenate(
-                               "   Feed URL: ", ws-rss-link)
-                           end-call
-                   end-read       
-                
-                   add 1 to ws-counter                   
-               end-perform
-           close rss-list-file
-
-           exit paragraph.           
 
        end program rss-reader-menu.
