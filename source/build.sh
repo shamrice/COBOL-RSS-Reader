@@ -8,7 +8,7 @@
 # set back to original placeholder values.
 #
 
-APP_VERSION=\"v0.14\"
+APP_VERSION=\"v0.15\"
 SOURCE_URL=\"https\\:\\/\\/github.com\\/shamrice\\/COBOL-RSS-Reader\"
 CUR_BUILD_DATE=\"$(date +%Y-%m-%d)\"
 
@@ -24,7 +24,7 @@ sed -i "s/__SOURCE_URL/$SOURCE_URL/" crssr.cbl
 sed -i "s/__BUILD_DATE/$CUR_BUILD_DATE/" crssr.cbl
 
 echo Compiling...
-cobc -x crssr.cbl rss_parser.cbl rss_reader_menu.cbl rss_reader_view_feed.cbl rss_reader_view_item.cbl rss_downloader.cbl logger.cbl cobweb-pipes.cob -o crssr 
+cobc -Wall -O -x crssr.cbl rss_parser.cbl rss_reader_menu.cbl rss_reader_view_feed.cbl rss_reader_view_item.cbl rss_downloader.cbl logger.cbl cobweb-pipes.cob -o crssr 
 
 echo Setting placeholders back to placeholder names for next build.
 sed -i "s/$APP_VERSION/__APP_VERSION/" crssr.cbl

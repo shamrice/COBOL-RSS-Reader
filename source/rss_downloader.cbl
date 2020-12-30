@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-12-21
-      *> Last Updated: 2020-12-27
+      *> Last Updated: 2020-12-30
       *> Purpose: Downloads given RSS feed url and calls rss_parser
       *> Tectonics:
       *>     ./build.sh
@@ -18,14 +18,7 @@
 
        repository.
            function pipe-open
-           function pipe-read
-           function pipe-write
-           function pipe-close
-           function pinpoint
-           function entrammel
-           function cmove
-           function all intrinsic.
-
+           function pipe-close.
 
        data division.
 

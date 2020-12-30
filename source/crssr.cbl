@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2020-12-28
+      *> Last Updated: 2020-12-30
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -13,9 +13,6 @@
        environment division.
 
        configuration section.
-
-       repository.
-           function logger.
 
        data division.
 
