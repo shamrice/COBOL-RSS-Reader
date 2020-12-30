@@ -83,15 +83,11 @@
 
                10  help-text 
                    foreground-color 2 background-color 0. 
-                   
-                   15  line 19 column 12 
-                       value 
-           " Use the arrow keys to move the cursor among RSS Entries. ". 
-                   
+                          
                    15  line 20 column 12 
                        value 
-           " Press <Return> to view selected RSS Feed Entry           ". 
+           " Press <Return> to open item in Lynx browser.             ". 
           
                    15  line 21 column 12 
                        value 
-           " Press <F10> to exit.                                   ".
+           " Press <F10> to return to previous screen.                ".

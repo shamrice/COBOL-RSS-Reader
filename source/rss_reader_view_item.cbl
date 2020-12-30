@@ -12,6 +12,12 @@
        environment division.
        
        configuration section.
+       special-names.
+           crt status is crt-status.
+
+       repository.
+           function pipe-open
+           function pipe-close.
 
        input-output section.
 
@@ -21,8 +27,14 @@
        working-storage section.
 
        copy "screenio.cpy".
-       
-       01  ws-accept-item                            pic x value space.
+
+       01  crt-status. 
+           05  key1                          pic x. 
+           05  key2                          pic x. 
+           05  filler                        pic x. 
+           05  filler                        pic x.
+
+       01  ws-accept-item                    pic x value space.
 
        01  ws-feed-header-lines.
            05  ws-feed-title                 pic x(128).
@@ -35,10 +47,17 @@
            05  ws-item-pub-date              pic x(128) value spaces.       
    
        01  ws-item-desc-lines.
-           05  ws-desc-line                  pic x(70) value spaces     
+           05  ws-desc-line                  pic x(70) value spaces                               
                                              occurs 8 times.
 
+       01  exit-sw                           pic a value 'N'.
+           88  exit-true                     value 'Y'.
+           88  exit-false                    value 'N'.
+
        77  empty-line                        pic x(80) value spaces. 
+
+       77  launch-status                       pic 9 value 9.
+      
        78  new-line                          value x"0a".
 
        linkage section.
@@ -83,9 +102,31 @@
 
            move ls-item-desc to ws-item-desc-lines
 
-           accept rss-item-screen
+           perform handle-user-input
 
            display blank-screen 
            goback.
+
+
+       handle-user-input.
+
+           perform until exit-true
+
+               accept rss-item-screen
+
+               evaluate true 
+                      
+                   when key1 = COB-SCR-OK
+                       call "browser-launcher" using by content 
+                           ws-item-link
+                       end-call 
+
+                   when crt-status = COB-SCR-F10
+                       move 'Y' to exit-sw
+                       
+               end-evaluate
+           end-perform
+
+           exit paragraph.
 
        end program rss-reader-view-item.

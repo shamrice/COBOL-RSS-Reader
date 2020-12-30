@@ -289,6 +289,7 @@
                "Removing rss/xml tags from parsed record..."
            end-call
 
+      * TODO : below words should be removed, not replaced by spaces.
            inspect ws-rss-record replacing all 
                 "<title>" by spaces
                 "</title>" by spaces
@@ -315,8 +316,7 @@
                 "&#39;" by spaces
                 "&lt;/h2&gt;" by spaces
                 "&lt;h2&gt;" by spaces
-
-      *> TODO : new lines should eventually have a space instead of just low-values.
+                "amp;" by spaces
 
            exit paragraph.
 

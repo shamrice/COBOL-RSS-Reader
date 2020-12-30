@@ -40,7 +40,6 @@
            05  filler                                pic x. 
            05  filler                                pic x.
 
-
        01  ws-accept-item                            pic x value space.
 
        01  eof-sw                                    pic a value 'N'.
