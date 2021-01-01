@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-30
-      * Last Modified: 2020-12-30
+      * Last Modified: 2021-01-01
       * Purpose: Launches url in lynx web browser
       * Tectonics: ./build.sh
       ******************************************************************
@@ -34,9 +34,9 @@
            05  pipe-return                   usage binary-long.
 
        01  ws-web-cmd.
-           05  browser-cmd                   pic x(10) value "lynx ".
+           05  browser-cmd                   pic x(5) value "lynx ".
            05  url                           pic x(255) value spaces.
-
+  
        77  empty-line                        pic x(80) value spaces. 
 
        77  launch-status                     pic 9 value 9.
@@ -55,11 +55,14 @@
 
        main-procedure.
 
-      * TODO : currently breaks user input. needs work.
+      * TODO : currently breaks user input. needs work.... tab shift+Tab still work. not arrow keys.
+      *        invalid url causes the input to be all wonky. currenlty urls are wonky.
 
            display blank-screen 
 
-           move ls-item-link to url
+           move function trim(ls-item-link) to url
+
+           move function substitute(url, "&", "\&") to url
 
            call "logger" using function concatenate(
                "Launching item in browser using command: ",
@@ -67,9 +70,13 @@
            end-call
 
            move pipe-open(ws-web-cmd, "w") to pipe-record
-                  
+           
+           call "logger" using "pipe open called..."
+
            if pipe-return not equal 255 then
+               call "logger" using "pipe return value check."
                move pipe-close(pipe-record) to launch-status
+               call "logger" using "pipe close return = " launch-status
                if launch-status is zero then
                    call "logger" using function concatenate(
                        "Web launch success. Status=", launch-status)
@@ -81,6 +88,8 @@
                    end-call
                end-if
            end-if
+
+           accept blank-screen 
 
            goback.
 

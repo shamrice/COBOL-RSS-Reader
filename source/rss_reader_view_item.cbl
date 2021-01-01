@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-19
-      * Last Modified: 2020-12-30
+      * Last Modified: 2021-01-01
       * Purpose: RSS Reader Item Viewer - Displays formatted feed
       *          item data
       * Tectonics: ./build.sh
@@ -56,7 +56,7 @@
 
        77  empty-line                        pic x(80) value spaces. 
 
-       77  launch-status                       pic 9 value 9.
+       77  launch-status                     pic 9 value 9.
       
        78  new-line                          value x"0a".
 
@@ -120,6 +120,7 @@
                        call "browser-launcher" using by content 
                            ws-item-link
                        end-call 
+                       cancel "browser-launcher"
 
                    when crt-status = COB-SCR-F10
                        move 'Y' to exit-sw

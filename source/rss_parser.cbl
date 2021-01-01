@@ -323,6 +323,7 @@
                move function substitute(ws-item-title(counter), 
                    "&amp;", "&",
                    "&#38;", "&",
+                   "&#038;", "&",
                    "<title>", space, 
                    "</title>", space,
                    "&#39;", "'",

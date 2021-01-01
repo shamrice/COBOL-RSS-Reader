@@ -8,7 +8,7 @@
 # set back to original placeholder values.
 #
 
-APP_VERSION=\"v0.16\"
+APP_VERSION=\"v0.18\"
 SOURCE_URL=\"https\\:\\/\\/github.com\\/shamrice\\/COBOL-RSS-Reader\"
 CUR_BUILD_DATE=\"$(date +%Y-%m-%d)\"
 
