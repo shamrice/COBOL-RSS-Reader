@@ -55,6 +55,7 @@
        77  desc-temp                            pic x(255) value spaces.
 
        77  raw-buffer                 pic x(:BUFFER-SIZE:) value spaces.
+       77  raw-buffer-2               pic x(:BUFFER-SIZE:) value spaces.
        77  counter                                 pic 99 value 1.
 
        77  search-count                            pic 9 value zero.
@@ -289,34 +290,78 @@
                "Removing rss/xml tags from parsed record..."
            end-call
 
-      * TODO : below words should be removed, not replaced by spaces.
-           inspect ws-rss-record replacing all 
-                "<title>" by spaces
-                "</title>" by spaces
-                "<link>" by spaces
-                "</link>" by spaces
-                "<guid>" by spaces
-                '<guid isPermaLink="false">' by spaces
-                '<guid isPermaLink="true">' by spaces
-                "</guid>" by spaces
-                "<pubDate>" by spaces
-                "</pubDate>" by spaces
-                "<description>" by spaces
-                "</description>" by spaces
-                "&lt;br /&gt;" by spaces
-                "&lt;br&gt;" by spaces
-                "&lt;a" by spaces
-                "target=&quot;_blank&quot;" by spaces
-                "href=&quot;" by spaces
-                "&quot;&gt;" by spaces
-                "&lt;/a&gt;" by spaces
-                "&lt;h1&gt;" by spaces
-                "&lt;/h1&gt;" by spaces
-                "&lt;hr /&gt;" by spaces
-                "&#39;" by spaces
-                "&lt;/h2&gt;" by spaces
-                "&lt;h2&gt;" by spaces
-                "amp;" by spaces
+      * Sanitize RSS feed info.
+           move function substitute(ws-feed-title, 
+               "&amp;", "&",
+               "<title>", space, 
+               "</title>", space,
+               "&#39;", "'") 
+               to ws-feed-title
+
+           move function substitute(ws-feed-site-link, 
+               "&amp;", "&",
+               "<link>", space, 
+               "</link>", space) 
+               to ws-feed-site-link
+           
+           move function substitute(ws-feed-desc, 
+               "&amp;", "&",
+               "<description>", space, 
+               "</description>", space
+               "&#39;", "'") 
+               to ws-feed-desc
+
+      * Sanitize rss item fields...
+           move 1 to counter
+           perform until counter = ws-max-rss-items
+
+               move function substitute(ws-item-title(counter), 
+                   "&amp;", "&",
+                   "<title>", space, 
+                   "</title>", space,
+                   "&#39;", "'") 
+                   to ws-item-title(counter)
+
+               move function substitute(ws-item-guid(counter), 
+                   "&amp;", "&",
+                   "<guid>", space, 
+                   "</guid>", space)
+                   to ws-item-guid(counter)
+
+               move function substitute(ws-item-pub-date(counter), 
+                   "<pubDate>", space, 
+                   "</pubDate>", space)
+                   to ws-item-pub-date(counter)
+
+               move function substitute(ws-item-link(counter), 
+                   "&amp;", "&",
+                   "<link>", space, 
+                   "</link>", space) 
+                   to ws-item-link(counter)
+
+               move function substitute(ws-item-desc(counter), 
+                   "&amp;", "&",
+                   "<description>", space, 
+                   "</description>", space
+                   "&lt;br /&gt;", space
+                   "&lt;br&gt;", space
+                   "&lt;a", space
+                   "target=&quot;_blank&quot;", space
+                   "href=&quot;", space
+                   "&quot;&gt;", space
+                   "&lt;/a&gt;", space
+                   "&lt;h1&gt;", space
+                   "&lt;/h1&gt;", space
+                   "&lt;hr /&gt;", space
+                   "&#39;", "'"
+                   "&lt;/h2&gt;", space
+                   "&lt;h2&gt;", space,
+                   "&lt;pre&gt;", space,
+                   "&lt;/pre&gt;", space) 
+                   to ws-item-desc(counter)
+
+               add 1 to counter 
+           end-perform
 
            exit paragraph.
 
