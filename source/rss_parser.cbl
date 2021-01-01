@@ -9,7 +9,7 @@
        replace ==:BUFFER-SIZE:== by ==32768==.
 
        identification division.
-       program-id. rss-parser.
+       function-id. rss-parser.
 
        environment division.
 
@@ -78,7 +78,11 @@
            01  ls-file-name                       pic x(255).
            01  ls-feed-url                        pic x(256).
 
-       procedure division using ls-file-name ls-feed-url.
+           01  ls-parse-status                    pic S9 value zero.
+
+       procedure division 
+           using ls-file-name ls-feed-url
+           returning ls-parse-status.
 
        main-procedure.
 
@@ -88,6 +92,7 @@
            end-call
 
       * Values persist between follow up calls to subprogram. need clear
+           move zero to ls-parse-status
            move 'N' to eof-sw
            move spaces to raw-buffer
            move 1 to item-idx
@@ -110,7 +115,8 @@
            perform remove-tags-in-record
            perform print-parsed-record
            perform save-parsed-record
-
+               
+           move 1 to ls-parse-status
            goback.
 
 
@@ -440,7 +446,8 @@
                    "data cannot be saved. Please check the url and try",
                    " again.")
                end-call
-               exit paragraph
+               set ls-parse-status to 9
+               goback 
            end-if
                    
 
@@ -580,4 +587,4 @@
            
            exit paragraph.                 
 
-       end program rss-parser.
+       end function rss-parser.

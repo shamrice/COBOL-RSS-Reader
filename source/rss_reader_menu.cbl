@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2020-12-28
+      * Last Modified: 2021-01-01
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -11,6 +11,9 @@
        environment division.
        
        configuration section.
+
+       repository.
+           function rss-downloader.
 
       *   The SPECIAL-NAMES paragraph that follows provides for the 
       *   capturing of the positioning of the cursor and key input.        
@@ -82,6 +85,8 @@
 
        77  ws-loading-msg                       pic x(70) value spaces.
        77  empty-line                           pic x(80) value spaces. 
+
+       77  download-and-parse-status            pic S9 value zero.
 
        78  new-line                             value x"0a".
        
@@ -239,10 +244,9 @@
                                call "logger" using function concatenate(
                                    "Refreshing feed: ", ws-rss-link)
                                end-call
-                           
-                               call "rss-downloader" using by content 
-                                   ws-rss-link 
-                               end-call
+      *      TODO : display error message to user on failure.                     
+                               move function rss-downloader(ws-rss-link)
+                                   to download-and-parse-status                                
                            end-if
                    
                    end-read       

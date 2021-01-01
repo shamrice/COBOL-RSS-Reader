@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-12-21
-      *> Last Updated: 2020-12-30
+      *> Last Updated: 2021-01-01
       *> Purpose: Downloads given RSS feed url and calls rss_parser
       *> Tectonics:
       *>     ./build.sh
@@ -10,7 +10,7 @@
        replace ==:BUFFER-SIZE:== by ==32768==.
 
        identification division.
-       program-id. rss-downloader.
+       function-id. rss-downloader.
 
        environment division.
 
@@ -18,37 +18,43 @@
 
        repository.
            function pipe-open
-           function pipe-close.
+           function pipe-close
+           function rss-parser.
 
        data division.
 
        working-storage section.
 
-       01 raw-buffer                  pic x(:BUFFER-SIZE:) value spaces.
+       01  raw-buffer                 pic x(:BUFFER-SIZE:) value spaces.
 
 
       *> a file pointer
-       01 pipe-record.
+       01  pipe-record.
            05 pipe-pointer                     usage pointer.
            05 pipe-return                      usage binary-long.
 
 
-       77 download-cmd                         pic x(:BUFFER-SIZE:).
-       77 download-status                      pic 9 value 9.
+       77  download-cmd                         pic x(:BUFFER-SIZE:).
+       77  download-status                      pic 9 value 9.
 
-       77 rss-feed-url                         pic x(256) value spaces.
-       77 rss-temp-filename                    pic x(255)
+       77  rss-feed-url                         pic x(256) value spaces.
+       77  rss-temp-filename                    pic x(255)
                                                value "./feeds/temp.rss".
 
-       78 new-line                             value x"0a".
-       78 wget                                 value "wget -q -O ".
+       77  parse-status                        pic S9 value 0.
 
+       78  new-line                             value x"0a".
+       78  wget                                 value "wget -q -O ".
       
 
        linkage section.
-           01 ls-feed-url                      pic x(256).
+           01  ls-feed-url                      pic x(256).
 
-       procedure division using ls-feed-url.
+           01  download-and-parse-status        pic S9 value zero.
+
+       procedure division 
+           using ls-feed-url
+           returning download-and-parse-status.
 
        main-procedure.
 
@@ -56,6 +62,7 @@
            move spaces to rss-feed-url
            move 9 to download-status
            move spaces to raw-buffer
+           move zero to parse-status
            
            call "logger" using 
                function concatenate("URL passed to downloader: ", 
@@ -70,20 +77,35 @@
                    call "logger" using 
                        "Download complete. Attempting to parse data"
                    end-call
-                   call "rss-parser" 
-                       using by content rss-temp-filename rss-feed-url
-                   end-call
+
+                   move function rss-parser(
+                       rss-temp-filename, rss-feed-url)
+                       to parse-status
+                   if parse-status = 1 then 
+                       call "logger" using "Parsing success."
+                       set download-and-parse-status to 1
+                   else 
+                       call "logger" using function concatenate(
+                           "Parse failure. Parse Status code:",
+                           parse-status)
+                       end-call 
+                       set download-and-parse-status to -1 
+                       goback 
+                   end-if 
+                   
                else 
 
                    call "logger" using function concatenate(
                        "Error downloading RSS feed. Status: ",
                        download-status new-line)
                    end-call
+                   set download-and-parse-status to -2
                end-if
            else 
                call "logger" 
                    using "Cannot download RSS Feed. Url is invalid." 
                end-call
+               set download-and-parse-status to -3
            end-if           
 
            goback.
@@ -124,4 +146,4 @@
                end-if
            end-if.
 
-       end program rss-downloader.
+       end function rss-downloader.

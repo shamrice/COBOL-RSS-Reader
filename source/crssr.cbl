@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2020-12-30
+      *> Last Updated: 2021-01-01
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -13,6 +13,9 @@
        environment division.
 
        configuration section.
+
+       repository.
+           function rss-downloader.
 
        data division.
 
@@ -33,6 +36,8 @@
                88  not-interactive             value 'N'.
 
        77  cmd-args-buffer                     pic x(2048) value spaces.
+
+       77  download-status                     pic S9 value zero.
 
        78  new-line                            value x"0a".
 
@@ -62,9 +67,17 @@
                    "Downloading and parsing RSS feed: " 
                    function trim(cmd-args-buffer)
                end-display
-               call "rss-downloader" using by content cmd-args-buffer
-              
-               display "Downloading and parsing complete."   
+               move function rss-downloader(cmd-args-buffer)
+                    to download-status
+               if download-status = 1 then 
+                   display "Downloading and parsing success."
+               else 
+                   display 
+                       "Downloading and parsing failed. "
+                       "Please check logs. Parse status: " 
+                       download-status
+                   end-display
+               end-if    
            end-if    
   
            if is-interactive then 
