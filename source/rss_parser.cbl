@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2020-12-27
+      * Last Modified: 2020-12-31
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
