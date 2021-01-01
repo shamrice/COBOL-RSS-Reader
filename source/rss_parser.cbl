@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2020-12-31
+      * Last Modified: 2021-01-01
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -293,6 +293,8 @@
       * Sanitize RSS feed info.
            move function substitute(ws-feed-title, 
                "&amp;", "&",
+               "&#38;", "&",
+               "&quot;", '"',
                "<title>", space, 
                "</title>", space,
                "&#39;", "'") 
@@ -300,12 +302,15 @@
 
            move function substitute(ws-feed-site-link, 
                "&amp;", "&",
+               "&#38;", "&",
                "<link>", space, 
                "</link>", space) 
                to ws-feed-site-link
            
            move function substitute(ws-feed-desc, 
                "&amp;", "&",
+               "&#38;", "&",
+               "&quot;", '"',
                "<description>", space, 
                "</description>", space
                "&#39;", "'") 
@@ -317,14 +322,19 @@
 
                move function substitute(ws-item-title(counter), 
                    "&amp;", "&",
+                   "&#38;", "&",
                    "<title>", space, 
                    "</title>", space,
-                   "&#39;", "'") 
+                   "&#39;", "'",
+                   "&quot;", '"') 
                    to ws-item-title(counter)
 
                move function substitute(ws-item-guid(counter), 
                    "&amp;", "&",
+                   "&#38;", "&",
                    "<guid>", space, 
+                   '<guid isPermaLink="false">', space,
+                   '<guid isPermaLink="true">', space,
                    "</guid>", space)
                    to ws-item-guid(counter)
 
@@ -335,12 +345,14 @@
 
                move function substitute(ws-item-link(counter), 
                    "&amp;", "&",
+                   "&#38;", "&",
                    "<link>", space, 
                    "</link>", space) 
                    to ws-item-link(counter)
 
                move function substitute(ws-item-desc(counter), 
                    "&amp;", "&",
+                   "&#38;", "&",
                    "<description>", space, 
                    "</description>", space
                    "&lt;br /&gt;", space
@@ -353,7 +365,8 @@
                    "&lt;h1&gt;", space
                    "&lt;/h1&gt;", space
                    "&lt;hr /&gt;", space
-                   "&#39;", "'"
+                   "&#39;", "'",
+                   "&quot;", '"',
                    "&lt;/h2&gt;", space
                    "&lt;h2&gt;", space,
                    "&lt;pre&gt;", space,
