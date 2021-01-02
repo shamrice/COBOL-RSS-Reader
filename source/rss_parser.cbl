@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2021-01-01
+      * Last Modified: 2021-01-02
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -115,8 +115,11 @@
            perform remove-tags-in-record
            perform print-parsed-record
            perform save-parsed-record
-               
-           move 1 to ls-parse-status
+
+           if ls-parse-status is zero then     
+               move 1 to ls-parse-status
+           end-if
+
            goback.
 
 
@@ -447,7 +450,7 @@
                    " again.")
                end-call
                set ls-parse-status to 9
-               goback 
+               exit paragraph 
            end-if
                    
 

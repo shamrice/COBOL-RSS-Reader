@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-11
-      * Last Modified: 2020-11-17
+      * Last Modified: 2021-01-02
       * Purpose: Screen definition for rss_reader_menu program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -108,4 +108,4 @@
           
                    15  line 21 column 12 
                        value 
-           " <F10> Exit <F5> Refresh Feeds                          ".
+           " <F3> Add Feed <F5> Refresh Feeds <F10> Exit            ".

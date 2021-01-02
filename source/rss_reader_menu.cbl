@@ -68,27 +68,31 @@
 
       * String to display on menu screen.
        01  ws-display-text                     occurs 17 times. 
-           05  ws-display-list-title           pic x(20) value spaces.
+           05  ws-display-list-title           pic x(50) value spaces.
            05  ws-display-list-url             pic x(50) value spaces.
 
        01  refresh-items-sw                    pic a value 'Y'.
            88  is-refresh-items                value 'Y'.
            88  not-refresh-items               value 'N'.
 
+       01  message-screen-fields.
+           05  ws-msg-title                    pic x(70) value spaces.
+           05  ws-msg-body                     occurs 2 times.
+               10  ws-msg-body-text            pic x(70) value spaces.
+           05  ws-msg-input                    pic x value space.
+           
        77 rss-temp-filename                    pic x(255)
                                                value "./feeds/temp.rss".
+       77  ws-selected-feed-file-name          pic x(255) value spaces.
+       77  ws-selected-id                      pic 9(5) value zeros.
 
-       77  ws-selected-feed-file-name           pic x(255) value spaces.
-       77  ws-selected-id                       pic 9(5) value zeros.
+       77  ws-counter                          pic 9(5) value 1.
 
-       77  ws-counter                           pic 9(5) value 1.
+       77  empty-line                          pic x(80) value spaces. 
 
-       77  ws-loading-msg                       pic x(70) value spaces.
-       77  empty-line                           pic x(80) value spaces. 
+       77  download-and-parse-status           pic 9 value zero.
 
-       77  download-and-parse-status            pic S9 value zero.
-
-       78  new-line                             value x"0a".
+       78  new-line                            value x"0a".
        
        77  ws-rss-content-file-name          pic x(255) value spaces.
        78  ws-rss-list-file-name             value "./feeds/list.dat".
@@ -102,7 +106,7 @@
 
        copy "./screens/rss_list_screen.cpy".
        copy "./screens/blank_screen.cpy".
-       copy "./screens/loading_screen.cpy".
+       copy "./screens/message_screen.cpy".
 
        procedure division using ls-refresh-on-start.
        set environment 'COB_SCREEN_EXCEPTIONS' TO 'Y'.
@@ -112,15 +116,16 @@
            call "logger" using "In RSS reader."
       
       * Set switch to refresh items based on refresh parameter.
+           move "Loading..." to ws-msg-title
            if ls-refresh-on-start = 'Y' then 
                move "Loading and refreshing RSS feeds..." 
-                   to ws-loading-msg
+                   to ws-msg-body-text(1)
                move 'Y' to refresh-items-sw
            else 
-               move "Loading RSS feeds..." to ws-loading-msg
+               move "Loading RSS feeds..." to ws-msg-body-text(1)
                move 'N' to refresh-items-sw
            end-if
-           display loading-screen
+           display message-screen
 
       * Load and set RSS feeds into feed menu records 
            perform set-rss-menu-items  
@@ -153,11 +158,18 @@
                            cancel "rss-reader-view-feed"
                        end-if
 
+                   when crt-status = COB-SCR-F3
+                       call "rss-reader-add-feed"
+                       cancel "rss-reader-add-feed"
+      *                Feed is refreshed if success in add sub program                     
+                       move 'N' to refresh-items-sw
+                       perform set-rss-menu-items  
+
                    when crt-status = COB-SCR-F5
                        
                        move "Loading and refreshing RSS feeds..." 
-                           to ws-loading-msg
-                       display loading-screen
+                           to ws-msg-body-text(1)
+                       display message-screen
 
                        move 'Y' to refresh-items-sw
                        perform set-rss-menu-items  
@@ -244,7 +256,9 @@
                                end-call
       *      TODO : display error message to user on failure.                     
                                move function rss-downloader(ws-rss-link)
-                                   to download-and-parse-status                                
+                                   to download-and-parse-status   
+
+                               display message-screen                             
                            end-if
                    
                    end-read       

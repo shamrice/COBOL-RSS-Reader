@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-12-21
-      *> Last Updated: 2021-01-01
+      *> Last Updated: 2021-01-02
       *> Purpose: Downloads given RSS feed url and calls rss_parser
       *> Tectonics:
       *>     ./build.sh
@@ -50,7 +50,7 @@
        linkage section.
            01  ls-feed-url                      pic x(256).
 
-           01  download-and-parse-status        pic S9 value zero.
+           01  download-and-parse-status        pic 9 value zero.
 
        procedure division 
            using ls-feed-url
@@ -81,6 +81,7 @@
                    move function rss-parser(
                        rss-temp-filename, rss-feed-url)
                        to parse-status
+                       
                    if parse-status = 1 then 
                        call "logger" using "Parsing success."
                        set download-and-parse-status to 1
@@ -89,7 +90,7 @@
                            "Parse failure. Parse Status code:",
                            parse-status)
                        end-call 
-                       set download-and-parse-status to -1 
+                       set download-and-parse-status to 2 
                        goback 
                    end-if 
                    
@@ -99,13 +100,13 @@
                        "Error downloading RSS feed. Status: ",
                        download-status new-line)
                    end-call
-                   set download-and-parse-status to -2
+                   set download-and-parse-status to 3
                end-if
            else 
                call "logger" 
                    using "Cannot download RSS Feed. Url is invalid." 
                end-call
-               set download-and-parse-status to -3
+               set download-and-parse-status to 4
            end-if           
 
            goback.

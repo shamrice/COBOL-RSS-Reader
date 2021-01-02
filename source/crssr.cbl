@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2021-01-01
+      *> Last Updated: 2021-01-02
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -37,7 +37,7 @@
 
        77  cmd-args-buffer                     pic x(2048) value spaces.
 
-       77  download-status                     pic S9 value zero.
+       77  download-status                     pic 9 value zero.
 
        78  new-line                            value x"0a".
 
