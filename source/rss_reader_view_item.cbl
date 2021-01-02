@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-19
-      * Last Modified: 2021-01-01
+      * Last Modified: 2021-01-02
       * Purpose: RSS Reader Item Viewer - Displays formatted feed
       *          item data
       * Tectonics: ./build.sh
@@ -14,10 +14,6 @@
        configuration section.
        special-names.
            crt status is crt-status.
-
-       repository.
-           function pipe-open
-           function pipe-close.
 
        input-output section.
 
