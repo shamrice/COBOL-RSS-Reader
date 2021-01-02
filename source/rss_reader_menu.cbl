@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2021-01-01
+      * Last Modified: 2021-01-02
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -105,6 +105,8 @@
        copy "./screens/loading_screen.cpy".
 
        procedure division using ls-refresh-on-start.
+       set environment 'COB_SCREEN_EXCEPTIONS' TO 'Y'.
+       set environment 'COB_SCREEN_ESC'        TO 'Y'.
 
        main-procedure.
            call "logger" using "In RSS reader."
@@ -161,10 +163,6 @@
                        perform set-rss-menu-items  
       
                    when crt-status = COB-SCR-F10
-                       display 
-                           "Exiting...                 " 
-                           line 23 column 30
-                       end-display
                        move 'Y' to exit-sw
                    
                end-evaluate

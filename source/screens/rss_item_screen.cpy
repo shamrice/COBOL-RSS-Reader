@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-19
-      * Last Modified: 2020-12-30
+      * Last Modified: 2021-01-02
       * Purpose: Screen definition for rss_reader_view_item program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -90,4 +90,4 @@
           
                    15  line 21 column 12 
                        value 
-           " Press <F10> to return to previous screen.                ".
+           " Press <ESC> to return to previous screen.                ".

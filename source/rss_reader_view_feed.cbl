@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2020-12-28
+      * Last Modified: 2021-01-02
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       *  Cancel subprogram after each run to ensure that variables are 
       *  reset and loaded fresh at start up.
@@ -69,7 +69,10 @@
        copy "./screens/blank_screen.cpy".
 
        procedure division using ls-rss-content-file-name.
-       
+       set environment 'COB_SCREEN_EXCEPTIONS' TO 'Y'.
+       set environment 'COB_SCREEN_ESC'        TO 'Y'.
+
+
        main-procedure.
       
            display blank-screen 
@@ -106,7 +109,7 @@
                    when key1 = COB-SCR-OK
                        perform view-selected-feed-item
               
-                   when crt-status = COB-SCR-F10
+                   when crt-status = COB-SCR-ESC
                        move 'Y' to exit-sw
                        
                end-evaluate

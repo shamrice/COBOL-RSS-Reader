@@ -80,6 +80,9 @@
        procedure division using 
            ls-feed-title, ls-feed-site-link, ls-feed-item.
 
+       set environment 'COB_SCREEN_EXCEPTIONS' TO 'Y'.
+       set environment 'COB_SCREEN_ESC'        TO 'Y'.
+
        main-procedure.
 
            display blank-screen 
@@ -118,7 +121,7 @@
                        end-call 
                        cancel "browser-launcher"
 
-                   when crt-status = COB-SCR-F10
+                   when crt-status = COB-SCR-ESC
                        move 'Y' to exit-sw
                        
                end-evaluate
