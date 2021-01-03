@@ -22,78 +22,77 @@
                    foreground-color cob-color-black background-color 7.
 
                    15 line 2 pic x(80) from empty-line.                   
-                   15 line 2 column 5 value "RSS Name".
-                   15 line 2 column 40 value "RSS Feed URL".
+                   15 line 2 column 5 value "RSS Feed Name".
                
                10  line 3  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(1).
+               10  column 4 pic x(70) from ws-display-list-title(1).
 
                10  line 4  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(2).               
+               10  column 4 pic x(70) from ws-display-list-title(2).               
 
                10  line 5  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(3).        
+               10  column 4 pic x(70) from ws-display-list-title(3).        
      
 
                10  line 6  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(4).        
+               10  column 4 pic x(70) from ws-display-list-title(4).        
 
 
                10  line 7  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(5).        
+               10  column 4 pic x(70) from ws-display-list-title(5).        
 
 
                10  line 8  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(6).        
+               10  column 4 pic x(70) from ws-display-list-title(6).        
 
 
                10  line 9  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(7).        
+               10  column 4 pic x(70) from ws-display-list-title(7).        
 
 
                10  line 10  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(8).        
+               10  column 4 pic x(70) from ws-display-list-title(8).        
 
 
                10  line 11  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(9).        
+               10  column 4 pic x(70) from ws-display-list-title(9).        
 
                10  line 12  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(10).        
+               10  column 4 pic x(70) from ws-display-list-title(10).        
 
                10  line 13  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(11).        
+               10  column 4 pic x(70) from ws-display-list-title(11).        
 
                10  line 14  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(12).        
+               10  column 4 pic x(70) from ws-display-list-title(12).        
 
                10  line 15  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(13).        
+               10  column 4 pic x(70) from ws-display-list-title(13).        
 
                10  line 16  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(14).                            
+               10  column 4 pic x(70) from ws-display-list-title(14).                            
 
                10  line 17  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(15).                            
+               10  column 4 pic x(70) from ws-display-list-title(15).                            
 
                10  line 18  column 2 
                    pic x to accept-item1. 
-               10  column 4 pic x(70) from ws-display-text(16).                            
+               10  column 4 pic x(70) from ws-display-list-title(16).                            
 
                10  help-text 
                    foreground-color 2 background-color 0. 

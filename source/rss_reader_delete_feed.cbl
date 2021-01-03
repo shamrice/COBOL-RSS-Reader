@@ -56,8 +56,6 @@
            88  exit-true                     value 'Y'.
            88  exit-false                    value 'N'.
 
-       01  ws-rss-id                         pic 9(5) value zeros.
-
        77  empty-line                        pic x(80) value spaces. 
 
        78  new-line                          value x"0a".
@@ -79,8 +77,18 @@
       
        main-procedure.
 
+           if ls-rss-feed-id is zeros then 
+               call "logger" using function concatenate(
+                   "Cannot delete RSS feed with ID ", ls-rss-feed-id,
+                   ". Ignoring delete request and returning.")
+               end-call
+               goback 
+           end-if
+
            move "Delete Feed Status" to ws-msg-title
-           move ls-rss-feed-id to ws-rss-id        
+           
+           move ls-rss-feed-id to rss-feed-id   
+
            perform load-feed-to-delete
 
            move function concatenate("Delete feed ", 
@@ -103,8 +111,7 @@
                       
                    when key1 = COB-SCR-OK
                        call "logger" using ls-rss-feed-id
-
-
+                       perform delete-rss-record
                        accept message-screen
                        move 'Y' to exit-sw
                     
@@ -119,8 +126,7 @@
 
        load-feed-to-delete.
 
-           move ws-rss-id to rss-feed-id
-
+          
            open input rss-list-file
 
                read rss-list-file into ws-rss-list-record
@@ -131,17 +137,47 @@
                            "rss list id. Invalid key: ", rss-feed-id)
                        end-call
 
-                   not invalid key 
-                           
+                   not invalid key                            
                        call "logger" using function concatenate( 
-                           "FOUND: ", ws-rss-list-record)
-                       end-call
-                       call "logger" using function concatenate(
-                           "title=", ws-rss-title)
-                       end-call                           
+                           "Found to delete :: ID: ", rss-feed-id, 
+                           " :: Title: ", ws-rss-title)
+                       end-call     
+                  
                end-read       
            close rss-list-file      
            
+           exit paragraph.
+
+       
+       delete-rss-record.
+
+           call "logger" using function concatenate(
+               "Deleting RSS id: " rss-feed-id)
+           end-call 
+
+           open i-o rss-list-file
+
+               delete rss-list-file record
+                   invalid key
+                       call "logger" using function concatenate( 
+                           "No RSS record to delete with id: " 
+                           rss-feed-id) 
+                       end-call 
+                       move "Unable to delete RSS feed from list."
+                           to ws-msg-body-text(1)
+                       move function concatenate(
+                           "ID ", rss-feed-id, " was not found.")
+                           to ws-msg-body-text(2)
+                   not invalid key
+                       call "logger" using function concatenate( 
+                           "RSS Record " rss-feed-id " deleted.") 
+                       end-call 
+                       move "Successfully deleted RSS Feed from list."
+                           to ws-msg-body-text(1)
+               end-delete
+
+           close rss-list-file
+
            exit paragraph.
 
        end program rss-reader-delete-feed.

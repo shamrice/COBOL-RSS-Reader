@@ -67,10 +67,10 @@
            88  exit-false                       value 'N'.
 
       * String to display on menu screen.
-       01  ws-display-text                     occurs 17 times. 
-           05  ws-display-list-title           pic x(50) value spaces.
-           05  ws-display-list-url             pic x(50) value spaces.
-
+       01  ws-display-text                     occurs 17 times.
+           05  ws-display-rss-id               pic 9(5) value zeros. 
+           05  ws-display-list-title           pic x(70) value spaces.
+      
        01  refresh-items-sw                    pic a value 'Y'.
            88  is-refresh-items                value 'Y'.
            88  not-refresh-items               value 'N'.
@@ -148,15 +148,20 @@
                evaluate true 
                
                    when key1 = COB-SCR-OK
-                      compute ws-selected-id = cursor-line - 2
+                      compute ws-selected-id = 
+                           ws-display-rss-id(cursor-line - 2)
+                       end-compute
                        if ws-selected-id <= ws-last-id-record then
 
                            perform set-selected-feed-file-name
 
-                           call "rss-reader-view-feed" using by content                  
-                               ws-selected-feed-file-name
-                           end-call
-                           cancel "rss-reader-view-feed"
+                           if ws-selected-feed-file-name 
+                               not = spaces then
+                               call "rss-reader-view-feed" using 
+                                   by content ws-selected-feed-file-name
+                               end-call
+                               cancel "rss-reader-view-feed"
+                           end-if
                        end-if
 
                    when crt-status = COB-SCR-F3
@@ -168,14 +173,16 @@
 
 
                    when crt-status = COB-SCR-F4
-                       compute ws-selected-id = cursor-line - 2
+                       compute ws-selected-id = 
+                           ws-display-rss-id(cursor-line - 2)
+                       end-compute
                        if ws-selected-id <= ws-last-id-record then
                            call "rss-reader-delete-feed" using 
                                ws-selected-id
                            cancel "rss-reader-delete-feed"
       *                                     
                            move 'N' to refresh-items-sw
-      *                     perform set-rss-menu-items 
+     *                     perform set-rss-menu-items 
                        end-if                   
                         
 
@@ -225,6 +232,11 @@
 
        set-rss-menu-items.
 
+      * reset display items
+           perform varying ws-counter from 1 by 1 until ws-counter > 17
+               initialize ws-display-text(ws-counter)
+           end-perform
+
            perform load-highest-rss-record
 
            if ws-last-id-record is zeros then 
@@ -272,24 +284,16 @@
                            end-call 
                        not invalid key 
                            
-                           call "logger" using function concatenate( 
-                               "FOUND: ", ws-rss-list-record)
-                           end-call
                            call "logger" using function concatenate(
-                               "title=", ws-rss-title)
+                               "FOUND :: Title=", ws-rss-title)
                            end-call                           
                        
+                           move rss-feed-id 
+                           to ws-display-rss-id(ws-counter)
+
                            move ws-rss-title
                            to ws-display-list-title(ws-counter)                           
-
-                           move ws-rss-link
-                           to ws-display-list-url(ws-counter)                       
-
-                           call "logger" using function concatenate( 
-                               "disp=",
-                               ws-display-text(ws-rss-idx))
-                           end-call
-                           
+                          
       *                Only refresh items if switch is set.                     
                            if is-refresh-items then 
                                call "logger" using function concatenate(
@@ -315,10 +319,18 @@
 
 
        set-selected-feed-file-name.
-           open input rss-list-file
+
+           if ws-selected-id > 0 then 
                call "logger" using function concatenate( 
                    "Getting file name for Feed ID: ", ws-selected-id)
-               end-call                      
+               end-call
+           else
+               call "logger" using "Selected Id=0. No File name to set."
+               move spaces to ws-selected-feed-file-name
+               exit paragraph
+           end-if                      
+               
+           open input rss-list-file
                
                move ws-selected-id to rss-feed-id
                read rss-list-file into ws-rss-list-record
