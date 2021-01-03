@@ -81,12 +81,13 @@
                10  ws-msg-body-text            pic x(70) value spaces.
            05  ws-msg-input                    pic x value space.
            
-       77 rss-temp-filename                    pic x(255)
+       77  rss-temp-filename                   pic x(255)
                                                value "./feeds/temp.rss".
        77  ws-selected-feed-file-name          pic x(255) value spaces.
        77  ws-selected-id                      pic 9(5) value zeros.
 
        77  ws-counter                          pic 9(5) value 1.
+       77  ws-rss-idx                          pic 9(5) value 1.
 
        77  empty-line                          pic x(80) value spaces. 
 
@@ -214,6 +215,10 @@
                end-perform
            close rss-last-id-file
 
+           call "logger" using function concatenate(
+               "Highest record found: ", ws-last-id-record)
+           end-call 
+
            exit paragraph.
 
 
@@ -222,6 +227,17 @@
 
            perform load-highest-rss-record
 
+           if ws-last-id-record is zeros then 
+               call "logger" using 
+                   "No max RSS id found. No items to set. Skipping..."
+               end-call 
+               exit paragraph
+           end-if 
+
+      * Counter used to set idx of display line number. Only advances
+      * on valid ws-rss-idx found.
+           move 1 to ws-counter
+
       * make sure file exists... 
            open extend rss-list-file close rss-list-file
 
@@ -229,19 +245,31 @@
 
            open input rss-list-file
 
-               perform varying ws-counter 
-                   from 1 by 1 until ws-counter = 17
+               perform varying ws-rss-idx 
+                   from 1 by 1 until ws-rss-idx > ws-last-id-record
+
+                   if ws-counter > 17 then 
+                       call "logger" using function concatenate(
+                           "Max feeds displayed on current page. Last",
+                           "RSS idx: ", ws-last-id-record, 
+                           " : line number: ", ws-counter, 
+                           " :: done setting items.")
+                       end-call 
+                       close rss-list-file
+                       exit paragraph
+                   end-if 
 
                    call "logger" using function concatenate(
-                       "Checking RSS Feed ID: ", ws-counter)
+                       "Checking RSS Feed ID: ", ws-rss-idx)
                    end-call                      
-                   move ws-counter to rss-feed-id
+                   move ws-rss-idx to rss-feed-id
                    read rss-list-file into ws-rss-list-record
                        key is rss-feed-id
                        invalid key 
-                           move spaces 
-                           to ws-display-text(ws-counter)
-
+                           call "logger" using function concatenate(
+                               "Unable to find feed with id: ", 
+                               rss-feed-id, " : Skipping.")
+                           end-call 
                        not invalid key 
                            
                            call "logger" using function concatenate( 
@@ -255,11 +283,11 @@
                            to ws-display-list-title(ws-counter)                           
 
                            move ws-rss-link
-                           to ws-display-list-url(ws-counter)                           
+                           to ws-display-list-url(ws-counter)                       
 
                            call "logger" using function concatenate( 
                                "disp=",
-                               ws-display-text(ws-counter))
+                               ws-display-text(ws-rss-idx))
                            end-call
                            
       *                Only refresh items if switch is set.                     
@@ -273,7 +301,8 @@
 
                                display message-screen                             
                            end-if
-                   
+                           
+                           add 1 to ws-counter 
                    end-read       
    
                end-perform
@@ -288,7 +317,7 @@
        set-selected-feed-file-name.
            open input rss-list-file
                call "logger" using function concatenate( 
-                   "Getting file name for Feed ID: ", ws-counter)
+                   "Getting file name for Feed ID: ", ws-selected-id)
                end-call                      
                
                move ws-selected-id to rss-feed-id
