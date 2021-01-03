@@ -165,6 +165,19 @@
                        move 'N' to refresh-items-sw
                        perform set-rss-menu-items  
 
+
+                   when crt-status = COB-SCR-F4
+                       compute ws-selected-id = cursor-line - 2
+                       if ws-selected-id <= ws-last-id-record then
+                           call "rss-reader-delete-feed" using 
+                               ws-selected-id
+                           cancel "rss-reader-delete-feed"
+      *                                     
+                           move 'N' to refresh-items-sw
+      *                     perform set-rss-menu-items 
+                       end-if                   
+                        
+
                    when crt-status = COB-SCR-F5
                        
                        move "Loading and refreshing RSS feeds..." 
