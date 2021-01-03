@@ -42,6 +42,10 @@
 
        01  ws-delete-feed-status                pic 9 value zero.
 
+       01  ws-delete-msg.
+           05  ws-delete-line-1              pic x(70) value spaces.
+           05  ws-delete-line-2              pic x(70) value spaces.
+
        01  message-screen-fields.
            05  ws-msg-title                    pic x(70) value spaces.
            05  ws-msg-body                     occurs 2 times.
@@ -79,6 +83,10 @@
            move ls-rss-feed-id to ws-rss-id        
            perform load-feed-to-delete
 
+           move function concatenate("Delete feed ", 
+               function trim(ws-rss-title), 
+               " from feed list?") to ws-delete-msg
+
            perform handle-user-input
 
            display blank-screen 
@@ -111,16 +119,16 @@
 
        load-feed-to-delete.
 
-      * TODO: Always returns invalid key... not sure why.
+           move ws-rss-id to rss-feed-id
 
            open input rss-list-file
 
                read rss-list-file into ws-rss-list-record
-               key is ws-rss-id
+               key is rss-feed-id
                    invalid key 
                        call "logger" using function concatenate( 
                            "Delete RSS feed: Unable to load feed by ",
-                           "rss list id. Invalid key: ", ws-rss-id)
+                           "rss list id. Invalid key: ", rss-feed-id)
                        end-call
 
                    not invalid key 
