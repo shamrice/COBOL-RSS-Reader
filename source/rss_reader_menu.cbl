@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2021-01-02
+      * Last Modified: 2021-01-03
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -213,12 +213,12 @@
            open extend rss-list-file close rss-list-file
 
       * TODO : add paging offsets and real perform max value.
-           move 1 to ws-counter
 
            open input rss-list-file
-               perform until ws-counter > ws-last-id-record 
-                             or ws-counter > 17
-                                                                 
+
+               perform varying ws-counter 
+                   from 1 by 1 until ws-counter = 17
+
                    call "logger" using function concatenate(
                        "Checking RSS Feed ID: ", ws-counter)
                    end-call                      
@@ -262,8 +262,6 @@
                            end-if
                    
                    end-read       
-                  
-                   add 1 to ws-counter                                  
    
                end-perform
 

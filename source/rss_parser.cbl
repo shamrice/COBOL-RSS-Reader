@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2021-01-02
+      * Last Modified: 2021-01-03
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -25,7 +25,6 @@
                copy "./copybooks/filecontrol/rss_list_file.cpy".
                copy "./copybooks/filecontrol/rss_last_id_file.cpy".       
                
-
        data division.
        file section.
            FD temp-rss-file.
@@ -35,8 +34,8 @@
            copy "./copybooks/filedescriptor/fd_rss_list_file.cpy".
            copy "./copybooks/filedescriptor/fd_rss_last_id_file.cpy".
 
-                              
-       working-storage section.
+      * variable values are not persisted between runs for local storage                              
+       local-storage section.
        
        copy "./copybooks/wsrecord/ws-rss-record.cpy".
        copy "./copybooks/wsrecord/ws-rss-list-record.cpy".
@@ -90,13 +89,6 @@
                "File name to parse: ", function trim(ls-file-name),
                " Source feed url: ", function trim(ls-feed-url))
            end-call
-
-      * Values persist between follow up calls to subprogram. need clear
-           move zero to ls-parse-status
-           move 'N' to eof-sw
-           move spaces to raw-buffer
-           move 1 to item-idx
-           perform reset-ws-items         
 
            call "logger" using "Parsing RSS feed..."
            open input temp-rss-file
@@ -574,20 +566,5 @@
            close rss-last-id-file
 
            exit paragraph. 
-
-       reset-ws-items.
-           move 1 to counter
-           perform until counter = ws-max-rss-items
-               move 'N' to ws-item-exists(counter)
-               move spaces to ws-item-title(counter)
-               move spaces to ws-item-link(counter)
-               move spaces to ws-item-guid(counter)
-               move spaces to ws-item-pub-date(counter)
-               move spaces to ws-item-desc(counter)
-
-               add 1 to counter
-           end-perform
-           
-           exit paragraph.                 
 
        end function rss-parser.
