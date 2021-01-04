@@ -2,16 +2,18 @@
 
 Console RSS reader application written in GnuCOBOL
 
-Project is still in it's early stage so not all functionality is fully implemented yet.
-
 ## Building 
 Run the shell script "build.sh" in the source directory.
 
 ## Running
-* Download and parse an RSS feed: 
-  ```./crssr [url of rss feed]```
-* Display parsed feeds:
-  ``` ./crssr ```
+* Open application in interactive mode and refresh feeds at start:
+  ```./crssr```
+* Open application in interactive mode and do not refresh feeds at start:
+  ```./crssr --no-refresh```
+* Download and parse an RSS feed into feed list: 
+  ```./crssr -a [url of rss feed]```
+* Delete existing RSS feed from feed list:
+  ```./crssr -d [url of rss feed]```
 * Display usage help:
   ``` ./crssr --help ```
 
@@ -21,6 +23,7 @@ Run the shell script "build.sh" in the source directory.
 ## Build/Run Prerequisites 
   * GnuCOBOL installed
   * wget installed
+  * lynx installed - optional - used to open RSS item in browser
   * Linux(?) - Build script is written for Linux but can be modified to compile on other operating systems if needed.
   
 ## Current Limitations:
