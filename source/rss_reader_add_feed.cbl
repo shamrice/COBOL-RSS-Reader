@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-02
-      * Last Modified: 2021-01-02
+      * Last Modified: 2021-01-04
       * Purpose: RSS Reader Add Feed - Screen sub program to add feeds
       * Tectonics: ./build.sh
       ******************************************************************
@@ -103,10 +103,10 @@
                        end-if    
 
                        accept message-screen
-                       move 'Y' to exit-sw
+                       set exit-true to true 
                     
                    when crt-status = COB-SCR-ESC
-                       move 'Y' to exit-sw
+                       set exit-true to true 
                        
                end-evaluate
            end-perform

@@ -113,10 +113,10 @@
                        call "logger" using ls-rss-feed-id
                        perform delete-rss-record
                        accept message-screen
-                       move 'Y' to exit-sw
+                       set exit-true to true 
                     
                    when crt-status = COB-SCR-ESC
-                       move 'Y' to exit-sw
+                       set exit-true to true
                        
                end-evaluate
            end-perform

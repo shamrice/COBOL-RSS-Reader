@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-16
-      * Last Modified: 2021-01-03
+      * Last Modified: 2021-01-04
       * Purpose: Screen definition for rss_reader_view_feed program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -79,23 +79,23 @@
 
                10  line 15  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(16).                            
+               10  column 4 pic x(70) from ws-item-title(11).                            
 
                10  line 16  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(11).                            
+               10  column 4 pic x(70) from ws-item-title(12).                            
 
                10  line 17  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(12). 
+               10  column 4 pic x(70) from ws-item-title(13). 
 
                10  line 18  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(13). 
+               10  column 4 pic x(70) from ws-item-title(14). 
 
                10  line 19  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(14). 
+               10  column 4 pic x(70) from ws-item-title(15). 
 
                10  help-text 
                    foreground-color 2 background-color 0. 

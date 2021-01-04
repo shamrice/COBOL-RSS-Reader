@@ -51,6 +51,10 @@
            01  ls-feed-url                      pic x(256).
 
            01  download-and-parse-status        pic 9 value zero.
+               88  return-status-success        value 1.
+               88  return-status-parse-fail     value 2.
+               88  return-status-download-fail  value 3.
+               88  return-status-url-invalid    value 4.
 
        procedure division 
            using ls-feed-url
@@ -84,13 +88,13 @@
                        
                    if parse-status = 1 then 
                        call "logger" using "Parsing success."
-                       set download-and-parse-status to 1
+                       set return-status-success to true 
                    else 
                        call "logger" using function concatenate(
                            "Parse failure. Parse Status code:",
                            parse-status)
                        end-call 
-                       set download-and-parse-status to 2 
+                       set return-status-parse-fail to true 
                        goback 
                    end-if 
                    
@@ -100,13 +104,13 @@
                        "Error downloading RSS feed. Status: ",
                        download-status new-line)
                    end-call
-                   set download-and-parse-status to 3
+                   set return-status-download-fail to true 
                end-if
            else 
                call "logger" 
                    using "Cannot download RSS Feed. Url is invalid." 
                end-call
-               set download-and-parse-status to 4
+               set return-status-url-invalid to true 
            end-if           
 
            goback.

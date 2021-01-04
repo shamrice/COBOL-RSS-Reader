@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2021-01-03
+      * Last Modified: 2021-01-04
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -78,6 +78,8 @@
            01  ls-feed-url                        pic x(256).
 
            01  ls-parse-status                    pic S9 value zero.
+               88 return-status-success           value 1.
+               88 return-status-fail              value 2.
 
        procedure division 
            using ls-file-name ls-feed-url
@@ -94,7 +96,7 @@
            open input temp-rss-file
                perform until eof
                    read temp-rss-file into raw-buffer
-                       at end move 'Y' to eof-sw
+                       at end set eof to true
                    not at end
                        call "logger" using function trim(raw-buffer)
 
@@ -109,7 +111,7 @@
            perform save-parsed-record
 
            if ls-parse-status is zero then     
-               move 1 to ls-parse-status
+               set return-status-success to true 
            end-if
 
            goback.
@@ -447,7 +449,7 @@
                    "data cannot be saved. Please check the url and try",
                    " again.")
                end-call
-               set ls-parse-status to 9
+               set return-status-fail to true
                exit paragraph 
            end-if
                    
@@ -537,12 +539,12 @@
              *> make sure file exists... 
            open extend rss-last-id-file close rss-last-id-file
            
-           move 'N' to eof-sw
+           set not-eof to true 
 
            open input rss-last-id-file
                perform until eof
                    read rss-last-id-file into ws-last-id-record
-                       at end move 'Y' to eof-sw
+                       at end set eof to true
                    not at end
                        call "logger" using ws-last-id-record
                        if ws-last-id-record is numeric then 

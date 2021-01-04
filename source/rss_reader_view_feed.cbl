@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2021-01-02
+      * Last Modified: 2021-01-04
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       *  Cancel subprogram after each run to ensure that variables are 
       *  reset and loaded fresh at start up.
@@ -110,7 +110,7 @@
                        perform view-selected-feed-item
               
                    when crt-status = COB-SCR-ESC
-                       move 'Y' to exit-sw
+                       set exit-true to true 
                        
                end-evaluate
            end-perform
@@ -120,8 +120,8 @@
 
        view-selected-feed-item.
 
-      * 3 is line offset to account for header lines.
-           compute ws-selected-id = cursor-line - 3
+      * 4 is line offset to account for header lines.
+           compute ws-selected-id = cursor-line - 4
            
            if ws-selected-id <= ws-max-rss-items then
                if ws-item-exists(ws-selected-id) = 'Y' then
@@ -158,7 +158,7 @@
            open input rss-content-file
                perform until eof
                    read rss-content-file into ws-rss-record
-                       at end move 'Y' to eof-sw
+                       at end set eof to true 
                    not at end
                        call "logger" using function concatenate(
                            "Viewing feed data items for feed: ",

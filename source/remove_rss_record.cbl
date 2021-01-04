@@ -35,6 +35,9 @@
        01  ls-rss-link                         pic x(256).
 
        01  ls-delete-feed-status               pic 9 value zero.
+           88  return-status-success           value 1.
+           88  return-status-bad-param         value 2.
+           88  return-status-not-found         value 3.
 
        screen section.    
    
@@ -49,7 +52,7 @@
                    "URL is required to delete an RSS feed. No URL ",
                    "passed to remove-rss-record. Returning status 2.")
                end-call
-               move 2 to ls-delete-feed-status
+               set return-status-bad-param to true 
                goback 
            end-if
 
@@ -73,14 +76,14 @@
                        call "logger" using function concatenate( 
                            "No RSS record to delete with url: " 
                            rss-link, " : No record found.") 
-                       end-call 
-                       move 3 to ls-delete-feed-status
+                       end-call
+                       set return-status-not-found to true 
                        
                    not invalid key
                        call "logger" using function concatenate( 
                            "RSS Record id " rss-feed-id " deleted.") 
                        end-call 
-                       move 1 to ls-delete-feed-status
+                       set return-status-success to true 
                end-delete
 
            close rss-list-file

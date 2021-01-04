@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2021-01-03
+      * Last Modified: 2021-01-04
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -121,10 +121,10 @@
            if ls-refresh-on-start = 'Y' then 
                move "Loading and refreshing RSS feeds..." 
                    to ws-msg-body-text(1)
-               move 'Y' to refresh-items-sw
+               set is-refresh-items to true 
            else 
                move "Loading RSS feeds..." to ws-msg-body-text(1)
-               move 'N' to refresh-items-sw
+               set not-refresh-items to true 
            end-if
            display message-screen
 
@@ -167,8 +167,8 @@
                    when crt-status = COB-SCR-F3
                        call "rss-reader-add-feed"
                        cancel "rss-reader-add-feed"
-      *                Feed is refreshed if success in add sub program                     
-                       move 'N' to refresh-items-sw
+      *                Feed is refreshed if success in add sub program 
+                       set not-refresh-items to true
                        perform set-rss-menu-items  
 
 
@@ -181,7 +181,7 @@
                                ws-selected-id
                            cancel "rss-reader-delete-feed"
       *                                     
-                           move 'N' to refresh-items-sw
+                           set not-refresh-items to true 
      *                     perform set-rss-menu-items 
                        end-if                   
                         
@@ -192,11 +192,11 @@
                            to ws-msg-body-text(1)
                        display message-screen
 
-                       move 'Y' to refresh-items-sw
+                       set is-refresh-items to true 
                        perform set-rss-menu-items  
       
                    when crt-status = COB-SCR-F10
-                       move 'Y' to exit-sw
+                       set exit-true to true 
                    
                end-evaluate
     
@@ -209,7 +209,7 @@
       * Called from set-rss-menu-items paragraph.
        load-highest-rss-record.
                       
-           move 'N' to eof-sw
+           set not-eof to true 
 
       * make sure file exists... 
            open extend rss-last-id-file close rss-last-id-file
@@ -217,7 +217,7 @@
            open input rss-last-id-file
                perform until eof
                    read rss-last-id-file into ws-last-id-record
-                       at end move 'Y' to eof-sw                   
+                       at end set eof to true                    
                    end-read
                end-perform
            close rss-last-id-file
