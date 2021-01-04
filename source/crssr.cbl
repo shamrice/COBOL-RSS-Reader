@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2021-01-02
+      *> Last Updated: 2021-01-04
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -15,7 +15,8 @@
        configuration section.
 
        repository.
-           function rss-downloader.
+           function rss-downloader
+           function remove-rss-record.
 
        data division.
 
@@ -31,9 +32,16 @@
            05  add-feed-sw                     pic a value 'N'.
                88  is-add-feed                 value 'Y'.
                88  not-add-feed                value 'N'.
+           05  delete-feed-sw                  pic a value 'N'.
+               88  is-delete-feed              value 'Y'.
+               88  not-delete-feed             value 'N'.
            05  interactive-mode-sw             pic a value 'N'.
                88  is-interactive              value 'Y'.
                88  not-interactive             value 'N'.
+
+       01  delete-rss-record.
+           05  url-of-record                   pic x(256) value spaces.
+           05  delete-status                   pic 9 value zero.
 
        77  cmd-args-buffer                     pic x(2048) value spaces.
 
@@ -61,24 +69,50 @@
            accept cmd-args-buffer from command-line 
            perform parse-cmd-args
           
-
            if is-add-feed then 
-               display 
-                   "Downloading and parsing RSS feed: " 
-                   function trim(cmd-args-buffer)
-               end-display
-               move function rss-downloader(cmd-args-buffer)
-                    to download-status
-               if download-status = 1 then 
-                   display "Downloading and parsing success."
+               if cmd-args-buffer(4:4) not = "http" and "HTTP" then
+                   display 
+                       "Please enter url starting with http or https "
+                       "and try again."
+                   end-display
                else 
                    display 
-                       "Downloading and parsing failed. "
-                       "Please check logs. Parse status: " 
-                       download-status
+                       "Downloading and parsing RSS feed: " 
+                       function trim(cmd-args-buffer(4:))
                    end-display
+                   move function rss-downloader(cmd-args-buffer(4:))
+                       to download-status
+                   if download-status = 1 then 
+                       display "Downloading and parsing success."
+                   else 
+                       display 
+                           "Downloading and parsing failed. "
+                           "Please check logs. Parse status: " 
+                           download-status
+                       end-display
+                   end-if
                end-if    
            end-if    
+
+           if is-delete-feed then 
+               move cmd-args-buffer(4:) to url-of-record
+               display 
+                   "Attempting to delete RSS feed: " 
+                    function trim(url-of-record)
+               end-display 
+               
+               move function remove-rss-record(url-of-record) 
+                   to delete-status
+               if delete-status = 1 then 
+                   display "RSS Successfully deleted from feed list."
+               else 
+                   display 
+                       "Failed to delete url from feed list. "
+                       "Please check logs. Delete status: " 
+                       delete-status
+                   end-display
+               end-if 
+           end-if
   
            if is-interactive then 
                call "rss-reader-menu" using by content refresh-feed-sw
@@ -94,25 +128,32 @@
 
        parse-cmd-args.
 
-      *> No where near perfect... but will at least check if user has some url in their input.
-           if cmd-args-buffer(1:4) = "http" or "HTTP" then
-               move 'Y' to valid-param-sw
-               move 'Y' to add-feed-sw
+      * If add flag is specified.
+           if cmd-args-buffer(1:2) = "-a" then 
+               set is-valid-param to true 
+               set is-add-feed to true 
                exit paragraph      
+           end-if
+
+      * If delete flag is specified.
+           if cmd-args-buffer(1:2) = "-d" then 
+               set is-valid-param to true 
+               set is-delete-feed to true 
+               exit paragraph
            end-if
 
       * If user specifies to not refresh feeds at start, set flag.
            if cmd-args-buffer(1:12) = "--no-refresh" then
                display "Not refreshing RSS Feeds."
-               move 'Y' to valid-param-sw 
-               move 'N' to refresh-feed-sw 
-               move 'Y' to interactive-mode-sw
+               set is-valid-param to true 
+               set not-refresh to true  
+               set is-interactive to true  
                exit paragraph           
            end-if
 
            if cmd-args-buffer = spaces  then
-               move 'Y' to valid-param-sw
-               move 'Y' to interactive-mode-sw
+               set is-valid-param to true 
+               set is-interactive to true 
                display "Launching application in interactive mode..."
                exit paragraph
            end-if
@@ -124,13 +165,19 @@
            display
                "CRSSR is a console RSS reader application written in "
                "COBOL." new-line new-line
-               "Add new feed:" new-line
-               "  Usage: crssr [url of rss feed]" new-line new-line
-               "Start interactive mode without refreshing feeds:"
-               new-line 
-               "  Usage: crssr --no-refresh" new-line new-line
-               "Run application with no arguments to start application "
+               "Usage:" new-line
+               "  crssr                       Run application "
+               "with no arguments to start application "
                "in interactive mode and refresh feeds." new-line
+
+               "  crssr --no-refesh           Start interactive "
+               "mode without refreshing feeds" new-line
+
+               "  crssr -a [url of rss feed]  Add a new RSS feed "
+               "to RSS feed list."
+               new-line
+               "  crssr -d [url of rss feed]  Delete an existing "
+               "RSS feed from list." new-line 
                new-line  
            end-display
 

@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-03
-      * Last Modified: 2021-01-03
+      * Last Modified: 2021-01-04
       * Purpose: RSS Reader Delete Feed - Screen sub program to delete 
       *          selected feed.
       * Tectonics: ./build.sh
@@ -14,7 +14,7 @@
        configuration section.
 
        repository.
-           function rss-downloader.
+           function remove-rss-record.
 
        special-names.
            crt status is crt-status.
@@ -125,7 +125,6 @@
 
 
        load-feed-to-delete.
-
           
            open input rss-list-file
 
@@ -155,28 +154,22 @@
                "Deleting RSS id: " rss-feed-id)
            end-call 
 
-           open i-o rss-list-file
+           move function remove-rss-record(rss-link) 
+               to ws-delete-feed-status
 
-               delete rss-list-file record
-                   invalid key
-                       call "logger" using function concatenate( 
-                           "No RSS record to delete with id: " 
-                           rss-feed-id) 
-                       end-call 
-                       move "Unable to delete RSS feed from list."
-                           to ws-msg-body-text(1)
-                       move function concatenate(
-                           "ID ", rss-feed-id, " was not found.")
-                           to ws-msg-body-text(2)
-                   not invalid key
-                       call "logger" using function concatenate( 
-                           "RSS Record " rss-feed-id " deleted.") 
-                       end-call 
-                       move "Successfully deleted RSS Feed from list."
-                           to ws-msg-body-text(1)
-               end-delete
-
-           close rss-list-file
+           if ws-delete-feed-status = 1 then 
+               call "logger" using function concatenate( 
+                   "RSS Record " rss-feed-id " deleted.") 
+               end-call 
+               move "Successfully deleted RSS Feed from list."
+                   to ws-msg-body-text(1)
+           else
+               move "Unable to delete RSS feed from list."
+                   to ws-msg-body-text(1)
+               move function concatenate(
+                   "Delete status code: ", ws-delete-feed-status)
+                   to ws-msg-body-text(2)
+           end-if
 
            exit paragraph.
 
