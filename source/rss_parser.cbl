@@ -296,9 +296,11 @@
                "&amp;", "&",
                "&#38;", "&",
                "&quot;", '"',
+               "&#8211;", "-",
                "<title>", space, 
                "</title>", space,
-               "&#39;", "'") 
+               "&#39;", "'",
+               spaces, space) 
                to ws-feed-title
 
            move function substitute(ws-feed-site-link, 
@@ -312,6 +314,7 @@
                "&amp;", "&",
                "&#38;", "&",
                "&quot;", '"',
+               "&#8211;", "-",
                "<description>", space, 
                "</description>", space
                "&#39;", "'") 
@@ -325,10 +328,12 @@
                    "&amp;", "&",
                    "&#38;", "&",
                    "&#038;", "&",
+                   "&#8211;", "-",
                    "<title>", space, 
                    "</title>", space,
                    "&#39;", "'",
-                   "&quot;", '"') 
+                   "&quot;", '"',
+                   spaces, space) 
                    to ws-item-title(counter)
 
                move function substitute(ws-item-guid(counter), 
@@ -355,6 +360,7 @@
                move function substitute(ws-item-desc(counter), 
                    "&amp;", "&",
                    "&#38;", "&",
+                   "&#8211;", "-",
                    "<description>", space, 
                    "</description>", space
                    "&lt;br /&gt;", space
