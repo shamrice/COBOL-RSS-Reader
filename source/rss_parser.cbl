@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2021-01-04
+      * Last Modified: 2021-01-09
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -15,6 +15,10 @@
 
        configuration section.
 
+       repository.
+           function sanitize-rss-field
+           function remove-leading-spaces.
+           
        input-output section.
            file-control.
                select temp-rss-file
@@ -57,7 +61,7 @@
        77  raw-buffer-2               pic x(:BUFFER-SIZE:) value spaces.
        77  counter                                 pic 99 value 1.
 
-       77  search-count                            pic 9 value zero.
+       77  search-count                            pic 999 value zeros.
 
        77  next-rss-id                             pic 9(5) value zeros.
        77  temp-id                                 pic 9(5) value zeros.
@@ -294,96 +298,37 @@
            end-call
 
       * Sanitize RSS feed info.
-           move function substitute(ws-feed-title, 
-               "&amp;", "&",
-               "&#38;", "&",
-               "&quot;", '"',
-               "&#8211;", "-",
-               "<title>", space, 
-               "</title>", space,
-               "&#39;", "'",
-               spaces, space) 
+           move function sanitize-rss-field(ws-feed-title) 
                to ws-feed-title
 
-           move function substitute(ws-feed-site-link, 
-               "&amp;", "&",
-               "&#38;", "&",
-               "<link>", space, 
-               "</link>", space) 
+           move function sanitize-rss-field(ws-feed-site-link) 
                to ws-feed-site-link
-           
-           move function substitute(ws-feed-desc, 
-               "&amp;", "&",
-               "&#38;", "&",
-               "&quot;", '"',
-               "&#8211;", "-",
-               "<description>", space, 
-               "</description>", space
-               "&#39;", "'") 
+
+           move function sanitize-rss-field(ws-feed-desc) 
                to ws-feed-desc
 
       * Sanitize rss item fields...
-           move 1 to counter
-           perform until counter = ws-max-rss-items
+           perform varying counter from 1 by 1 
+               until counter = ws-max-rss-items
 
-               move function substitute(ws-item-title(counter), 
-                   "&amp;", "&",
-                   "&#38;", "&",
-                   "&#038;", "&",
-                   "&#8211;", "-",
-                   "<title>", space, 
-                   "</title>", space,
-                   "&#39;", "'",
-                   "&quot;", '"',
-                   spaces, space) 
+               move function sanitize-rss-field(ws-item-title(counter)) 
                    to ws-item-title(counter)
 
-               move function substitute(ws-item-guid(counter), 
-                   "&amp;", "&",
-                   "&#38;", "&",
-                   "<guid>", space, 
-                   '<guid isPermaLink="false">', space,
-                   '<guid isPermaLink="true">', space,
-                   "</guid>", space)
+               move function sanitize-rss-field(ws-item-guid(counter)) 
                    to ws-item-guid(counter)
 
-               move function substitute(ws-item-pub-date(counter), 
-                   "<pubDate>", space, 
-                   "</pubDate>", space)
+               move function 
+                   sanitize-rss-field(ws-item-pub-date(counter)) 
                    to ws-item-pub-date(counter)
 
-               move function substitute(ws-item-link(counter), 
-                   "&amp;", "&",
-                   "&#38;", "&",
-                   "<link>", space, 
-                   "</link>", space) 
+               move function 
+                   sanitize-rss-field(ws-item-link(counter)) 
                    to ws-item-link(counter)
 
-               move function substitute(ws-item-desc(counter), 
-                   "&amp;", "&",
-                   "&#38;", "&",
-                   "&#8211;", "-",
-                   "<description>", space, 
-                   "</description>", space
-                   "&lt;br /&gt;", space
-                   "&lt;br&gt;", space
-                   "&lt;a", space
-                   "target=&quot;_blank&quot;", space
-                   "href=&quot;", space
-                   "&quot;&gt;", space
-                   "&lt;/a&gt;", space
-                   "&lt;h1&gt;", space
-                   "&lt;/h1&gt;", space
-                   "&lt;hr /&gt;", space
-                   "&#39;", "'",
-                   "&quot;", '"',
-                   "&lt;/h2&gt;", space
-                   "&lt;h2&gt;", space,
-                   "&lt;pre&gt;", space,
-                   "&lt;/pre&gt;", space) 
+               move function 
+                   sanitize-rss-field(ws-item-desc(counter)) 
                    to ws-item-desc(counter)
 
-               add 1 to counter 
            end-perform
 
            exit paragraph.
@@ -574,5 +519,6 @@
            close rss-last-id-file
 
            exit paragraph. 
+
 
        end function rss-parser.
