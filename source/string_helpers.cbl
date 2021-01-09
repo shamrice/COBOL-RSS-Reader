@@ -50,29 +50,47 @@
 
            set ws-non-space-not-found to true 
 
+      * TODO : tabs counted as 2 here but offset is actually just 1. Causes
+      *        some fields to lose a char to two at the beginning.
+
            perform varying ws-space-count 
                from 1 by 1 until ws-non-space-found
 
                if ls-field(ws-space-count:) greater than space then
                    set ws-non-space-found to true
+      *  Due to issue above, leaning on side of caution and adding back one space.
+                   subtract 1 from ws-space-count
                else 
                    if ws-space-count > ws-length then 
                        set ws-non-space-found to true 
-                       move 1 to ws-space-count
+                       move 0 to ws-space-count
                    end-if 
                end-if
            end-perform
 
-           compute ws-final-offset = ws-length - ws-space-count
+           if ws-space-count > 1 then 
+               
+               compute ws-final-offset = ws-length - ws-space-count
 
-           call "logger" using function concatenate("Found ", 
-               ws-space-count, " leading spaces in field. Length: ",
-               ws-length, " : Final offset: ", ws-final-offset)
-           end-call
+               call "logger" using function concatenate("Found ", 
+                   ws-space-count, " leading spaces in field. Length: ",
+                   ws-length, " : Final offset: ", ws-final-offset)
+               end-call
+               
+               move ls-field(ws-space-count:ws-final-offset) 
+                   to ls-updated-record
 
-           move ls-field(ws-space-count:ws-final-offset) 
-               to ls-updated-record
+           else              
+               call "logger" using function concatenate(
+                   "No leading spaces in field. Length: ",
+                   ws-length)
+               end-call
+               
+               move ls-field to ls-updated-record
+           end-if
 
+
+           
            goback.
 
        end function remove-leading-spaces.
@@ -121,7 +139,6 @@
                goback
            end-if
            
-
            call "logger" using 
                function concatenate("Sanitizing raw RSS field: ", 
                function trim(ls-field))
@@ -130,7 +147,9 @@
            move function substitute(ls-field, 
                "&amp;", "&",
                "&#38;", "&",
+               "&#038;", "&",
                "&#8211;", "-",
+               "&#8217;", "'",
                "<description>", space, 
                "</description>", space,
                "<title>", space, 
@@ -158,8 +177,21 @@
                "&lt;/h2&gt;", space,
                "&lt;h2&gt;", space,
                "&lt;pre&gt;", space,
-               "&lt;/pre&gt;", space)       
-               to ls-field     
+               "&lt;/pre&gt;", space,   
+               "<![CDATA[", space,
+               "]]>", space,
+               '<a href="', space,
+               '">', space,
+               "</a>", space,
+               "<p>", space,
+               "</p>", space,
+               "<i>", space, 
+               "</i>", space,
+               "<u>", space,
+               "</u>", space,
+               "<b>", space,
+               "</b>", space
+               ) to ls-field  
 
            move function remove-leading-spaces(ls-field) 
                to ls-updated-record

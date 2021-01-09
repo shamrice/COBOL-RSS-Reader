@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-16
-      * Last Modified: 2021-01-04
+      * Last Modified: 2021-01-09
       * Purpose: Screen definition for rss_reader_view_feed program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -26,12 +26,12 @@
                10 sub-header-line-1
                    foreground-color cob-color-black background-color 7.
                    15 line 3 pic x(80) from empty-line.                   
-                   15 line 3 column 4 pic x(70) from ws-feed-site-link. 
+                   15 line 3 column 2 pic x(70) from ws-feed-site-link. 
                                    
                10  sub-header-line-2
                    foreground-color cob-color-black background-color 7.
                    15 line 4 pic x(80) from empty-line.                   
-                   15 line 4 column 4 pic x(70) from ws-feed-desc. 
+                   15 line 4 column 2 pic x(70) from ws-feed-desc. 
                                    
                10  line 5  column 2 
                    pic x to ws-accept-item. 
