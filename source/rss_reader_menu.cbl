@@ -93,8 +93,7 @@
 
        77  download-and-parse-status           pic 9 value zero.
 
-       78  new-line                            value x"0a".
-       
+      
        77  ws-rss-content-file-name          pic x(255) value spaces.
        78  ws-rss-list-file-name             value "./feeds/list.dat".
        78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
@@ -163,6 +162,10 @@
                                cancel "rss-reader-view-feed"
                            end-if
                        end-if
+
+                   when crt-status = COB-SCR-F1
+                       call "rss-reader-help"
+                       cancel "rss-reader-help"
 
                    when crt-status = COB-SCR-F3
                        call "rss-reader-add-feed"

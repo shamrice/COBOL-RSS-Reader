@@ -58,7 +58,6 @@
 
        77  empty-line                        pic x(80) value spaces. 
 
-       78  new-line                          value x"0a".
        78  ws-rss-list-file-name             value "./feeds/list.dat".
 
        linkage section.

@@ -1,14 +1,14 @@
 #!/bin/bash
 
 #
-# Last updated: 2021-01-09
+# Last updated: 2021-01-10
 #
 # Builds sets placeholder values in source code based on variables at start of script 
 # and compiles the application. Once compilation step is completed, placeholders are 
 # set back to original placeholder values.
 #
 
-APP_VERSION=\"v0.26\"
+APP_VERSION=\"v0.27\"
 SOURCE_URL=\"https\\:\\/\\/github.com\\/shamrice\\/COBOL-RSS-Reader\"
 CUR_BUILD_DATE=\"$(date +%Y-%m-%d)\"
 
@@ -22,14 +22,20 @@ echo Replacing placeholders in source with values for build process.
 sed -i "s/__APP_VERSION/$APP_VERSION/" crssr.cbl
 sed -i "s/__SOURCE_URL/$SOURCE_URL/" crssr.cbl
 sed -i "s/__BUILD_DATE/$CUR_BUILD_DATE/" crssr.cbl
+sed -i "s/__APP_VERSION/$APP_VERSION/" rss_reader_help.cbl
+sed -i "s/__SOURCE_URL/$SOURCE_URL/" rss_reader_help.cbl
+sed -i "s/__BUILD_DATE/$CUR_BUILD_DATE/" rss_reader_help.cbl
 
 echo Compiling...
-cobc -O -x crssr.cbl rss_parser.cbl rss_reader_menu.cbl rss_reader_view_feed.cbl rss_reader_view_item.cbl rss_downloader.cbl browser_launcher.cbl rss_reader_add_feed.cbl rss_reader_delete_feed.cbl remove_rss_record.cbl logger.cbl string_helpers.cbl cobweb-pipes.cob -o crssr 
+cobc -O -x crssr.cbl rss_parser.cbl rss_reader_menu.cbl rss_reader_view_feed.cbl rss_reader_view_item.cbl rss_downloader.cbl browser_launcher.cbl rss_reader_add_feed.cbl rss_reader_delete_feed.cbl rss_reader_help.cbl remove_rss_record.cbl logger.cbl string_helpers.cbl cobweb-pipes.cob -o crssr 
 
 echo Setting placeholders back to placeholder names for next build.
 sed -i "s/$APP_VERSION/__APP_VERSION/" crssr.cbl
 sed -i "s/$SOURCE_URL/__SOURCE_URL/" crssr.cbl
 sed -i "s/$CUR_BUILD_DATE/__BUILD_DATE/" crssr.cbl
+sed -i "s/$APP_VERSION/__APP_VERSION/" rss_reader_help.cbl
+sed -i "s/$SOURCE_URL/__SOURCE_URL/" rss_reader_help.cbl
+sed -i "s/$CUR_BUILD_DATE/__BUILD_DATE/" rss_reader_help.cbl
 
 echo
 echo Done.

@@ -58,8 +58,6 @@
        77  ws-rss-content-file-name                  pic x(255) 
                                                      value spaces.
       
-       78  new-line                                  value x"0a".
-
        linkage section.
            01  ls-rss-content-file-name              pic x(255).
 

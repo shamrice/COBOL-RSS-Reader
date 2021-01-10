@@ -67,8 +67,6 @@
        77  temp-id                                 pic 9(5) value zeros.
        77  id-found                                pic a values 'N'.
 
-       78  new-line                                 value x"0a".
-
        77  ws-rss-content-file-name pic x(21) value "./feeds/UNSET.dat".
        78  ws-rss-list-file-name              value "./feeds/list.dat".
        78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".

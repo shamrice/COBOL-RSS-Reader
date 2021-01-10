@@ -53,9 +53,7 @@
        77  empty-line                        pic x(80) value spaces. 
 
        77  launch-status                     pic 9 value 9.
-      
-       78  new-line                          value x"0a".
-
+     
        linkage section.
 
        01  ls-feed-title                     pic x any length.

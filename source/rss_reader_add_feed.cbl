@@ -49,10 +49,7 @@
 
        77  empty-line                        pic x(80) value spaces. 
 
-       78  new-line                          value x"0a".
-
        linkage section.
-
 
        screen section.
        
