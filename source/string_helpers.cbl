@@ -164,6 +164,8 @@
                "</pubDate>", space,
                "&lt;br /&gt;", space,
                "&lt;br&gt;", space,
+               "&lt;b&gt;", space,
+               "&lt;/b&gt;", space,
                "&lt;a", space,
                "target=&quot;_blank&quot;", space,
                "href=&quot;", space,
