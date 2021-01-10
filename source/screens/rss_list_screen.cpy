@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-11
-      * Last Modified: 2021-01-03
+      * Last Modified: 2021-01-10
       * Purpose: Screen definition for rss_reader_menu program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -94,19 +94,51 @@
                    pic x to accept-item1. 
                10  column 4 pic x(70) from ws-display-list-title(16).                            
 
-               10  help-text 
-                   foreground-color 2 background-color 0. 
-                   
-                   15  line 19 column 12 
+               10  help-line-1
+                   foreground-color cob-color-black background-color 7.
+
+                   15  line 20 pic x(80) from empty-line.                   
+                   15  line 20 column 8
                        value 
-           " Use the arrow keys to move the cursor among RSS Feeds. ". 
-                   
-                   15  line 20 column 12 
-                       value 
-           " Press <Return> to view selected RSS Feed               ". 
-          
-                   15  line 21 column 2 
-                       value 
-           " <F3> Add Feed <F4> Delete Feed <F5> Refresh Feeds      ".
-                   15  line 21 column 52 value
-           " <F10> Exit                                             ".
+            "Arrow Keys or Tab to move between feeds. Enter to select.".
+
+               10  help-text-2.
+                   15  foreground-color cob-color-black 
+                   background-color cob-color-white line 21 column 7
+                   value "F1".
+
+                   15  foreground-color cob-color-white 
+                   background-color cob-color-black line 21 column 10
+                   value "Help".
+
+                   15  foreground-color cob-color-black 
+                   background-color cob-color-white line 21 column 15
+                   value "F3".
+
+                   15  foreground-color cob-color-white 
+                   background-color cob-color-black line 21 column 18
+                   value "Add Feed".
+
+                   15  foreground-color cob-color-black 
+                   background-color cob-color-white line 21 column 27
+                   value "F4".
+
+                   15  foreground-color cob-color-white 
+                   background-color cob-color-black line 21 column 30
+                   value "Delete Feed".
+
+                   15  foreground-color cob-color-black 
+                   background-color cob-color-white line 21 column 42
+                   value "F5".
+
+                   15  foreground-color cob-color-white 
+                   background-color cob-color-black line 21 column 45
+                   value "Refresh Feeds".
+
+                   15  foreground-color cob-color-black
+                   background-color cob-color-white line 21 column 59
+                   value "F10".
+
+                   15  foreground-color cob-color-white 
+                   background-color cob-color-black line 21 column 63
+                   value "Exit".

@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-16
-      * Last Modified: 2021-01-09
+      * Last Modified: 2021-01-10
       * Purpose: Screen definition for rss_reader_view_feed program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -97,17 +97,20 @@
                    pic x to ws-accept-item. 
                10  column 4 pic x(70) from ws-item-title(15). 
 
-               10  help-text 
-                   foreground-color 2 background-color 0. 
-                   
-                   15  line 20 column 12 
-                       value 
-           " Use the arrow keys to move the cursor among RSS Entries. ". 
-                   
-                   15  line 21 column 12 
-                       value 
-           " Press <Return> to view selected RSS Feed Entry           ". 
-          
-                   15  line 22 column 12 
-                       value 
-           " Press <ESC> to return to previous menu.                  ".
+               10  help-text-1.
+                   15  foreground-color cob-color-black 
+                   background-color cob-color-white line 21 column 8
+                   value " Enter ".
+
+                   15  foreground-color cob-color-white 
+                   background-color cob-color-black line 21 column 16
+                   value "View Feed Item".
+
+                   15  foreground-color cob-color-black 
+                   background-color cob-color-white line 21 column 35
+                   value " ESC ".
+
+                   15  foreground-color cob-color-white 
+                   background-color cob-color-black line 21 column 41
+                   value "Return to RSS List".
+
