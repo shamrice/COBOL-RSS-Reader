@@ -10,9 +10,9 @@ Run the shell script "build.sh" in the source directory.
   ```./crssr```
 * Open application in interactive mode and do not refresh feeds at start:
   ```./crssr --no-refresh``
-* Open applicatoin in interactive mode with logging enabled: 
+* Open application in interactive mode and enable logging: 
   ```./crssr --logging=true```
-* Open application in interactive mode with logging disabled (default):
+* Open application in interactive mode and disable logging (default if not set):
   ```./crssr -logging=false```
 * Download and parse an RSS feed into feed list: 
   ```./crssr -a [url of rss feed]```

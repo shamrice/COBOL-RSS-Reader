@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-10
-      * Last Modified: 2021-01-10
+      * Last Modified: 2021-01-11
       * Purpose: RSS Reader Help - Screen sub program to show help
       * Tectonics: ./build.sh
       ******************************************************************
@@ -110,6 +110,9 @@
 
                when ws-page-num = 4
                    perform set-page-4-text
+
+               when ws-page-num = 5
+                   perform set-page-5-text
 
                when other
                    set exit-true to true 
@@ -236,16 +239,47 @@
            move "The log file name uses the following format:"
                to ws-display-text(15) 
            move "  crssr_YYYYMMDD.log" to ws-display-text(16)
-           move function concatenate(
-           "The date in the file name will roll over to the next day ",
-           "automatically") to ws-display-text(17)
+           move spaces to ws-display-text(17)
            move spaces to ws-display-text(18)  
        
            exit paragraph.
 
 
-
        set-page-4-text.
+
+           move function concatenate(
+           "  The date in the file name will roll over to the next ",
+           "day automatically") to ws-display-text(1)
+           move spaces to ws-display-text(2)
+           move function concatenate(
+           "  Logging by default is turned off when not set in the ",
+           "configuration file.") to ws-display-text(3) 
+           move function concatenate(
+           "  It can be turned on and off using the following command ",
+           "line parameters.") to ws-display-text(4) 
+           move spaces to ws-display-text(5)
+           move "Turn on logging:" to ws-display-text(6) 
+           move "  crssr --logging=true" to ws-display-text(7) 
+           move spaces to ws-display-text(8) 
+           move "Turn off logging:" to ws-display-text(9) 
+           move "  crssr --logging=false" to ws-display-text(10)
+           move spaces to ws-display-text(11)
+           move function concatenate(
+           "NOTE: These values will persist until the config ",
+           "file is updated using") to ws-display-text(12) 
+           move function concatenate(
+           "      the command line parameter or the configuration file",
+           " is deleted.")to ws-display-text(13)  
+           move spaces to ws-display-text(14)  
+           move spaces to ws-display-text(15)  
+           move spaces to ws-display-text(16)  
+           move spaces to ws-display-text(17)  
+           move spaces to ws-display-text(18)  
+       
+           exit paragraph.
+
+
+       set-page-5-text.
            move spaces to ws-display-text(1) 
            move "About:" to ws-display-text(2) 
            move "        By: Erik Eriksen" to ws-display-text(3) 

@@ -15,6 +15,7 @@
        configuration section.
 
        repository.
+           function get-config
            function rss-downloader
            function remove-rss-record.
 
@@ -47,6 +48,8 @@
 
        77  download-status                     pic 9 value zero.
 
+       77  log-config-value                    pic x(16) value spaces.
+
        78  new-line                            value x"0a".
        78  log-enabled-switch                  value "==ENABLE-LOG==".
        78  log-disabled-switch                 value "==DISABLE-LOG==".
@@ -54,7 +57,6 @@
        78  program-version                     value __APP_VERSION.
        78  web-url value __SOURCE_URL.
        78  build-date                          value __BUILD_DATE.
-
 
        procedure division.
 
@@ -70,7 +72,10 @@
 
            accept cmd-args-buffer from command-line 
            perform parse-cmd-args
-          
+
+           perform set-logging-based-on-config
+
+
            if is-add-feed then 
                if cmd-args-buffer(4:4) not = "http" and "HTTP" then
                    display 
@@ -159,11 +164,11 @@
                    exit paragraph 
                end-if 
                if cmd-args-buffer(11:4) = "true" then 
-                   display "Logging is turned on."
-                   call "logger" using log-enabled-switch
+                   display "Logging is now enabled. Saving to config."
+                   call "save-config" using "logging" "true"
                else
-                   display "Logging is turned off."
-                   call "logger" using log-disabled-switch
+                   display "Logging is now disabled. Saving to config."
+                   call "save-config" using "logging" "false"
                end-if
                set is-valid-param to true 
                set is-interactive to true 
@@ -179,6 +184,23 @@
            
            exit paragraph.
 
+
+
+       set-logging-based-on-config.
+
+      * Enable / disable logging based on config.    
+           move function get-config("logging") to log-config-value
+           if log-config-value = "true" then 
+               display "Logging is enabled in config. Turning on."
+               call "logger" using log-enabled-switch
+           else 
+               display "Logging disabled in config. Turning off."
+               call "logger" using log-disabled-switch
+           end-if
+
+           exit paragraph.
+
+
        print-help.
 
            display
@@ -190,9 +212,9 @@
                "  crssr --no-refesh           Start interactive "
                "mode without refreshing feeds" new-line
                "  crssr --logging=true        Start interactive "
-               "mode with logs enabled." new-line
+               "mode and enables logging." new-line
                "  crssr --logging=false       Start interactive "
-               "mode with logs disabled." new-line
+               "mode and disables logging." new-line
                "  crssr -a [url of rss feed]  Add a new RSS feed "
                "to RSS feed list."
                new-line
