@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-12-26
-      *> Last Updated: 2020-01-11
+      *> Last Updated: 2021-01-11
       *> Purpose: File logger for CRSSR
       *> Tectonics:
       *>     ./build.sh
