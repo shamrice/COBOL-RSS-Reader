@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-12-26
-      *> Last Updated: 2020-12-27
+      *> Last Updated: 2020-01-11
       *> Purpose: File logger for CRSSR
       *> Tectonics:
       *>     ./build.sh
@@ -43,6 +43,10 @@
                10  ws-milli              pic 99.
            05  ws-time-offset            pic S9(4).
 
+       01  log-enabled-sw               pic a value 'N'.
+           88  log-enabled              value 'Y'.
+           88  log-disabled             value 'N'.
+
        77  ws-log-buffer                 pic x(:BUFFER-SIZE:).
 
        77  ws-file-name               pic x(18) value "crssr_UNSET.log".
@@ -50,13 +54,26 @@
 
        linkage section.
        01  ls-log-text                   pic x any length.
-      
 
        procedure division 
            using ls-log-text.
 
        main-procedure.
-           
+
+      * If log text is disable log flag or enable log flag, turn log enabled
+      * switch on and off as needed.
+           if ls-log-text = "==DISABLE-LOG==" then
+               set log-disabled to true
+           end-if 
+
+           if ls-log-text = "==ENABLE-LOG==" then 
+               set log-enabled to true
+           end-if
+
+           if log-disabled then 
+               goback
+           end-if 
+
            move spaces to ws-log-buffer
 
            move function current-date to ws-date-record

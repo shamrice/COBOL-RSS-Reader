@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2021-01-04
+      *> Last Updated: 2021-01-11
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -48,6 +48,8 @@
        77  download-status                     pic 9 value zero.
 
        78  new-line                            value x"0a".
+       78  log-enabled-switch                  value "==ENABLE-LOG==".
+       78  log-disabled-switch                 value "==DISABLE-LOG==".
 
        78  program-version                     value __APP_VERSION.
        78  web-url value __SOURCE_URL.
@@ -151,6 +153,23 @@
                exit paragraph           
            end-if
 
+      * Set logging based on logging param and start in interactive mode.
+           if cmd-args-buffer(1:10) = "--logging=" then
+               if cmd-args-buffer(11:5) not = "true" and "false" then 
+                   exit paragraph 
+               end-if 
+               if cmd-args-buffer(11:4) = "true" then 
+                   display "Logging is turned on."
+                   call "logger" using log-enabled-switch
+               else
+                   display "Logging is turned off."
+                   call "logger" using log-disabled-switch
+               end-if
+               set is-valid-param to true 
+               set is-interactive to true 
+               exit paragraph 
+           end-if
+
            if cmd-args-buffer = spaces  then
                set is-valid-param to true 
                set is-interactive to true 
@@ -166,13 +185,14 @@
                "CRSSR is a console RSS reader application written in "
                "COBOL." new-line new-line
                "Usage:" new-line
-               "  crssr                       Run application "
-               "with no arguments to start application "
-               "in interactive mode and refresh feeds." new-line
-
+               "  crssr                       Start interactive " 
+               "mode and refresh feeds." new-line
                "  crssr --no-refesh           Start interactive "
                "mode without refreshing feeds" new-line
-
+               "  crssr --logging=true        Start interactive "
+               "mode with logs enabled." new-line
+               "  crssr --logging=false       Start interactive "
+               "mode with logs disabled." new-line
                "  crssr -a [url of rss feed]  Add a new RSS feed "
                "to RSS feed list."
                new-line
