@@ -144,7 +144,7 @@
                function trim(ls-field))
            end-call
 
-           move function substitute(ls-field, 
+           move function substitute-case(ls-field, 
                "&amp;", "&",
                "&#38;", "&",
                "&#038;", "&",
