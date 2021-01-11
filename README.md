@@ -13,7 +13,7 @@ Run the shell script "build.sh" in the source directory.
 * Open application in interactive mode and enable logging: 
   ```./crssr --logging=true```
 * Open application in interactive mode and disable logging (default if not set):
-  ```./crssr -logging=false```
+  ```./crssr --logging=false```
 * Download and parse an RSS feed into feed list: 
   ```./crssr -a [url of rss feed]```
 * Delete existing RSS feed from feed list:
