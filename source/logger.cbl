@@ -43,14 +43,17 @@
                10  ws-milli              pic 99.
            05  ws-time-offset            pic S9(4).
 
-       01  log-enabled-sw               pic a value 'N'.
-           88  log-enabled              value 'Y'.
-           88  log-disabled             value 'N'.
+       01  log-enabled-sw                pic a value 'N'.
+           88  log-enabled               value 'Y'.
+           88  log-disabled              value 'N'.
 
        77  ws-log-buffer                 pic x(:BUFFER-SIZE:).
 
        77  ws-file-name               pic x(18) value "crssr_UNSET.log".
- 
+
+       78  log-enabled-switch            value "==ENABLE-LOG==".
+       78  log-disabled-switch           value "==DISABLE-LOG==".
+
 
        linkage section.
        01  ls-log-text                   pic x any length.
@@ -62,11 +65,11 @@
 
       * If log text is disable log flag or enable log flag, turn log enabled
       * switch on and off as needed.
-           if ls-log-text = "==DISABLE-LOG==" then
+           if ls-log-text = log-disabled-switch then
                set log-disabled to true
            end-if 
 
-           if ls-log-text = "==ENABLE-LOG==" then 
+           if ls-log-text = log-enabled-switch then 
                set log-enabled to true
            end-if
 
