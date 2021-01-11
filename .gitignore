@@ -4,5 +4,5 @@ source/feeds/*.dat
 source/feeds/*.dat.*
 source/crssr
 source/*.log
-
+source/*.conf
 
