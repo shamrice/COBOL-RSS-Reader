@@ -87,7 +87,7 @@
        77  ws-counter                          pic 9(5) value 1.
        77  ws-rss-idx                          pic 9(5) value 1.
 
-       77  empty-line                          pic x(80) value spaces. 
+       77  ws-empty-line                       pic x(80) value spaces. 
 
        77  ws-download-and-parse-status        pic 9 value zero.
 

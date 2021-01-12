@@ -38,16 +38,16 @@
        01  ws-add-feed-status                pic 9 value zero.
 
        01  ws-message-screen-fields.
-           05  ws-msg-title                    pic x(70) value spaces.
-           05  ws-msg-body                     occurs 2 times.
-               10  ws-msg-body-text            pic x(70) value spaces.
-           05  ws-msg-input                    pic x value space.
+           05  ws-msg-title                  pic x(70) value spaces.
+           05  ws-msg-body                   occurs 2 times.
+               10  ws-msg-body-text          pic x(70) value spaces.
+           05  ws-msg-input                  pic x value space.
          
-       01  ws-exit-sw                           pic a value 'N'.
-           88  ws-exit-true                     value 'Y'.
-           88  ws-exit-false                    value 'N'.
+       01  ws-exit-sw                        pic a value 'N'.
+           88  ws-exit-true                  value 'Y'.
+           88  ws-exit-false                 value 'N'.
 
-       77  empty-line                        pic x(80) value spaces. 
+       77  ws-empty-line                     pic x(80) value spaces. 
 
        linkage section.
 

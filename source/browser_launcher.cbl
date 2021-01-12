@@ -30,8 +30,6 @@
        01  ws-web-cmd.
            05  ws-browser-cmd                   pic x(5) value "lynx ".
            05  ws-url                           pic x(255) value spaces.
-  
-       77  empty-line                        pic x(80) value spaces. 
 
        77  ws-launch-status                     pic 9 value 9.
       

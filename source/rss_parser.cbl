@@ -38,6 +38,15 @@
            copy "./copybooks/filedescriptor/fd_rss_list_file.cpy".
            copy "./copybooks/filedescriptor/fd_rss_last_id_file.cpy".
 
+
+       working-storage section.
+
+       77  ws-rss-content-file-name          pic x(21) 
+                                             value "./feeds/UNSET.dat".
+       78  ws-rss-list-file-name             value "./feeds/list.dat".
+       78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
+
+ 
       * variable values are not persisted between runs for local storage                              
        local-storage section.
        
@@ -67,13 +76,6 @@
        77  ls-next-rss-id                        pic 9(5) value zeros.
 
        77  ls-id-found                           pic a values 'N'.
-
-
-       77  ws-rss-content-file-name          pic x(21) 
-                                             value "./feeds/UNSET.dat".
-
-       78  ws-rss-list-file-name             value "./feeds/list.dat".
-       78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
 
        linkage section.
            01  l-file-name                       pic x(255).

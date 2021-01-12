@@ -56,7 +56,7 @@
            88  ws-exit-true                  value 'Y'.
            88  ws-exit-false                 value 'N'.
 
-       77  empty-line                        pic x(80) value spaces. 
+       77  ws-empty-line                     pic x(80) value spaces. 
 
        78  ws-rss-list-file-name             value "./feeds/list.dat".
 

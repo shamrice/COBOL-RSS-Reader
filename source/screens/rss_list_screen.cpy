@@ -15,13 +15,13 @@
                10  s-title-line
                    foreground-color cob-color-white background-color 1. 
 
-                   15 line 1 pic x(80) from empty-line.
+                   15 line 1 pic x(80) from ws-empty-line.
                    15 line 1 column 32 value "COBOL RSS Reader". 
 
                10  s-header-line
                    foreground-color cob-color-black background-color 7.
 
-                   15 line 2 pic x(80) from empty-line.                   
+                   15 line 2 pic x(80) from ws-empty-line.                   
                    15 line 2 column 5 value "RSS Feed Name".
                
                10  line 3  column 2 
@@ -97,7 +97,7 @@
                10  s-help-line-1
                    foreground-color cob-color-black background-color 7.
 
-                   15  line 20 pic x(80) from empty-line.                   
+                   15  line 20 pic x(80) from ws-empty-line.                   
                    15  line 20 column 8
                        value 
             "Arrow Keys or Tab to move between feeds. Enter to select.".
