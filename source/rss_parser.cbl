@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2021-01-09
+      * Last Modified: 2021-01-12
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -21,8 +21,8 @@
            
        input-output section.
            file-control.
-               select temp-rss-file
-               assign to dynamic ls-file-name
+               select fd-temp-rss-file
+               assign to dynamic l-file-name
                organization is line sequential.
 
                copy "./copybooks/filecontrol/rss_content_file.cpy".
@@ -31,8 +31,8 @@
                
        data division.
        file section.
-           FD temp-rss-file.
-           01 temp-rss-file-raw                 pic x(:BUFFER-SIZE:).
+           FD fd-temp-rss-file.
+           01 f-temp-rss-file-raw                 pic x(:BUFFER-SIZE:).
 
            copy "./copybooks/filedescriptor/fd_rss_content_file.cpy".
            copy "./copybooks/filedescriptor/fd_rss_list_file.cpy".
@@ -45,75 +45,75 @@
        copy "./copybooks/wsrecord/ws-rss-list-record.cpy".
        copy "./copybooks/wsrecord/ws-last-id-record.cpy".
      
+       01  ls-eof-sw                             pic a value 'N'.
+           88 ls-eof                                 value 'Y'.
+           88 ls-not-eof                             value 'N'.
 
-       01  eof-sw                                   pic a value 'N'.
-           88 eof                                   value 'Y'.
-           88 not-eof                               value 'N'.
+       77  ls-is-desc-single-line                pic a value 'N'.
+       77  ls-in-description                     pic a value 'N'.
+       77  ls-in-items                           pic a value 'N'.
+       77  ls-item-idx                           pic 99 value 1.
 
-       77  is-desc-single-line                      pic a value 'N'.
-       77  in-description                           pic a value 'N'.
-       77  in-items                                 pic a value 'N'.
-       77  item-idx                                 pic 99 value 1.
+       77  ls-desc-temp                          pic x(255) 
+                                                 value spaces.
 
-       77  desc-temp                            pic x(255) value spaces.
+       77  ls-raw-buffer                         pic x(:BUFFER-SIZE:) 
+                                                 value spaces.
 
-       77  raw-buffer                 pic x(:BUFFER-SIZE:) value spaces.
-       77  raw-buffer-2               pic x(:BUFFER-SIZE:) value spaces.
-       77  counter                                 pic 99 value 1.
+       77  ls-counter                            pic 99 value 1.
 
-       77  search-count                            pic 999 value zeros.
+       77  ls-search-count                       pic 999 value zeros.
 
-       77  next-rss-id                             pic 9(5) value zeros.
-       77  temp-id                                 pic 9(5) value zeros.
-       77  id-found                                pic a values 'N'.
+       77  ls-next-rss-id                        pic 9(5) value zeros.
 
-       77  ws-rss-content-file-name pic x(21) value "./feeds/UNSET.dat".
-       78  ws-rss-list-file-name              value "./feeds/list.dat".
+       77  ls-id-found                           pic a values 'N'.
+
+
+       77  ws-rss-content-file-name          pic x(21) 
+                                             value "./feeds/UNSET.dat".
+
+       78  ws-rss-list-file-name             value "./feeds/list.dat".
        78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
 
-       01  remove-space-field.
-           03  rsf-leading-space       pic x.
-           03  rsf-rest                pic x(100).
-
        linkage section.
-           01  ls-file-name                       pic x(255).
-           01  ls-feed-url                        pic x(256).
+           01  l-file-name                       pic x(255).
+           01  l-feed-url                        pic x(256).
 
-           01  ls-parse-status                    pic S9 value zero.
-               88 return-status-success           value 1.
-               88 return-status-fail              value 2.
+           01  l-parse-status                    pic S9 value zero.
+               88 l-return-status-success           value 1.
+               88 l-return-status-fail              value 2.
 
        procedure division 
-           using ls-file-name ls-feed-url
-           returning ls-parse-status.
+           using l-file-name l-feed-url
+           returning l-parse-status.
 
        main-procedure.
 
            call "logger" using function concatenate(
-               "File name to parse: ", function trim(ls-file-name),
-               " Source feed url: ", function trim(ls-feed-url))
+               "File name to parse: ", function trim(l-file-name),
+               " Source feed url: ", function trim(l-feed-url))
            end-call
 
            call "logger" using "Parsing RSS feed..."
-           open input temp-rss-file
-               perform until eof
-                   read temp-rss-file into raw-buffer
-                       at end set eof to true
+           open input fd-temp-rss-file
+               perform until ls-eof
+                   read fd-temp-rss-file into ls-raw-buffer
+                       at end set ls-eof to true
                    not at end
-                       call "logger" using function trim(raw-buffer)
+                       call "logger" using function trim(ls-raw-buffer)
 
                        perform parse-buffer-line
 
                    end-read
                end-perform
-           close temp-rss-file.
+           close fd-temp-rss-file.
 
            perform remove-tags-in-record
            perform print-parsed-record
            perform save-parsed-record
 
-           if ls-parse-status is zero then     
-               set return-status-success to true 
+           if l-parse-status is zero then     
+               set l-return-status-success to true 
            end-if
 
            goback.
@@ -123,165 +123,171 @@
        parse-buffer-line.
 
       *> reset single line flag each line.
-           move 'N' to is-desc-single-line
+           move 'N' to ls-is-desc-single-line
 
       *> search for item end
-           move zero to search-count
-           inspect raw-buffer tallying search-count for all "</item>"
+           move zero to ls-search-count
+           inspect ls-raw-buffer 
+               tallying ls-search-count for all "</item>"
 
-           if search-count > 0 then
+           if ls-search-count > 0 then
                call "logger" using function concatenate(
-                   "Found item end: ", function trim(raw-buffer))
+                   "Found item end: ", function trim(ls-raw-buffer))
                end-call
-               move 'N' to in-items
-               add 1 to item-idx
+               move 'N' to ls-in-items
+               add 1 to ls-item-idx
            end-if
 
 
       *> search for item start
-           move zero to search-count
-           inspect raw-buffer tallying search-count for all "<item>"
+           move zero to ls-search-count
+           inspect ls-raw-buffer 
+               tallying ls-search-count for all "<item>"
 
-           if search-count > 0 then
+           if ls-search-count > 0 then
                call "logger" using function concatenate(
-                   "Found item start: ", function trim(raw-buffer))
+                   "Found item start: ", function trim(ls-raw-buffer))
                end-call
-               move 'Y' to in-items
-               move 'Y' to ws-item-exists(item-idx)
+               move 'Y' to ls-in-items
+               move 'Y' to ws-item-exists(ls-item-idx)
            end-if
 
       *> search for title
-           move zero to search-count
-           inspect raw-buffer tallying search-count for all "<title>"
+           move zero to ls-search-count
+           inspect ls-raw-buffer 
+                tallying ls-search-count for all "<title>"
 
-           if search-count > 0 then
+           if ls-search-count > 0 then
                call "logger" using function concatenate(
-                   "Found title: ", function trim(raw-buffer))
+                   "Found title: ", function trim(ls-raw-buffer))
                end-call
-               if in-items = 'N' then
+               if ls-in-items = 'N' then
                    call "logger" using "feed title"
-                   move function trim(raw-buffer) to ws-feed-title
+                   move function trim(ls-raw-buffer) to ws-feed-title
                else
                    call "logger" using "item title"
-                   move function trim(raw-buffer)
-                   to ws-item-title(item-idx)
+                   move function trim(ls-raw-buffer)
+                   to ws-item-title(ls-item-idx)
                end-if
            end-if
 
       *> search for link
-           move zero to search-count
-           inspect raw-buffer tallying search-count for all "<link>"
+           move zero to ls-search-count
+           inspect ls-raw-buffer 
+               tallying ls-search-count for all "<link>"
 
-           if search-count > 0 then
+           if ls-search-count > 0 then
                call "logger" using function concatenate(
-                   "Found link: ", function trim(raw-buffer))
+                   "Found link: ", function trim(ls-raw-buffer))
                end-call
-               if in-items = 'N' then
+               if ls-in-items = 'N' then
                    call "logger" using "feed site link"
-                   move function trim(raw-buffer) to ws-feed-site-link
+                   move function trim(ls-raw-buffer) 
+                       to ws-feed-site-link
                else
                    call "logger" using "item link"
-                   move function trim(raw-buffer)
-                   to ws-item-link(item-idx)
+                   move function trim(ls-raw-buffer)
+                   to ws-item-link(ls-item-idx)
                end-if
            end-if
 
       *> search item pub date
-           move zero to search-count
-           inspect raw-buffer tallying search-count for all "<pubDate>"
+           move zero to ls-search-count
+           inspect ls-raw-buffer 
+               tallying ls-search-count for all "<pubDate>"
 
-           if search-count > 0 then
+           if ls-search-count > 0 then
                call "logger" using function concatenate(
-                   "Found pub date: ", function trim(raw-buffer))
+                   "Found pub date: ", function trim(ls-raw-buffer))
                end-call
-               if in-items = 'Y' then
-                   move function trim(raw-buffer)
-                   to ws-item-pub-date(item-idx)
+               if ls-in-items = 'Y' then
+                   move function trim(ls-raw-buffer)
+                   to ws-item-pub-date(ls-item-idx)
                end-if
            end-if
 
       *> search for item guid
-           move zero to search-count
-           inspect raw-buffer
-               tallying search-count
+           move zero to ls-search-count
+           inspect ls-raw-buffer
+               tallying ls-search-count
                for all "<guid>"
                        '<guid isPermaLink="false">'
                        '<guid isPermaLink="true">'
 
-           if search-count > 0 then
-               if in-items = 'Y' then
+           if ls-search-count > 0 then
+               if ls-in-items = 'Y' then
                    call "logger" using function concatenate(
-                       "Found guid: " function trim(raw-buffer))
+                       "Found guid: " function trim(ls-raw-buffer))
                    end-call 
                    
-                   move function trim(raw-buffer)
-                   to ws-item-guid(item-idx)
+                   move function trim(ls-raw-buffer)
+                   to ws-item-guid(ls-item-idx)
                end-if
            end-if
 
 
       *> search for single line description
-           move zero to search-count
-           inspect raw-buffer
-           tallying search-count
+           move zero to ls-search-count
+           inspect ls-raw-buffer
+               tallying ls-search-count
                for all "<description>" "</description>"
 
-           if search-count = 2 then
+           if ls-search-count = 2 then
                call "logger" using function concatenate(
                    "Found single line desc: ",
-                   function trim(raw-buffer))
+                   function trim(ls-raw-buffer))
                end-call
-               move 'Y' to is-desc-single-line
-               if in-items = 'N' then
+               move 'Y' to ls-is-desc-single-line
+               if ls-in-items = 'N' then
                    call "logger" using "feed desc single"
-                   move function trim(raw-buffer) to ws-feed-desc
+                   move function trim(ls-raw-buffer) to ws-feed-desc
                else
                    call "logger" using "item desc single"
-                   move function trim(raw-buffer)
-                   to ws-item-desc(item-idx)
+                   move function trim(ls-raw-buffer)
+                   to ws-item-desc(ls-item-idx)
                end-if
            end-if
 
 
       *> search for description
-           if is-desc-single-line equals 'N' then
-               move zero to search-count
-               inspect raw-buffer
-               tallying search-count for all "<description>"
+           if ls-is-desc-single-line equals 'N' then
+               move zero to ls-search-count
+               inspect ls-raw-buffer
+                   tallying ls-search-count for all "<description>"
 
-               if search-count > 0 then
+               if ls-search-count > 0 then
                    call "logger" using "start of multiline description"
-                   move 'Y' to in-description
-                   move spaces to desc-temp
+                   move 'Y' to ls-in-description
+                   move spaces to ls-desc-temp
                end-if
 
-               if in-description = 'Y' then
+               if ls-in-description = 'Y' then
                    call "logger" using function concatenate(
-                       "Found desc: " function trim(raw-buffer))
+                       "Found desc: " function trim(ls-raw-buffer))
                    end-call 
-                   if in-items = 'N' then
+                   if ls-in-items = 'N' then
                        call "logger" using "feed description"
                        move function concatenate(
                            function trim(ws-feed-desc),
-                           function trim(raw-buffer))
+                           function trim(ls-raw-buffer))
                        to ws-feed-desc
                    else
                        call "logger" using "item desc"
                        move function concatenate(
-                           function trim(ws-item-desc(item-idx)),
-                           function trim(raw-buffer))
-                       to ws-item-desc(item-idx)
+                           function trim(ws-item-desc(ls-item-idx)),
+                           function trim(ls-raw-buffer))
+                       to ws-item-desc(ls-item-idx)
                    end-if
                end-if
 
       *> check for end
-               move zero to search-count
-               inspect raw-buffer
-               tallying search-count for all "</description>"
+               move zero to ls-search-count
+               inspect ls-raw-buffer
+                   tallying ls-search-count for all "</description>"
 
-               if search-count > 0 then
+               if ls-search-count > 0 then
                    call "logger" using "end multi line description"
-                   move 'N' to in-description
+                   move 'N' to ls-in-description
                end-if
 
            end-if
@@ -306,26 +312,28 @@
                to ws-feed-desc
 
       * Sanitize rss item fields...
-           perform varying counter from 1 by 1 
-               until counter = ws-max-rss-items
-
-               move function sanitize-rss-field(ws-item-title(counter)) 
-                   to ws-item-title(counter)
-
-               move function sanitize-rss-field(ws-item-guid(counter)) 
-                   to ws-item-guid(counter)
+           perform varying ls-counter from 1 by 1 
+               until ls-counter = ws-max-rss-items
 
                move function 
-                   sanitize-rss-field(ws-item-pub-date(counter)) 
-                   to ws-item-pub-date(counter)
+                   sanitize-rss-field(ws-item-title(ls-counter)) 
+                   to ws-item-title(ls-counter)
 
                move function 
-                   sanitize-rss-field(ws-item-link(counter)) 
-                   to ws-item-link(counter)
+                   sanitize-rss-field(ws-item-guid(ls-counter)) 
+                   to ws-item-guid(ls-counter)
 
                move function 
-                   sanitize-rss-field(ws-item-desc(counter)) 
-                   to ws-item-desc(counter)
+                   sanitize-rss-field(ws-item-pub-date(ls-counter)) 
+                   to ws-item-pub-date(ls-counter)
+
+               move function 
+                   sanitize-rss-field(ws-item-link(ls-counter)) 
+                   to ws-item-link(ls-counter)
+
+               move function 
+                   sanitize-rss-field(ws-item-desc(ls-counter)) 
+                   to ws-item-desc(ls-counter)
 
            end-perform
 
@@ -347,31 +355,31 @@
            end-call
            
            call "logger" using "Feed Items:"
-           move 1 to counter
-           perform until counter > ws-max-rss-items
-               if ws-item-exists(counter) = 'Y' then
+           move 1 to ls-counter
+           perform until ls-counter > ws-max-rss-items
+               if ws-item-exists(ls-counter) = 'Y' then
                    call "logger" using function concatenate(
                        "Item title: ",
-                       function trim(ws-item-title(counter)))
+                       function trim(ws-item-title(ls-counter)))
                    end-call
                    call "logger" using function concatenate(
                        "Item link: ",
-                       function trim(ws-item-link(counter)))
+                       function trim(ws-item-link(ls-counter)))
                    end-call
                    call "logger" using function concatenate(
                        "Item guid: ",
-                       function trim(ws-item-guid(counter)))
+                       function trim(ws-item-guid(ls-counter)))
                    end-call
                    call "logger" using function concatenate(
                        "Item date: ",
-                       function trim(ws-item-pub-date(counter)))
+                       function trim(ws-item-pub-date(ls-counter)))
                    end-call
                    call "logger" using function concatenate(
                        "Item desc: ",
-                       function trim(ws-item-desc(counter)))
+                       function trim(ws-item-desc(ls-counter)))
                    end-call
                end-if
-               add 1 to counter
+               add 1 to ls-counter
            end-perform
 
            exit paragraph.
@@ -384,7 +392,7 @@
            end-call
 
       *> make sure file exists... 
-           open extend rss-list-file close rss-list-file
+           open extend fd-rss-list-file close fd-rss-list-file
 
            if ws-feed-site-link = spaces then
                call "logger" using function concatenate( 
@@ -392,32 +400,32 @@
                    "data cannot be saved. Please check the url and try",
                    " again.")
                end-call
-               set return-status-fail to true
+               set l-return-status-fail to true
                exit paragraph 
            end-if
                    
 
       * set idx search value is RSS feed url
-           move function trim(ls-feed-url) to rss-link
+           move function trim(l-feed-url) to f-rss-link
 
-           open input rss-list-file
-               read rss-list-file into ws-rss-list-record
-                   key is rss-link
+           open input fd-rss-list-file
+               read fd-rss-list-file into ws-rss-list-record
+                   key is f-rss-link
                    invalid key 
                        call "logger" using function concatenate(
-                           "RSS Feed URL Not Found: ", rss-link)
+                           "RSS Feed URL Not Found: ", f-rss-link)
                        end-call
                    not invalid key 
                        call "logger" using function concatenate(
                            "Found:", ws-rss-list-record)
                        end-call
-                       move 'Y' to id-found
+                       move 'Y' to ls-id-found
                end-read       
-           close rss-list-file
+           close fd-rss-list-file
 
-           if id-found = 'N' then 
+           if ls-id-found = 'N' then 
                perform set-new-feed-id
-               move next-rss-id to ws-feed-id
+               move ls-next-rss-id to ws-feed-id
            else 
                call "logger" using function concatenate(
                    "Using existing id: ", ws-rss-feed-id)
@@ -442,7 +450,7 @@
            move function trim(ws-feed-title) 
            to ws-rss-title
            
-           move function trim(ls-feed-url)
+           move function trim(l-feed-url)
            to ws-rss-link
 
            call "logger" using function concatenate(
@@ -451,8 +459,8 @@
 
            call "logger" using ws-rss-list-record
 
-           open i-o rss-list-file
-               write rss-list-record from ws-rss-list-record
+           open i-o fd-rss-list-file
+               write f-rss-list-record from ws-rss-list-record
                    invalid key 
                        call "logger" using 
                            "RSS Feed already exists in list."
@@ -462,15 +470,15 @@
                            "Saved new RSS Feed to idx file"
                        end-call 
                end-write
-           close rss-list-file
+           close fd-rss-list-file
 
 
            call "logger" using "Saving parsed RSS data to disk...".
 
-           open output rss-content-file    
-               write rss-content-record from ws-rss-record
+           open output fd-rss-content-file    
+               write f-rss-content-record from ws-rss-record
                end-write
-           close rss-content-file
+           close fd-rss-content-file
 
            exit paragraph.
 
@@ -480,41 +488,41 @@
            call "logger" using "Getting last id saved."
 
              *> make sure file exists... 
-           open extend rss-last-id-file close rss-last-id-file
+           open extend fd-rss-last-id-file close fd-rss-last-id-file
            
-           set not-eof to true 
+           set ls-not-eof to true 
 
-           open input rss-last-id-file
-               perform until eof
-                   read rss-last-id-file into ws-last-id-record
-                       at end set eof to true
+           open input fd-rss-last-id-file
+               perform until ls-eof
+                   read fd-rss-last-id-file into ws-last-id-record
+                       at end set ls-eof to true
                    not at end
                        call "logger" using ws-last-id-record
                        if ws-last-id-record is numeric then 
-                           move ws-last-id-record to next-rss-id
+                           move ws-last-id-record to ls-next-rss-id
                        end-if 
 
                    end-read
                end-perform
-           close rss-last-id-file
+           close fd-rss-last-id-file
 
            call "logger" using function concatenate(
-               "last RSS ID found: ", next-rss-id)
+               "last RSS ID found: ", ls-next-rss-id)
            end-call 
-           add 1 to next-rss-id
+           add 1 to ls-next-rss-id
            call "logger" using function concatenate(
-               "Next new RSS ID: ", next-rss-id)
+               "Next new RSS ID: ", ls-next-rss-id)
            end-call
 
            call "logger" using function concatenate( 
-               "Saving new RSS ID ", next-rss-id, 
+               "Saving new RSS ID ", ls-next-rss-id, 
                " to last id data file.")
            end-call
 
-           open output rss-last-id-file
-               write rss-last-id-record from next-rss-id
+           open output fd-rss-last-id-file
+               write f-rss-last-id-record from ls-next-rss-id
                end-write
-           close rss-last-id-file
+           close fd-rss-last-id-file
 
            exit paragraph. 
 

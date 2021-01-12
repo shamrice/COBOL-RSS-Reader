@@ -1,28 +1,28 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-10
-      * Last Modified: 2021-01-10
+      * Last Modified: 2021-01-12
       * Purpose: Screen definition for help.
       * Tectonics: ./build.sh
       ******************************************************************
-       01  rss-help-screen           
+       01  s-rss-help-screen           
            blank screen 
            foreground-color cob-color-white 
            background-color cob-color-black. 
 
-           05 rss-help-screen-2. 
+           05 s-rss-help-screen-2. 
 
-               10  title-line
+               10  s-title-line
                    foreground-color cob-color-white 
                    background-color cob-color-blue. 
                    15  line 1 column 1 pic x(80) from empty-line.
                    15  line 1 column 28 value "COBOL RSS Reader Help". 
 
-               10  spacer-line
+               10  s-spacer-line
                    foreground-color cob-color-black background-color 7.
                    15  line 2 column 1 pic x(80) from empty-line.                 
                    
-               10  message-lines
+               10  s-message-lines
                    foreground-color cob-color-white 
                    background-color cob-color-black.
                    15  line 3 column 1 pic x(78) from ws-help-text(1).
@@ -44,13 +44,13 @@
                    15  line 19 column 1 pic x(78) from ws-help-text(17).
                    15  line 20 column 1 pic x(78) from ws-help-text(18).
                    
-               10  input-line
+               10  s-input-line
                    foreground-color cob-color-black 
                    background-color cob-color-white.
                    15  line 2 column 1 pic x(80) from empty-line.                   
                    15  line 2 column 2 pic x to ws-accept. 
  
-               10  help-text-1.
+               10  s-help-text-1.
                    15  foreground-color cob-color-black 
                    background-color cob-color-white line 21 column 6
                    value " Enter ".

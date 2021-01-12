@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-01-09
-      *> Last Updated: 2021-01-09
+      *> Last Updated: 2021-01-12
       *> Purpose: Removes leading spaces from field passed.
       *> Tectonics:
       *>     ./build.sh
@@ -21,75 +21,75 @@
 
        working-storage section.
 
-           01  ws-space-count                  pic 9(5) value zeros.
-           01  ws-length                       pic 9(5) value zeros.
-           01  ws-final-offset                 pic 9(5) value zeros.
+       local-storage section.
+           01  ls-space-count                  pic 9(5) value zeros.
+           01  ls-length                       pic 9(5) value zeros.
+           01  ls-final-offset                 pic 9(5) value zeros.
 
-           01  ws-non-space-found-sw        pic a.
-               88  ws-non-space-found       value 'Y'.
-               88  ws-non-space-not-found   value 'N'.
+           01  ls-non-space-found-sw           pic a.
+               88  ls-non-space-found          value 'Y'.
+               88  ls-non-space-not-found      value 'N'.
 
        linkage section.
-           01  ls-field               pic x any length.
-           01  ls-updated-record      pic x(:BUFFER-SIZE:) value spaces.
+           01  l-field                         pic x any length.
+           01  l-updated-record                pic x(:BUFFER-SIZE:) 
+                                               value spaces.
 
        procedure division 
-           using ls-field
-           returning ls-updated-record.
+           using l-field
+           returning l-updated-record.
 
        main-procedure.
            
-           initialize ls-updated-record
+           initialize l-updated-record
 
-           move function length(ls-field) to ws-length
+           move function length(l-field) to ls-length
 
            call "logger" using 
                function concatenate("Removing leading spaces from: ", 
-               function trim(ls-field), " Length: ", ws-length)
+               function trim(l-field), " Length: ", ls-length)
            end-call
 
-           set ws-non-space-not-found to true 
+           set ls-non-space-not-found to true 
 
       * TODO : tabs counted as 2 here but offset is actually just 1. Causes
       *        some fields to lose a char to two at the beginning.
 
-           perform varying ws-space-count 
-               from 1 by 1 until ws-non-space-found
+           perform varying ls-space-count 
+               from 1 by 1 until ls-non-space-found
 
-               if ls-field(ws-space-count:) greater than space then
-                   set ws-non-space-found to true
+               if l-field(ls-space-count:) greater than space then
+                   set ls-non-space-found to true
       *  Due to issue above, leaning on side of caution and adding back one space.
-                   subtract 1 from ws-space-count
+                   subtract 1 from ls-space-count
                else 
-                   if ws-space-count > ws-length then 
-                       set ws-non-space-found to true 
-                       move 0 to ws-space-count
+                   if ls-space-count > ls-length then 
+                       set ls-non-space-found to true 
+                       move 0 to ls-space-count
                    end-if 
                end-if
            end-perform
 
-           if ws-space-count > 1 then 
+           if ls-space-count > 1 then 
                
-               compute ws-final-offset = ws-length - ws-space-count
+               compute ls-final-offset = ls-length - ls-space-count
 
                call "logger" using function concatenate("Found ", 
-                   ws-space-count, " leading spaces in field. Length: ",
-                   ws-length, " : Final offset: ", ws-final-offset)
+                   ls-space-count, " leading spaces in field. Length: ",
+                   ls-length, " : Final offset: ", ls-final-offset)
                end-call
                
-               move ls-field(ws-space-count:ws-final-offset) 
-                   to ls-updated-record
+               move l-field(ls-space-count:ls-final-offset) 
+                   to l-updated-record
 
            else              
                call "logger" using function concatenate(
                    "No leading spaces in field. Length: ",
-                   ws-length)
+                   ls-length)
                end-call
                
-               move ls-field to ls-updated-record
+               move l-field to l-updated-record
            end-if
-
-
            
            goback.
 
@@ -99,7 +99,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-01-09
-      *> Last Updated: 2021-01-09
+      *> Last Updated: 2021-01-12
       *> Purpose: Removes tags and converts HTML encoded string values.
       *>          Also calls function to remove leading spaces from field.
       *> Tectonics:
@@ -122,29 +122,29 @@
        working-storage section.
 
        linkage section.
-           01  ls-field               pic x any length.
-           01  ls-updated-record      pic x(:BUFFER-SIZE:) value spaces.
+           01  l-field               pic x any length.
+           01  l-updated-record      pic x(:BUFFER-SIZE:) value spaces.
 
        procedure division 
-           using ls-field
-           returning ls-updated-record.
+           using l-field
+           returning l-updated-record.
 
        main-procedure.
            
-           initialize ls-updated-record
+           initialize l-updated-record
 
-           if ls-field = spaces then 
+           if l-field = spaces then 
                call "logger" using "No value to sanitize. Returning."
-               move ls-field to ls-updated-record
+               move l-field to l-updated-record
                goback
            end-if
            
            call "logger" using 
                function concatenate("Sanitizing raw RSS field: ", 
-               function trim(ls-field))
+               function trim(l-field))
            end-call
 
-           move function substitute-case(ls-field, 
+           move function substitute-case(l-field, 
                "&amp;", "&",
                "&#38;", "&",
                "&#038;", "&",
@@ -193,10 +193,10 @@
                "</u>", space,
                "<b>", space,
                "</b>", space
-               ) to ls-field  
+               ) to l-field  
 
-           move function remove-leading-spaces(ls-field) 
-               to ls-updated-record
+           move function remove-leading-spaces(l-field) 
+               to l-updated-record
        
            goback.
 

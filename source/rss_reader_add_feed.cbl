@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-02
-      * Last Modified: 2021-01-04
+      * Last Modified: 2021-01-12
       * Purpose: RSS Reader Add Feed - Screen sub program to add feeds
       * Tectonics: ./build.sh
       ******************************************************************
@@ -16,7 +16,7 @@
            function rss-downloader.
 
        special-names.
-           crt status is crt-status.
+           crt status is ws-crt-status.
 
        input-output section.
 
@@ -27,9 +27,9 @@
 
        copy "screenio.cpy".
 
-       01  crt-status. 
-           05  key1                          pic x. 
-           05  key2                          pic x. 
+       01  ws-crt-status. 
+           05  ws-key1                       pic x. 
+           05  ws-key2                       pic x. 
            05  filler                        pic x. 
            05  filler                        pic x.
 
@@ -37,15 +37,15 @@
 
        01  ws-add-feed-status                pic 9 value zero.
 
-       01  message-screen-fields.
+       01  ws-message-screen-fields.
            05  ws-msg-title                    pic x(70) value spaces.
            05  ws-msg-body                     occurs 2 times.
                10  ws-msg-body-text            pic x(70) value spaces.
            05  ws-msg-input                    pic x value space.
          
-       01  exit-sw                           pic a value 'N'.
-           88  exit-true                     value 'Y'.
-           88  exit-false                    value 'N'.
+       01  ws-exit-sw                           pic a value 'N'.
+           88  ws-exit-true                     value 'Y'.
+           88  ws-exit-false                    value 'N'.
 
        77  empty-line                        pic x(80) value spaces. 
 
@@ -67,19 +67,19 @@
 
            perform handle-user-input
 
-           display blank-screen 
+           display s-blank-screen 
            goback.
 
 
        handle-user-input.
 
-           perform until exit-true
+           perform until ws-exit-true
 
-               accept rss-add-feed-screen 
+               accept s-rss-add-feed-screen 
 
                evaluate true 
                       
-                   when key1 = COB-SCR-OK
+                   when ws-key1 = COB-SCR-OK
                        call "logger" using ws-rss-url
 
                        move function rss-downloader(ws-rss-url)
@@ -99,11 +99,11 @@
                                to ws-msg-body-text(2)
                        end-if    
 
-                       accept message-screen
-                       set exit-true to true 
+                       accept s-message-screen
+                       set ws-exit-true to true 
                     
-                   when crt-status = COB-SCR-ESC
-                       set exit-true to true 
+                   when ws-crt-status = COB-SCR-ESC
+                       set ws-exit-true to true 
                        
                end-evaluate
            end-perform

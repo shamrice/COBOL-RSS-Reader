@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-12-21
-      *> Last Updated: 2021-01-02
+      *> Last Updated: 2021-01-12
       *> Purpose: Downloads given RSS feed url and calls rss_parser
       *> Tectonics:
       *>     ./build.sh
@@ -25,76 +25,68 @@
 
        working-storage section.
 
-       01  raw-buffer                 pic x(:BUFFER-SIZE:) value spaces.
-
-
       *> a file pointer
-       01  pipe-record.
-           05 pipe-pointer                     usage pointer.
-           05 pipe-return                      usage binary-long.
+       01  ws-pipe-record.
+           05 ws-pipe-pointer                  usage pointer.
+           05 ws-pipe-return                   usage binary-long.
 
-
-       77  download-cmd                         pic x(:BUFFER-SIZE:).
-       77  download-status                      pic 9 value 9.
-
-       77  rss-feed-url                         pic x(256) value spaces.
-       77  rss-temp-filename                    pic x(255)
+       77  ws-rss-temp-filename                pic x(255)
                                                value "./feeds/temp.rss".
 
-       77  parse-status                        pic S9 value 0.
-
-       78  new-line                             value x"0a".
-       78  wget                                 value "wget -q -O ".
+       78  ws-wget                             value "wget -q -O ".
       
+       local-storage section.
+
+       77  ls-download-cmd                     pic x(:BUFFER-SIZE:).
+
+       77  ls-rss-feed-url                     pic x(256) value spaces.
+
+       77  ls-download-status                  pic 9 value 9.
+
+       77  ls-parse-status                     pic S9 value 0.
 
        linkage section.
-           01  ls-feed-url                      pic x(256).
+           01  l-feed-url                         pic x(256).
 
-           01  download-and-parse-status        pic 9 value zero.
-               88  return-status-success        value 1.
-               88  return-status-parse-fail     value 2.
-               88  return-status-download-fail  value 3.
-               88  return-status-url-invalid    value 4.
+           01  l-download-and-parse-status        pic 9 value zero.
+               88  l-return-status-success        value 1.
+               88  l-return-status-parse-fail     value 2.
+               88  l-return-status-download-fail  value 3.
+               88  l-return-status-url-invalid    value 4.
 
        procedure division 
-           using ls-feed-url
-           returning download-and-parse-status.
+           using l-feed-url
+           returning l-download-and-parse-status.
 
        main-procedure.
-
-           move spaces to download-cmd
-           move spaces to rss-feed-url
-           move 9 to download-status
-           move spaces to raw-buffer
-           move zero to parse-status
            
            call "logger" using 
                function concatenate("URL passed to downloader: ", 
-               ls-feed-url)
+               l-feed-url)
            end-call
 
       *> No where near perfect... but will at least somewhat check if url.
-           if ls-feed-url(1:4) = "http" or "HTTP" then               
-               move ls-feed-url to rss-feed-url
+           if l-feed-url(1:4) = "http" or "HTTP" then               
+               move l-feed-url to ls-rss-feed-url
                perform download-rss-feed               
-               if download-status is zero then
+               if ls-download-status is zero then
                    call "logger" using 
                        "Download complete. Attempting to parse data"
                    end-call
 
                    move function rss-parser(
-                       rss-temp-filename, rss-feed-url)
-                       to parse-status
+                       ws-rss-temp-filename, ls-rss-feed-url)
+                       to ls-parse-status
                        
-                   if parse-status = 1 then 
+                   if ls-parse-status = 1 then 
                        call "logger" using "Parsing success."
-                       set return-status-success to true 
+                       set l-return-status-success to true 
                    else 
                        call "logger" using function concatenate(
                            "Parse failure. Parse Status code:",
-                           parse-status)
+                           ls-parse-status)
                        end-call 
-                       set return-status-parse-fail to true 
+                       set l-return-status-parse-fail to true 
                        goback 
                    end-if 
                    
@@ -102,15 +94,15 @@
 
                    call "logger" using function concatenate(
                        "Error downloading RSS feed. Status: ",
-                       download-status new-line)
+                       ls-download-status)
                    end-call
-                   set return-status-download-fail to true 
+                   set l-return-status-download-fail to true 
                end-if
            else 
                call "logger" 
                    using "Cannot download RSS Feed. Url is invalid." 
                end-call
-               set return-status-url-invalid to true 
+               set l-return-status-url-invalid to true 
            end-if           
 
            goback.
@@ -120,33 +112,33 @@
            
            call "logger" using 
                function concatenate(
-               "Downloading RSS Feed: ", function trim(rss-feed-url))
+               "Downloading RSS Feed: ", function trim(ls-rss-feed-url))
            end-call.
 
       *> Build WGET command...
            move function concatenate(
-               wget,
-               function trim(rss-temp-filename), SPACE,
-               function trim(rss-feed-url), SPACE)
-           to download-cmd
+               ws-wget,
+               function trim(ws-rss-temp-filename), SPACE,
+               function trim(ls-rss-feed-url), SPACE)
+           to ls-download-cmd
 
-           call "logger" using function trim(download-cmd)
+           call "logger" using function trim(ls-download-cmd)
 
 
       *> open pipe and execute download cmd.
-           move pipe-open(download-cmd, "r") to pipe-record
+           move pipe-open(ls-download-cmd, "r") to ws-pipe-record
 
-           if pipe-return not equal 255 then
-               move pipe-close(pipe-record) to download-status
-               if download-status is zero then
+           if ws-pipe-return not equal 255 then
+               move pipe-close(ws-pipe-record) to ls-download-status
+               if ls-download-status is zero then
 
                    call "logger" using function concatenate(
-                       "Download success. Status=", download-status)
+                       "Download success. Status=", ls-download-status)
                    end-call
                else
                    call "logger" using function concatenate(
                        "Error downloading RSS feed. Status=", 
-                       download-status)
+                       ls-download-status)
                    end-call
                end-if
            end-if.

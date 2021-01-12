@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-19
-      * Last Modified: 2021-01-04
+      * Last Modified: 2021-01-12
       * Purpose: RSS Reader Item Viewer - Displays formatted feed
       *          item data
       * Tectonics: ./build.sh
@@ -13,7 +13,7 @@
        
        configuration section.
        special-names.
-           crt status is crt-status.
+           crt status is ws-crt-status.
 
        input-output section.
 
@@ -24,9 +24,9 @@
 
        copy "screenio.cpy".
 
-       01  crt-status. 
-           05  key1                          pic x. 
-           05  key2                          pic x. 
+       01  ws-crt-status. 
+           05  ws-key1                       pic x. 
+           05  ws-key2                       pic x. 
            05  filler                        pic x. 
            05  filler                        pic x.
 
@@ -46,28 +46,25 @@
            05  ws-desc-line                  pic x(70) value spaces                               
                                              occurs 8 times.
 
-       01  exit-sw                           pic a value 'N'.
-           88  exit-true                     value 'Y'.
-           88  exit-false                    value 'N'.
+       01  ws-exit-sw                        pic a value 'N'.
+           88  ws-exit-true                  value 'Y'.
+           88  ws-exit-false                 value 'N'.
 
        77  empty-line                        pic x(80) value spaces. 
 
-       77  launch-status                     pic 9 value 9.
-     
        linkage section.
 
-       01  ls-feed-title                     pic x any length.
+       01  l-feed-title                      pic x any length.
+ 
+       01  l-feed-site-link                  pic x any length.
 
-       01  ls-feed-site-link                 pic x any length.
-
-       01  ls-feed-item.
-           05  ls-item-exists                pic a value 'N'.
-           05  ls-item-title                 pic x(128) value spaces.
-           05  ls-item-link                  pic x(256) value spaces.
-           05  ls-item-guid                  pic x(256) value spaces.
-           05  ls-item-pub-date              pic x(128) value spaces.
-           05  ls-item-desc                  pic x(512) value spaces.
-
+       01  l-feed-item.
+           05  l-item-exists                 pic a value 'N'.
+           05  l-item-title                  pic x(128) value spaces.
+           05  l-item-link                   pic x(256) value spaces.
+           05  l-item-guid                   pic x(256) value spaces.
+           05  l-item-pub-date               pic x(128) value spaces.
+           05  l-item-desc                   pic x(512) value spaces.
 
        screen section.
        
@@ -76,51 +73,51 @@
 
 
        procedure division using 
-           ls-feed-title, ls-feed-site-link, ls-feed-item.
+           l-feed-title, l-feed-site-link, l-feed-item.
 
        set environment 'COB_SCREEN_EXCEPTIONS' TO 'Y'.
        set environment 'COB_SCREEN_ESC'        TO 'Y'.
 
        main-procedure.
 
-           display blank-screen 
+           display s-blank-screen 
 
            call "logger" using function concatenate(
-               "Viewing feed item: ", ls-item-desc)
+               "Viewing feed item: ", l-item-desc)
            end-call 
            
-           move ls-feed-title to ws-feed-title
-           move ls-feed-site-link to ws-feed-site-link
+           move l-feed-title to ws-feed-title
+           move l-feed-site-link to ws-feed-site-link
 
-           move ls-item-title to ws-item-title
-           move ls-item-link to ws-item-link
-           move ls-item-guid to ws-item-guid
-           move ls-item-pub-date to ws-item-pub-date
+           move l-item-title to ws-item-title
+           move l-item-link to ws-item-link
+           move l-item-guid to ws-item-guid
+           move l-item-pub-date to ws-item-pub-date
 
-           move ls-item-desc to ws-item-desc-lines
+           move l-item-desc to ws-item-desc-lines
 
            perform handle-user-input
 
-           display blank-screen 
+           display s-blank-screen 
            goback.
 
 
        handle-user-input.
 
-           perform until exit-true
+           perform until ws-exit-true
 
-               accept rss-item-screen
+               accept s-rss-item-screen
 
                evaluate true 
                       
-                   when key1 = COB-SCR-OK
+                   when ws-key1 = COB-SCR-OK
                        call "browser-launcher" using by content 
                            ws-item-link
                        end-call 
                        cancel "browser-launcher"
 
-                   when crt-status = COB-SCR-ESC
-                       set exit-true to true
+                   when ws-crt-status = COB-SCR-ESC
+                       set ws-exit-true to true
                        
                end-evaluate
            end-perform

@@ -1,34 +1,34 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-16
-      * Last Modified: 2021-01-10
+      * Last Modified: 2021-01-12
       * Purpose: Screen definition for rss_reader_view_feed program.
       * Tectonics: ./build.sh
       ******************************************************************
-       01  rss-info-screen           
+       01  s-rss-info-screen           
            blank screen 
            foreground-color 7 
            background-color cob-color-black. 
 
-           05 menu-screen-2. 
+           05  s-menu-screen-2. 
 
-               10  title-line
+               10  s-title-line
                    foreground-color cob-color-white background-color 1. 
                    15  line 1 pic x(80) from empty-line.
                    15  line 1 column 25 
                        value "COBOL RSS Reader - View Feed". 
 
-               10  header-line
+               10  s-header-line
                    foreground-color cob-color-black background-color 7.
                    15 line 2 pic x(80) from empty-line.                   
                    15 line 2 column 2 pic x(70) from ws-feed-title.
 
-               10 sub-header-line-1
+               10  s-sub-header-line-1
                    foreground-color cob-color-black background-color 7.
                    15 line 3 pic x(80) from empty-line.                   
                    15 line 3 column 2 pic x(70) from ws-feed-site-link. 
                                    
-               10  sub-header-line-2
+               10  s-sub-header-line-2
                    foreground-color cob-color-black background-color 7.
                    15 line 4 pic x(80) from empty-line.                   
                    15 line 4 column 2 pic x(70) from ws-feed-desc. 
@@ -97,7 +97,7 @@
                    pic x to ws-accept-item. 
                10  column 4 pic x(70) from ws-item-title(15). 
 
-               10  help-text-1.
+               10  s-help-text-1.
                    15  foreground-color cob-color-black 
                    background-color cob-color-white line 21 column 8
                    value " Enter ".

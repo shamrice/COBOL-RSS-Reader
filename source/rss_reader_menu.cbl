@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2021-01-04
+      * Last Modified: 2021-01-12
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -18,8 +18,8 @@
       *   The SPECIAL-NAMES paragraph that follows provides for the 
       *   capturing of the positioning of the cursor and key input.        
        special-names.
-           cursor is cursor-position        
-           crt status is crt-status.
+           cursor is ws-cursor-position        
+           crt status is ws-crt-status.
 
        input-output section.
            file-control.                              
@@ -43,46 +43,44 @@
 
       *   CURSOR-LINE specifies the line and CURSOR-COL specifies the 
       *   column of the cursor position.            
-       01  cursor-position. 
-           05  cursor-line    pic 99. 
-           05  cursor-col     pic 99. 
+       01  ws-cursor-position. 
+           05  ws-cursor-line                   pic 99. 
+           05  ws-cursor-col                    pic 99. 
         
       *   CRT status has four digit value of what key was pressed.  
       *   screenio.cpy has values in form of COB-SCR-<KEY> defined. 
-       01  crt-status. 
-           05  key1             pic x. 
-           05  key2             pic x. 
-           05  filler           pic x. 
-           05  filler           pic x.
+       01  ws-crt-status. 
+           05  ws-key1                          pic x. 
+           05  ws-key2                          pic x. 
+           05  filler                           pic x. 
+           05  filler                           pic x.
 
       * Input from screen accept.  
        01  accept-item1                         pic x value space.
 
-       01  eof-sw                               pic a value 'N'.
-           88  eof                              value 'Y'.
-           88  not-eof                          value 'N'.     
+       01  ws-eof-sw                            pic a value 'N'.
+           88  ws-eof                           value 'Y'.
+           88  ws-not-eof                       value 'N'.     
 
-       01  exit-sw                              pic a value 'N'.
-           88  exit-true                        value 'Y'.
-           88  exit-false                       value 'N'.
+       01  ws-exit-sw                           pic a value 'N'.
+           88  ws-exit-true                     value 'Y'.
+           88  ws-exit-false                    value 'N'.
 
       * String to display on menu screen.
        01  ws-display-text                     occurs 17 times.
            05  ws-display-rss-id               pic 9(5) value zeros. 
            05  ws-display-list-title           pic x(70) value spaces.
       
-       01  refresh-items-sw                    pic a value 'Y'.
-           88  is-refresh-items                value 'Y'.
-           88  not-refresh-items               value 'N'.
+       01  ws-refresh-items-sw                 pic a value 'Y'.
+           88  ws-is-refresh-items             value 'Y'.
+           88  ws-not-refresh-items            value 'N'.
 
-       01  message-screen-fields.
+       01  ws-message-screen-fields.
            05  ws-msg-title                    pic x(70) value spaces.
            05  ws-msg-body                     occurs 2 times.
                10  ws-msg-body-text            pic x(70) value spaces.
            05  ws-msg-input                    pic x value space.
            
-       77  rss-temp-filename                   pic x(255)
-                                               value "./feeds/temp.rss".
        77  ws-selected-feed-file-name          pic x(255) value spaces.
        77  ws-selected-id                      pic 9(5) value zeros.
 
@@ -91,7 +89,7 @@
 
        77  empty-line                          pic x(80) value spaces. 
 
-       77  download-and-parse-status           pic 9 value zero.
+       77  ws-download-and-parse-status        pic 9 value zero.
 
       
        77  ws-rss-content-file-name          pic x(255) value spaces.
@@ -100,7 +98,7 @@
 
        linkage section.
 
-       01  ls-refresh-on-start                  pic a.
+       01  l-refresh-on-start                  pic a.
        
        screen section.
 
@@ -108,7 +106,7 @@
        copy "./screens/blank_screen.cpy".
        copy "./screens/message_screen.cpy".
 
-       procedure division using ls-refresh-on-start.
+       procedure division using l-refresh-on-start.
        set environment 'COB_SCREEN_EXCEPTIONS' TO 'Y'.
        set environment 'COB_SCREEN_ESC'        TO 'Y'.
 
@@ -117,15 +115,15 @@
       
       * Set switch to refresh items based on refresh parameter.
            move "Loading..." to ws-msg-title
-           if ls-refresh-on-start = 'Y' then 
+           if l-refresh-on-start = 'Y' then 
                move "Loading and refreshing RSS feeds..." 
                    to ws-msg-body-text(1)
-               set is-refresh-items to true 
+               set ws-is-refresh-items to true 
            else 
                move "Loading RSS feeds..." to ws-msg-body-text(1)
-               set not-refresh-items to true 
+               set ws-not-refresh-items to true 
            end-if
-           display message-screen
+           display s-message-screen
 
       * Load and set RSS feeds into feed menu records 
            perform set-rss-menu-items  
@@ -134,21 +132,21 @@
        
       *   The cursor position is not within an item on the screen, so the 
       *   first item in the menu will be accepted first. 
-           move 0 to cursor-line, cursor-col              
+           move 0 to ws-cursor-line, ws-cursor-col              
 
-           perform until exit-true
+           perform until ws-exit-true
                                   
                move 0 to ws-selected-id
-               move spaces to crt-status
+               move spaces to ws-crt-status
                move spaces to ws-selected-feed-file-name
                    
-               accept rss-list-screen
+               accept s-rss-list-screen
         
                evaluate true 
                
-                   when key1 = COB-SCR-OK
+                   when ws-key1 = COB-SCR-OK
                       compute ws-selected-id = 
-                           ws-display-rss-id(cursor-line - 2)
+                           ws-display-rss-id(ws-cursor-line - 2)
                        end-compute
                        if ws-selected-id <= ws-last-id-record then
 
@@ -163,67 +161,67 @@
                            end-if
                        end-if
 
-                   when crt-status = COB-SCR-F1
+                   when ws-crt-status = COB-SCR-F1
                        call "rss-reader-help"
                        cancel "rss-reader-help"
 
-                   when crt-status = COB-SCR-F3
+                   when ws-crt-status = COB-SCR-F3
                        call "rss-reader-add-feed"
                        cancel "rss-reader-add-feed"
       *                Feed is refreshed if success in add sub program 
-                       set not-refresh-items to true
+                       set ws-not-refresh-items to true
                        perform set-rss-menu-items  
 
 
-                   when crt-status = COB-SCR-F4
+                   when ws-crt-status = COB-SCR-F4
                        compute ws-selected-id = 
-                           ws-display-rss-id(cursor-line - 2)
+                           ws-display-rss-id(ws-cursor-line - 2)
                        end-compute
                        if ws-selected-id <= ws-last-id-record then
                            call "rss-reader-delete-feed" using 
                                ws-selected-id
                            cancel "rss-reader-delete-feed"
       *                                     
-                           set not-refresh-items to true 
+                           set ws-not-refresh-items to true 
      *                     perform set-rss-menu-items 
                        end-if                   
                         
 
-                   when crt-status = COB-SCR-F5
+                   when ws-crt-status = COB-SCR-F5
                        
                        move "Loading and refreshing RSS feeds..." 
                            to ws-msg-body-text(1)
-                       display message-screen
+                       display s-message-screen
 
-                       set is-refresh-items to true 
+                       set ws-is-refresh-items to true 
                        perform set-rss-menu-items  
       
-                   when crt-status = COB-SCR-F10
-                       set exit-true to true 
+                   when ws-crt-status = COB-SCR-F10
+                       set ws-exit-true to true 
                    
                end-evaluate
     
            end-perform       
 
-           display blank-screen    
+           display s-blank-screen    
            goback.
 
 
       * Called from set-rss-menu-items paragraph.
        load-highest-rss-record.
                       
-           set not-eof to true 
+           set ws-not-eof to true 
 
       * make sure file exists... 
-           open extend rss-last-id-file close rss-last-id-file
+           open extend fd-rss-last-id-file close fd-rss-last-id-file
 
-           open input rss-last-id-file
-               perform until eof
-                   read rss-last-id-file into ws-last-id-record
-                       at end set eof to true                    
+           open input fd-rss-last-id-file
+               perform until ws-eof
+                   read fd-rss-last-id-file into ws-last-id-record
+                       at end set ws-eof to true                    
                    end-read
                end-perform
-           close rss-last-id-file
+           close fd-rss-last-id-file
 
            call "logger" using function concatenate(
                "Highest record found: ", ws-last-id-record)
@@ -254,11 +252,11 @@
            move 1 to ws-counter
 
       * make sure file exists... 
-           open extend rss-list-file close rss-list-file
+           open extend fd-rss-list-file close fd-rss-list-file
 
       * TODO : add paging offsets and real perform max value.
 
-           open input rss-list-file
+           open input fd-rss-list-file
 
                perform varying ws-rss-idx 
                    from 1 by 1 until ws-rss-idx > ws-last-id-record
@@ -270,20 +268,20 @@
                            " : line number: ", ws-counter, 
                            " :: done setting items.")
                        end-call 
-                       close rss-list-file
+                       close fd-rss-list-file
                        exit paragraph
                    end-if 
 
                    call "logger" using function concatenate(
                        "Checking RSS Feed ID: ", ws-rss-idx)
                    end-call                      
-                   move ws-rss-idx to rss-feed-id
-                   read rss-list-file into ws-rss-list-record
-                       key is rss-feed-id
+                   move ws-rss-idx to f-rss-feed-id
+                   read fd-rss-list-file into ws-rss-list-record
+                       key is f-rss-feed-id
                        invalid key 
                            call "logger" using function concatenate(
                                "Unable to find feed with id: ", 
-                               rss-feed-id, " : Skipping.")
+                               f-rss-feed-id, " : Skipping.")
                            end-call 
                        not invalid key 
                            
@@ -291,22 +289,22 @@
                                "FOUND :: Title=", ws-rss-title)
                            end-call                           
                        
-                           move rss-feed-id 
+                           move f-rss-feed-id 
                            to ws-display-rss-id(ws-counter)
 
                            move ws-rss-title
                            to ws-display-list-title(ws-counter)                           
                           
       *                Only refresh items if switch is set.                     
-                           if is-refresh-items then 
+                           if ws-is-refresh-items then 
                                call "logger" using function concatenate(
                                    "Refreshing feed: ", ws-rss-link)
                                end-call
       *      TODO : display error message to user on failure.                     
                                move function rss-downloader(ws-rss-link)
-                                   to download-and-parse-status   
+                                   to ws-download-and-parse-status   
 
-                               display message-screen                             
+                               display s-message-screen                             
                            end-if
                            
                            add 1 to ws-counter 
@@ -314,7 +312,7 @@
    
                end-perform
 
-           close rss-list-file      
+           close fd-rss-list-file      
         
            call "logger" using "Done setting rss menu items"
 
@@ -333,11 +331,11 @@
                exit paragraph
            end-if                      
                
-           open input rss-list-file
+           open input fd-rss-list-file
                
-               move ws-selected-id to rss-feed-id
-               read rss-list-file into ws-rss-list-record
-                   key is rss-feed-id
+               move ws-selected-id to f-rss-feed-id
+               read fd-rss-list-file into ws-rss-list-record
+                   key is f-rss-feed-id
                    invalid key 
                        move spaces 
                        to ws-selected-feed-file-name
@@ -353,7 +351,7 @@
                
                end-read       
 
-           close rss-list-file 
+           close fd-rss-list-file 
 
            exit paragraph.
 

@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-10
-      * Last Modified: 2021-01-11
+      * Last Modified: 2021-01-12
       * Purpose: RSS Reader Help - Screen sub program to show help
       * Tectonics: ./build.sh
       ******************************************************************
@@ -15,7 +15,7 @@
        repository.
 
        special-names.
-           crt status is crt-status.
+           crt status is ws-crt-status.
 
        input-output section.
 
@@ -26,9 +26,9 @@
 
        copy "screenio.cpy".
 
-       01  crt-status. 
-           05  key1                          pic x. 
-           05  key2                          pic x. 
+       01  ws-crt-status. 
+           05  ws-key1                       pic x. 
+           05  ws-key2                       pic x. 
            05  filler                        pic x. 
            05  filler                        pic x.
 
@@ -41,15 +41,16 @@
 
        01  ws-page-num                       pic 9 value 1.
 
-       01  exit-sw                           pic a value 'N'.
-           88  exit-true                     value 'Y'.
-           88  exit-false                    value 'N'.
+       01  ws-exit-sw                        pic a value 'N'.
+           88  ws-exit-true                  value 'Y'.
+           88  ws-exit-false                 value 'N'.
 
        77  empty-line                        pic x(80) value spaces. 
 
-       78  program-version                     value __APP_VERSION.
-       78  web-url value __SOURCE_URL.
-       78  build-date                          value __BUILD_DATE.
+       78  ws-program-version                value __APP_VERSION.
+       78  ws-web-url 
+               value __SOURCE_URL.
+       78  ws-build-date                     value __BUILD_DATE.
 
        linkage section.
 
@@ -66,28 +67,28 @@
 
            perform set-page-text 
 
-           display blank-screen
+           display s-blank-screen
            perform handle-user-input
 
-           display blank-screen 
+           display s-blank-screen 
            goback.
 
 
        handle-user-input.
 
-           perform until exit-true
+           perform until ws-exit-true
 
-               accept rss-help-screen 
+               accept s-rss-help-screen 
 
                evaluate true 
                       
-                   when key1 = COB-SCR-OK
+                   when ws-key1 = COB-SCR-OK
                        add 1 to ws-page-num
                        perform set-page-text
                         
                    
-                   when crt-status = COB-SCR-ESC
-                       set exit-true to true 
+                   when ws-crt-status = COB-SCR-ESC
+                       set ws-exit-true to true 
                        
                end-evaluate
            end-perform
@@ -115,7 +116,7 @@
                    perform set-page-5-text
 
                when other
-                   set exit-true to true 
+                   set ws-exit-true to true 
 
            end-evaluate
 
@@ -284,9 +285,10 @@
            move "About:" to ws-display-text(2) 
            move "        By: Erik Eriksen" to ws-display-text(3) 
            move function concatenate(
-                "   Version: ", program-version) to ws-display-text(4) 
+                "   Version: ", ws-program-version) 
+                to ws-display-text(4) 
            move function concatenate(
-               "Build Date: ", build-date) to ws-display-text(5) 
+               "Build Date: ", ws-build-date) to ws-display-text(5) 
            move spaces to ws-display-text(6) 
            move spaces to ws-display-text(7) 
            move function concatenate(
@@ -296,7 +298,7 @@
                to ws-display-text(9)
            move spaces to ws-display-text(10) 
            move function concatenate(
-           " ", web-url) to ws-display-text(11)
+           " ", ws-web-url) to ws-display-text(11)
            move spaces to ws-display-text(12)
            move spaces to ws-display-text(13)
            move spaces to ws-display-text(14)
