@@ -161,9 +161,11 @@
                            end-if
                        end-if
 
+
                    when ws-crt-status = COB-SCR-F1
                        call "rss-reader-help"
                        cancel "rss-reader-help"
+
 
                    when ws-crt-status = COB-SCR-F3
                        call "rss-reader-add-feed"
