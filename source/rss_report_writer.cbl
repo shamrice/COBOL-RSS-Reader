@@ -67,8 +67,6 @@
        01  l-create-report-status                pic 9 value zero.
            88  l-return-status-success           value 1.
            88  l-return-status-bad-param         value 2.
-           88  l-return-status-not-found         value 3.
-
 
        report section.
            rd r-rss-report

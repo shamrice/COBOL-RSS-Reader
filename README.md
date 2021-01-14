@@ -18,6 +18,8 @@ Run the shell script "build.sh" in the source directory.
   ```./crssr -a [url of rss feed]```
 * Delete existing RSS feed from feed list:
   ```./crssr -d [url of rss feed]```
+* Generate report to output file for existing RSS feed from feed list: 
+  ```./crssr -r [output filename] [url of rss feed]```
 * Display usage help:
   ``` ./crssr --help ```
 
