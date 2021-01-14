@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-13
-      * Last Modified: 2021-01-13
+      * Last Modified: 2021-01-14
       * Purpose: Generates a report based on url of rss feed to file
       *          name provided.
       * Tectonics: ./build.sh
@@ -40,6 +40,8 @@
        copy "./copybooks/wsrecord/ws-rss-list-record.cpy".
        copy "./copybooks/wsrecord/ws-rss-record.cpy".
 
+       01  ws-counter                        pic 99 value zeros.
+
        01  ws-rss-content-file-found-sw      pic x value 'N'.
            88  ws-content-file-found         value 'Y'.
            88  ws-content-file-not-found     value 'N'.
@@ -48,7 +50,17 @@
            88  ws-eof                        value 'Y'.
            88  ws-not-eof                    value 'N'.
 
-       01  ws-counter                        pic 99 value zeros.
+       01  ws-date-record.
+           05  ws-current-date.
+               10  ws-year                   pic 9(4).
+               10  ws-month                  pic 99.
+               10  ws-day                    pic 99.
+           05 ws-current-time.
+               10  ws-hour                   pic 99.
+               10  ws-min                    pic 99.
+               10  ws-sec                    pic 99.
+               10  ws-milli                  pic 99.
+           05  ws-time-offset                pic S9(4).
 
        77  ws-report-file-name               pic x(512) 
                                              value "./report.txt".
@@ -77,14 +89,18 @@
            footing 65. 
 
            01  r-report-header type report heading.
-               05  line 2. 
-                   10  column 2 pic x(5) value "PAGE:".
-                   10  column 8 pic zz9 source page-counter.
-                   10  column 30 
-                       pic x(15) value "RSS REPORT - ".
-                   10  column 44 pic x(35) source ws-feed-title.                       
+               05  line 2.
+                   10  column 1 
+                       pic x(12) value "RSS REPORT -".
+                   10  column 13 pic x(35) source ws-feed-title. 
                05  line plus 1.
-                   10  column 25 pic x(50) value 
+                   10  column 1 pic x(5) value "DATE:".
+                   10  column 7 pic x(40) source ws-date-record.   
+               05  line plus 1.
+                   10  column 1 pic x(5) value "PAGE:".
+                   10  column 7 pic zz9 source page-counter.                   
+               05  line plus 1.
+                   10  column 1 pic x(50) value 
                    "--------------------------------------------------".
            01  r-id-line type detail line plus 1.
                05  column 8 pic x(3) value "Id:".
@@ -95,11 +111,17 @@
            01  r-site-link-line type detail line plus 1.
                05  column 6 pic x(5) value "Site:".
                05  column 12 pic x(55) source ws-feed-site-link.
-           01  r-feed-detail-line type detail line plus 1.
+
+           01  r-feed-detail-line-1 type detail line plus 1.
                05  column 4 pic x(7) value "Detail:".
                05  column 11 pic x(65) source ws-feed-desc(1:65).
            01  r-feed-detail-line-2 type detail line plus 1.
-               05  column 15 pic x(65) source ws-feed-desc(66:65).
+               05  column 12 pic x(65) source ws-feed-desc(66:65).
+           01  r-feed-detail-line-3 type detail line plus 1.
+               05  column 12 pic x(65) source ws-feed-desc(131:65).  
+           01  r-feed-detail-line-4 type detail line plus 1.
+               05  column 12 pic x(65) source ws-feed-desc(196:60). 
+
            01  r-item-line-1 type detail line plus 2.
                05  column 4 pic x(6) value "Items:".
            01  r-item-line-2 type detail line plus 1.
@@ -117,32 +139,33 @@
            01  r-item-guid-line type detail line plus 1.
                05  column 5 pic x(5) value "Guid:".
                05  column 11 pic x(70) source ws-item-guid(ws-counter).
+
            01  r-item-desc-line-title type detail line plus 2.
                05  column 5 pic x(12) value "Description:".
            01  r-item-desc-line-1 type detail line plus 1.
-               05  column 6 pic x(70) 
+               05  column 7 pic x(70) 
                    source ws-item-desc(ws-counter)(1:70).
            01  r-item-desc-line-2 type detail line plus 1.
-               05  column 6 pic x(70) 
+               05  column 7 pic x(70) 
                    source ws-item-desc(ws-counter)(71:70).
            01  r-item-desc-line-3 type detail line plus 1.
-               05  column 6 pic x(70) 
-                   source ws-item-desc(ws-counter)(142:70).
+               05  column 7 pic x(70) 
+                   source ws-item-desc(ws-counter)(141:70).
            01  r-item-desc-line-4 type detail line plus 1.
-               05  column 6 pic x(70) 
-                   source ws-item-desc(ws-counter)(213:70). 
+               05  column 7 pic x(70) 
+                   source ws-item-desc(ws-counter)(211:70). 
            01  r-item-desc-line-5 type detail line plus 1.
-               05  column 6 pic x(70) 
-                   source ws-item-desc(ws-counter)(284:70).
+               05  column 7 pic x(70) 
+                   source ws-item-desc(ws-counter)(281:70).
            01  r-item-desc-line-6 type detail line plus 1.
-               05  column 6 pic x(70) 
-                   source ws-item-desc(ws-counter)(355:70).
+               05  column 7 pic x(70) 
+                   source ws-item-desc(ws-counter)(351:70).
            01  r-item-desc-line-7 type detail line plus 1.
-               05  column 6 pic x(70) 
-                   source ws-item-desc(ws-counter)(426:70).       
+               05  column 7 pic x(70) 
+                   source ws-item-desc(ws-counter)(421:70).       
            01  r-item-desc-line-8 type detail line plus 1.
-               05  column 6 pic x(70) 
-                   source ws-item-desc(ws-counter)(497:16).   
+               05  column 7 pic x(70) 
+                   source ws-item-desc(ws-counter)(491:).   
            01  r-item-end-line type detail line plus 2.    
                05 column 1 pic x(70) value spaces. 
                
@@ -188,6 +211,7 @@
 
            perform generate-rss-report
 
+           call "logger" using "Report generation complete."
            set l-return-status-success to true 
 
            goback.
@@ -228,6 +252,8 @@
 
            initiate r-rss-report
 
+           move function current-date to ws-date-record
+
            open input fd-rss-content-file
                read fd-rss-content-file into ws-rss-record
            close fd-rss-content-file
@@ -240,8 +266,19 @@
                generate r-id-line 
                generate r-title-line
                generate r-site-link-line
-               generate r-feed-detail-line
-               generate r-feed-detail-line-2
+
+               generate r-feed-detail-line-1
+
+               if ws-feed-desc(66:65) not = spaces then  
+                   generate r-feed-detail-line-2
+               end-if
+               if ws-feed-desc(131:65) not = spaces then  
+                   generate r-feed-detail-line-3
+               end-if    
+               if ws-feed-desc(196:) not = spaces then  
+                   generate r-feed-detail-line-4
+               end-if    
+
                generate r-item-line-1
                generate r-item-line-2 
                perform varying ws-counter from 1 by 1 
@@ -252,40 +289,37 @@
                        generate r-item-link-line 
                        generate r-item-guid-line
                        generate r-item-desc-line-title
-                       generate r-item-desc-line-1  
-                       if function length(
-                           function trim(
-                               ws-item-desc(ws-counter))) > 70 then 
+
+                       if ws-item-desc(ws-counter)(1:70)
+                           not = spaces then 
+                           generate r-item-desc-line-1  
+                       end-if 
+                       if ws-item-desc(ws-counter)(71:70) 
+                           not = spaces then
                            generate r-item-desc-line-2
                        end-if
-                       if function length(
-                           function trim(
-                               ws-item-desc(ws-counter))) > 140 then     
+                       if ws-item-desc(ws-counter)(141:70) 
+                           not = spaces then     
                            generate r-item-desc-line-3
                        end-if
-                       if function length(
-                           function trim(
-                               ws-item-desc(ws-counter))) > 210 then      
+                       if ws-item-desc(ws-counter)(211:70) 
+                           not = spaces then      
                            generate r-item-desc-line-4
                        end-if
-                       if function length(
-                           function trim(
-                               ws-item-desc(ws-counter))) > 280 then  
+                       if ws-item-desc(ws-counter)(281:70) 
+                           not = spaces then  
                            generate r-item-desc-line-5
                        end-if
-                       if function length(
-                           function trim(
-                               ws-item-desc(ws-counter))) > 350 then  
+                       if ws-item-desc(ws-counter)(351:70) 
+                           not = spaces then  
                            generate r-item-desc-line-6
                        end-if
-                       if function length(
-                           function trim(
-                               ws-item-desc(ws-counter))) > 420 then      
+                       if ws-item-desc(ws-counter)(421:70) 
+                           not = spaces then      
                            generate r-item-desc-line-7
                        end-if
-                       if function length(
-                           function trim(
-                               ws-item-desc(ws-counter))) > 490 then                        
+                       if ws-item-desc(ws-counter)(491:) 
+                           not = spaces then                        
                            generate r-item-desc-line-8
                        end-if
                            
