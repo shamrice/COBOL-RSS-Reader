@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-11
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-01-15
       * Purpose: Screen definition for rss_reader_menu program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -104,41 +104,49 @@
 
                10  s-help-text-2.
                    15  foreground-color cob-color-black 
-                   background-color cob-color-white line 21 column 7
+                   background-color cob-color-white line 21 column 2
                    value "F1".
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 10
+                   background-color cob-color-black line 21 column 5
                    value "Help".
 
                    15  foreground-color cob-color-black 
-                   background-color cob-color-white line 21 column 15
+                   background-color cob-color-white line 21 column 10
                    value "F3".
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 18
+                   background-color cob-color-black line 21 column 13
                    value "Add Feed".
 
                    15  foreground-color cob-color-black 
-                   background-color cob-color-white line 21 column 27
+                   background-color cob-color-white line 21 column 22
                    value "F4".
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 30
+                   background-color cob-color-black line 21 column 25
                    value "Delete Feed".
 
                    15  foreground-color cob-color-black 
-                   background-color cob-color-white line 21 column 42
+                   background-color cob-color-white line 21 column 37
                    value "F5".
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 45
+                   background-color cob-color-black line 21 column 40
                    value "Refresh Feeds".
 
+                   15  foreground-color cob-color-black 
+                   background-color cob-color-white line 21 column 54
+                   value "F8".
+
+                   15  foreground-color cob-color-white 
+                   background-color cob-color-black line 21 column 57
+                   value "Export Feed".
+
                    15  foreground-color cob-color-black
-                   background-color cob-color-white line 21 column 59
+                   background-color cob-color-white line 21 column 69
                    value "F10".
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 63
+                   background-color cob-color-black line 21 column 73
                    value "Exit".

@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2021-01-14
+      *> Last Updated: 2021-01-15
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -37,17 +37,17 @@
            05  ws-delete-feed-sw                  pic a value 'N'.
                88  ws-is-delete-feed              value 'Y'.
                88  ws-not-delete-feed             value 'N'.
-           05  ws-report-sw                       pic a value 'N'.
-               88  ws-is-report                   value 'Y'.
-               88  ws-not-report                  value 'N'.
+           05  ws-export-sw                       pic a value 'N'.
+               88  ws-is-export                   value 'Y'.
+               88  ws-not-export                  value 'N'.
            05  ws-interactive-mode-sw             pic a value 'N'.
                88  ws-is-interactive              value 'Y'.
                88  ws-not-interactive             value 'N'.           
 
-       01  ws-report-args.
-           05  ws-report-name                  pic x(512) value spaces.
-           05  ws-report-url                   pic x(256) value spaces.
-           05  ws-report-status                pic 9 value zero.
+       01  ws-export-args.
+           05  ws-export-name                  pic x(512) value spaces.
+           05  ws-export-url                   pic x(256) value spaces.
+           05  ws-export-status                pic 9 value zero.
 
        01  ws-delete-rss-record.
            05  ws-url-of-record                pic x(256) value spaces.
@@ -136,27 +136,27 @@
                end-if 
            end-if
 
-           if ws-is-report then 
-               if ws-report-url(1:4) not = "http" and "HTTP" then 
+           if ws-is-export then 
+               if ws-export-url(1:4) not = "http" and "HTTP" then 
                    display 
                        "Please enter a RSS feed URL starting with HTTP "
                        "or HTTPS and try again."
                    end-display 
                else
                    display 
-                       "Attempting to generate report for RSS URL: "
-                       function trim(ws-report-url) ws-new-line
-                       "Output file: " function trim(ws-report-name)
+                       "Attempting to generate export for RSS URL: "
+                       function trim(ws-export-url) ws-new-line
+                       "Output file: " function trim(ws-export-name)
                    end-display 
                    move function rss-report-writer(
-                       ws-report-url, ws-report-name) 
-                       to ws-report-status
-                   if ws-report-status = 1 then 
-                       display "Report created successfully."
+                       ws-export-url, ws-export-name) 
+                       to ws-export-status
+                   if ws-export-status = 1 then 
+                       display "RSS export created successfully."
                    else 
                        display 
-                           "Failed to generate report. Please check "
-                           "logs and try again."
+                           "Failed to generate RSS export. Please check"
+                           " logs and try again."
                        end-display 
                    end-if 
                end-if
@@ -191,12 +191,12 @@
            end-if
 
       * Set report flag and command arg variables.
-           if ws-cmd-args-buffer(1:2) = "-r" then 
+           if ws-cmd-args-buffer(1:2) = "-o" then 
                unstring ws-cmd-args-buffer(4:) delimited by space 
-                   into ws-report-name ws-report-url
+                   into ws-export-name ws-export-url
                end-unstring
                set ws-is-valid-param to true 
-               set ws-is-report to true
+               set ws-is-export to true
                exit paragraph
            end-if
 
@@ -272,10 +272,10 @@
                "  crssr -d [url of rss feed]  Delete an existing "
                "RSS feed from list." ws-new-line 
                ws-new-line
-               "  crssr -r [output filename] [url of rss feed] "                    
+               "  crssr -o [output filename] [url of rss feed] "                    
                ws-new-line
-               "           Generate report for existing RSS feed "                   
-               "to output file specified." 
+               "           Export an existing RSS feed from feed list "
+               "to file name specified." 
                ws-new-line                  
            end-display
 

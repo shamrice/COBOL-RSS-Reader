@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-01-15
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -197,10 +197,27 @@
 
                        set ws-is-refresh-items to true 
                        perform set-rss-menu-items  
-      
+
+
+
+                   when ws-crt-status = COB-SCR-F8
+                       compute ws-selected-id = 
+                           ws-display-rss-id(ws-cursor-line - 2)
+                       end-compute
+                       if ws-selected-id <= ws-last-id-record then
+                           call "rss-reader-export-feed" using 
+                               ws-selected-id
+                           cancel "rss-reader-export-feed"
+      *                                     
+                           set ws-not-refresh-items to true 
+     *                     perform set-rss-menu-items 
+                       end-if                   
+                        
+
                    when ws-crt-status = COB-SCR-F10
                        set ws-exit-true to true 
                    
+
                end-evaluate
     
            end-perform       

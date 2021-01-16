@@ -264,23 +264,61 @@
            move spaces to ws-display-text(8) 
            move "Turn off logging:" to ws-display-text(9) 
            move "  crssr --logging=false" to ws-display-text(10)
-           move spaces to ws-display-text(11)
            move function concatenate(
            "NOTE: These values will persist until the config ",
-           "file is updated using") to ws-display-text(12) 
+           "file is updated using") to ws-display-text(11) 
            move function concatenate(
            "      the command line parameter or the configuration file",
-           " is deleted.")to ws-display-text(13)  
-           move spaces to ws-display-text(14)  
-           move spaces to ws-display-text(15)  
-           move spaces to ws-display-text(16)  
-           move spaces to ws-display-text(17)  
-           move spaces to ws-display-text(18)  
-       
+           " is deleted.")to ws-display-text(12)  
+           move spaces to ws-display-text(13)  
+           move "Refreshing Feeds:" to ws-display-text(14)  
+           move function concatenate(
+           "  All current feeds will be refreshed at start up unless ",
+           'the "--no-refresh" ') to ws-display-text(15)  
+           move function concatenate(
+           "  command line parameter is specified. This can also be ",
+           "done by pressing F5") to ws-display-text(16)  
+           move "  on the main feed menu." to ws-display-text(17)  
+           move spaces to ws-display-text(18)
+           
            exit paragraph.
 
 
        set-page-5-text.
+
+           move function concatenate(
+           "  Refreshing feeds will download the latest RSS feed ",
+           "data and parse its") to ws-display-text(1)
+           move function concatenate(
+           "  contents into data files in the feeds directory for each",
+           " feed in the feed") to ws-display-text(2)
+           move "  list." to ws-display-text(3) 
+           move spaces to ws-display-text(4) 
+           move "Export Feed:" to ws-display-text(5) 
+           move function concatenate(
+           "  Feeds can be exported to an output file either through ",
+           "a command parameter") to ws-display-text(6)
+           move function concatenate(
+           "  or by pressing F8 on the main feed menu. When exporting ",
+           "by using F8,") to ws-display-text(7)
+           move function concatenate(
+           "  you will be prompted for a file name to export to for ",
+           "the feed the") to ws-display-text(8) 
+           move "  cursor is positioned on." to ws-display-text(9)
+           move spaces to ws-display-text(10) 
+           move "Export feed URL to a file:" to ws-display-text(11)
+           move "  crssr -o [output file name] [feed url to export]" 
+               to ws-display-text(12)
+           move spaces to ws-display-text(13)
+           move spaces to ws-display-text(14)
+           move spaces to ws-display-text(15)
+           move spaces to ws-display-text(16)
+           move spaces to ws-display-text(17)
+           move spaces to ws-display-text(18)
+
+           exit paragraph.
+
+       set-page-6-text.
            move spaces to ws-display-text(1) 
            move "About:" to ws-display-text(2) 
            move "        By: Erik Eriksen" to ws-display-text(3) 
