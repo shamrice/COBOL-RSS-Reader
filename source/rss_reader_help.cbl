@@ -115,6 +115,9 @@
                when ws-page-num = 5
                    perform set-page-5-text
 
+               when ws-page-num = 6
+                   perform set-page-6-text
+
                when other
                    set ws-exit-true to true 
 
