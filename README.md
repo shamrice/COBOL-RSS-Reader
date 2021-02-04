@@ -14,6 +14,8 @@ Run the shell script "build.sh" in the source directory.
   ```./crssr --logging=true```
 * Open application in interactive mode and disable logging (default if not set):
   ```./crssr --logging=false```
+* Remove all current feeds by deleting data files in feeds directory:
+  ```./crssr --reset```
 * Download and parse an RSS feed into feed list: 
   ```./crssr -a [url of rss feed]```
 * Delete existing RSS feed from feed list:
