@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2021-01-15
+      *> Last Updated: 2021-02-04
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -42,7 +42,10 @@
                88  ws-not-export                  value 'N'.
            05  ws-interactive-mode-sw             pic a value 'N'.
                88  ws-is-interactive              value 'Y'.
-               88  ws-not-interactive             value 'N'.           
+               88  ws-not-interactive             value 'N'. 
+           05  ws-reset-files-sw                  pic a value 'N'.
+               88  ws-is-reset-files              value 'Y'.
+               88  ws-not-reset-files             value 'N'.          
 
        01  ws-export-args.
            05  ws-export-name                  pic x(512) value spaces.
@@ -162,6 +165,9 @@
                end-if
            end-if
 
+           if ws-is-reset-files then 
+               call "reset-files" 
+           end-if 
   
            if ws-is-interactive then 
                call "rss-reader-menu" 
@@ -175,6 +181,7 @@
 
 
        parse-cmd-args.
+      * TODO: Read args in using argument-value and argument-number instead
 
       * If add flag is specified.
            if ws-cmd-args-buffer(1:2) = "-a" then 
@@ -226,6 +233,13 @@
                exit paragraph 
            end-if
 
+      * Set flag to reset files.
+           if ws-cmd-args-buffer(1:7) = "--reset" then
+               set ws-is-valid-param to true 
+               set ws-is-reset-files to true
+               exit paragraph
+           end-if 
+
            if ws-cmd-args-buffer = spaces  then
                set ws-is-valid-param to true 
                set ws-is-interactive to true 
@@ -256,23 +270,26 @@
 
            display
                "CRSSR is a console RSS reader application written in "
-               "COBOL." ws-new-line ws-new-line
-               "Usage:" ws-new-line
-               "  crssr                       Start interactive " 
-               "mode and refresh feeds." ws-new-line
-               "  crssr --no-refesh           Start interactive "
+               "GnuCOBOL." ws-new-line ws-new-line
+               "Usage: crssr [options...]" ws-new-line ws-new-line
+               "Run application with no options for interactive mode."
+               ws-new-line ws-new-line
+               "Options:" ws-new-line
+               "    --no-refesh           Start interactive "
                "mode without refreshing feeds" ws-new-line
-               "  crssr --logging=true        Start interactive "
+               "    --logging=true        Start interactive "
                "mode and enables logging." ws-new-line
-               "  crssr --logging=false       Start interactive "
+               "    --logging=false       Start interactive "
                "mode and disables logging." ws-new-line
-               "  crssr -a [url of rss feed]  Add a new RSS feed "
+               "    --reset               Remove all feeds by deleting "
+               "application's data files. " ws-new-line
+               "    -a [url of rss feed]  Add a new RSS feed "
                "to RSS feed list."
                ws-new-line
-               "  crssr -d [url of rss feed]  Delete an existing "
+               "    -d [url of rss feed]  Delete an existing "
                "RSS feed from list." ws-new-line 
                ws-new-line
-               "  crssr -o [output filename] [url of rss feed] "                    
+               "    -o [output filename] [url of rss feed] "                    
                ws-new-line
                "           Export an existing RSS feed from feed list "
                "to file name specified." 

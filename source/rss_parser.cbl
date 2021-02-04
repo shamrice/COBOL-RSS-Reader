@@ -5,7 +5,6 @@
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
-
        replace ==:BUFFER-SIZE:== by ==32768==.
 
        identification division.
