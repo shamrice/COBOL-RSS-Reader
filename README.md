@@ -39,4 +39,7 @@ RSS Feeds must be properly formatted application/rss+xml. Some RSS feeds will mi
 
 Example of a properly formatted RSS feed: https://www.rssboard.org/files/sample-rss-2.xml
 
-  
+## Screen Shots:
+*Main RSS Feed List:
+![RSS Feed List](https://i.imgur.com/875Qg6z.png)
+
