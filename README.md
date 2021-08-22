@@ -9,7 +9,7 @@ Run the shell script "build.sh" in the source directory.
 * Open application in interactive mode and refresh feeds at start:
   ```./crssr```
 * Open application in interactive mode and do not refresh feeds at start:
-  ```./crssr --no-refresh``
+  ```./crssr --no-refresh```
 * Open application in interactive mode and enable logging: 
   ```./crssr --logging=true```
 * Open application in interactive mode and disable logging (default if not set):
