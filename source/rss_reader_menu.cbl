@@ -107,7 +107,7 @@
        copy "./screens/rss_list_screen.cpy".
        copy "./screens/blank_screen.cpy".
        copy "./screens/message_screen.cpy".
-       copy "./screens/rss_delete_feed_set_id_screen.cpy".
+              
 
        procedure division using l-refresh-on-start.
            set environment 'COB_SCREEN_EXCEPTIONS' to 'Y'.
