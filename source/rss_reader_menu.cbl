@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2021-01-15
+      * Last Modified: 2021-08-23
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -55,6 +55,8 @@
            05  filler                           pic x. 
            05  filler                           pic x.
 
+       01  ws-mouse-flags                       pic 9(4).       
+
       * Input from screen accept.  
        01  accept-item1                         pic x value space.
 
@@ -105,10 +107,21 @@
        copy "./screens/rss_list_screen.cpy".
        copy "./screens/blank_screen.cpy".
        copy "./screens/message_screen.cpy".
+       copy "./screens/rss_delete_feed_set_id_screen.cpy".
 
        procedure division using l-refresh-on-start.
-       set environment 'COB_SCREEN_EXCEPTIONS' TO 'Y'.
-       set environment 'COB_SCREEN_ESC'        TO 'Y'.
+           set environment 'COB_SCREEN_EXCEPTIONS' to 'Y'.
+           set environment 'COB_SCREEN_ESC'        to 'Y'.
+           set environment "COB_EXIT_WAIT"         to "NO".
+           
+
+       mouse-setup.
+           compute ws-mouse-flags = COB-AUTO-MOUSE-HANDLING 
+               + COB-ALLOW-LEFT-DOWN
+               + COB-ALLOW-LEFT-UP
+               + COB-ALLOW-MOUSE-MOVE
+
+           set environment "COB_MOUSE_FLAGS" to ws-mouse-flags.
 
        main-procedure.
            call "logger" using "In RSS reader."
@@ -139,84 +152,42 @@
                move 0 to ws-selected-id
                move spaces to ws-crt-status
                move spaces to ws-selected-feed-file-name
-                   
+               
+               display s-blank-screen        
                accept s-rss-list-screen
         
                evaluate true 
                
                    when ws-key1 = COB-SCR-OK
-                      compute ws-selected-id = 
-                           ws-display-rss-id(ws-cursor-line - 2)
-                       end-compute
-                       if ws-selected-id <= ws-last-id-record then
-
-                           perform set-selected-feed-file-name
-
-                           if ws-selected-feed-file-name 
-                               not = spaces then
-                               call "rss-reader-view-feed" using 
-                                   by content ws-selected-feed-file-name
-                               end-call
-                               cancel "rss-reader-view-feed"
-                           end-if
-                       end-if
-
+                      perform open-selected-in-reader-view-feed
 
                    when ws-crt-status = COB-SCR-F1
-                       call "rss-reader-help"
-                       cancel "rss-reader-help"
-
+                       perform open-help
 
                    when ws-crt-status = COB-SCR-F3
-                       call "rss-reader-add-feed"
-                       cancel "rss-reader-add-feed"
-      *                Feed is refreshed if success in add sub program 
-                       set ws-not-refresh-items to true
-                       perform set-rss-menu-items  
-
+                       perform open-add-feed 
 
                    when ws-crt-status = COB-SCR-F4
                        compute ws-selected-id = 
                            ws-display-rss-id(ws-cursor-line - 2)
                        end-compute
-                       if ws-selected-id <= ws-last-id-record then
-                           call "rss-reader-delete-feed" using 
-                               ws-selected-id
-                           cancel "rss-reader-delete-feed"
-      *                                     
-                           set ws-not-refresh-items to true 
-     *                     perform set-rss-menu-items 
-                       end-if                   
+                       perform open-delete-feed
                         
-
                    when ws-crt-status = COB-SCR-F5
-                       
-                       move "Loading and refreshing RSS feeds..." 
-                           to ws-msg-body-text(1)
-                       display s-message-screen
-
-                       set ws-is-refresh-items to true 
-                       perform set-rss-menu-items  
-
-
+                       perform refresh-feeds                       
 
                    when ws-crt-status = COB-SCR-F8
                        compute ws-selected-id = 
                            ws-display-rss-id(ws-cursor-line - 2)
                        end-compute
-                       if ws-selected-id <= ws-last-id-record then
-                           call "rss-reader-export-feed" using 
-                               ws-selected-id
-                           cancel "rss-reader-export-feed"
-      *                                     
-                           set ws-not-refresh-items to true 
-     *                     perform set-rss-menu-items 
-                       end-if                   
+                       perform open-export-feed              
                         
-
                    when ws-crt-status = COB-SCR-F10
                        set ws-exit-true to true 
-                   
+      
+      *>   Mouse input handling.                   
+                   when ws-crt-status = COB-SCR-LEFT-RELEASED
+                       perform handle-mouse-click                   
 
                end-evaluate
     
@@ -224,6 +195,132 @@
 
            display s-blank-screen    
            goback.
+
+
+       handle-mouse-click.
+           call "logger" using function concatenate(
+               "Mouse clicked at: ", ws-cursor-position)
+           end-call 
+           
+           if ws-cursor-line = 21 then 
+               
+               evaluate true 
+               
+                   when ws-cursor-col >= 2 and ws-cursor-col < 9 
+                       perform open-help
+                   
+
+                   when ws-cursor-col >= 10 and ws-cursor-col < 21
+                       perform open-add-feed
+
+                   when ws-cursor-col >= 22 and ws-cursor-col < 36 
+                       display ws-empty-line at 2101
+                       display "Enter RSS feed id to delete: " at 2101
+                       accept ws-selected-id at 2130
+
+                       call "logger" using function concatenate(
+                           "selected id from delete set: " 
+                           ws-selected-id)
+                       end-call
+                       perform open-delete-feed
+
+                   when ws-cursor-col >= 37 and ws-cursor-col < 53
+                       perform refresh-feeds
+
+                   when ws-cursor-col >= 54 and ws-cursor-col < 68
+                       display ws-empty-line at 2101
+                       display "Enter RSS feed id to export: " at 2101
+                       accept ws-selected-id at 2130
+
+                       call "logger" using function concatenate(
+                           "selected id for export set: " 
+                           ws-selected-id)
+                       end-call                       
+                       perform open-export-feed
+
+                   when ws-cursor-col >= 69 and ws-cursor-col < 77 
+                       set ws-exit-true to true 
+
+               end-evaluate
+
+           else 
+               perform open-selected-in-reader-view-feed
+           end-if 
+
+           exit paragraph.
+
+
+       open-help.
+           call "rss-reader-help"
+           cancel "rss-reader-help"
+           exit paragraph.
+
+
+       open-add-feed.
+           call "rss-reader-add-feed"
+           cancel "rss-reader-add-feed"
+      *>   Feed is refreshed if success in add sub program 
+           set ws-not-refresh-items to true
+           perform set-rss-menu-items        
+
+           exit paragraph.
+
+
+
+       open-delete-feed.
+      *>   selected id set by key or mouse input handler before calling
+      *>   this paragraph.     
+           if ws-selected-id <= ws-last-id-record then
+               call "rss-reader-delete-feed" using ws-selected-id
+               cancel "rss-reader-delete-feed"                                                          
+               set ws-not-refresh-items to true 
+               perform set-rss-menu-items
+           end-if  
+                      
+           exit paragraph.
+          
+
+       refresh-feeds.
+           move "Loading and refreshing RSS feeds..." 
+               to ws-msg-body-text(1)
+           display s-message-screen
+
+           set ws-is-refresh-items to true 
+           perform set-rss-menu-items         
+
+           exit paragraph.
+
+
+       open-export-feed.
+      *>   selected id set by key or mouse input handler before calling
+      *>   this paragraph.     
+           if ws-selected-id <= ws-last-id-record then
+               call "rss-reader-export-feed" using ws-selected-id
+               cancel "rss-reader-export-feed"
+                                           
+               set ws-not-refresh-items to true 
+               perform set-rss-menu-items 
+           end-if            
+           exit paragraph.
+
+
+       open-selected-in-reader-view-feed.
+           compute ws-selected-id = 
+               ws-display-rss-id(ws-cursor-line - 2)
+           end-compute
+           if ws-selected-id <= ws-last-id-record then
+
+               perform set-selected-feed-file-name
+
+               if ws-selected-feed-file-name not = spaces then
+                   call "rss-reader-view-feed" using 
+                       by content ws-selected-feed-file-name
+                   end-call
+                   cancel "rss-reader-view-feed"
+               end-if
+           end-if  
+
+           exit paragraph.
 
 
       * Called from set-rss-menu-items paragraph.
