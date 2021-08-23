@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-19
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-08-23
       * Purpose: RSS Reader Item Viewer - Displays formatted feed
       *          item data
       * Tectonics: ./build.sh
@@ -13,6 +13,7 @@
        
        configuration section.
        special-names.
+           cursor is ws-cursor-position      
            crt status is ws-crt-status.
 
        input-output section.
@@ -23,6 +24,10 @@
        working-storage section.
 
        copy "screenio.cpy".
+
+       01  ws-cursor-position. 
+           05  ws-cursor-line                        pic 99. 
+           05  ws-cursor-col                         pic 99. 
 
        01  ws-crt-status. 
            05  ws-key1                       pic x. 
@@ -118,9 +123,30 @@
 
                    when ws-crt-status = COB-SCR-ESC
                        set ws-exit-true to true
-                       
+
+      *>   Mouse input handling.                   
+                   when ws-crt-status = COB-SCR-LEFT-RELEASED
+                       perform handle-mouse-click    
+
                end-evaluate
            end-perform
+
+           exit paragraph.
+
+
+       handle-mouse-click.
+           if ws-cursor-line = 21 then 
+               evaluate true
+                   when ws-cursor-col >= 6 and ws-cursor-col < 34
+                       call "browser-launcher" using by content 
+                           ws-item-link
+                       end-call 
+                       cancel "browser-launcher"    
+
+                   when ws-cursor-col >= 35 and ws-cursor-col < 61 
+                       set ws-exit-true to true                                              
+               end-evaluate
+           end-if 
 
            exit paragraph.
 

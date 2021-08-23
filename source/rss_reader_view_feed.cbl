@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-08-23
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       *  Cancel subprogram after each run to ensure that variables are 
       *  reset and loaded fresh at start up.
@@ -109,9 +109,26 @@
               
                    when ws-crt-status = COB-SCR-ESC
                        set ws-exit-true to true 
-                       
+
+      *>   Mouse input handling.                   
+                   when ws-crt-status = COB-SCR-LEFT-RELEASED
+                       perform handle-mouse-click     
+
                end-evaluate
            end-perform
+
+           exit paragraph.
+
+
+       handle-mouse-click.
+           if ws-cursor-line = 21 and ws-cursor-col >= 35 
+           and ws-cursor-col < 59 then 
+               set ws-exit-true to true                
+           end-if 
+
+           if ws-cursor-line < 20 then                 
+               perform view-selected-feed-item
+           end-if 
 
            exit paragraph.
 

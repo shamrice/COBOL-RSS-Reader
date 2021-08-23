@@ -107,7 +107,7 @@
        copy "./screens/rss_list_screen.cpy".
        copy "./screens/blank_screen.cpy".
        copy "./screens/message_screen.cpy".
-              
+
 
        procedure division using l-refresh-on-start.
            set environment 'COB_SCREEN_EXCEPTIONS' to 'Y'.
@@ -242,8 +242,8 @@
                        set ws-exit-true to true 
 
                end-evaluate
-
-           else 
+           end-if 
+           if ws-cursor-line < 20 then 
                perform open-selected-in-reader-view-feed
            end-if 
 

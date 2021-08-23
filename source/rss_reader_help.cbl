@@ -36,8 +36,7 @@
            05  ws-key2                       pic x. 
            05  filler                        pic x. 
            05  filler                        pic x.
-
-       01  ws-mouse-flags                    pic 9(4).       
+      
 
       * Strings to display on help screen.
        01  ws-display-text                   occurs 18 times.
