@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-10
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-08-23
       * Purpose: RSS Reader Help - Screen sub program to show help
       * Tectonics: ./build.sh
       ******************************************************************
@@ -15,6 +15,7 @@
        repository.
 
        special-names.
+           cursor is ws-cursor-position 
            crt status is ws-crt-status.
 
        input-output section.
@@ -26,16 +27,21 @@
 
        copy "screenio.cpy".
 
+       01  ws-cursor-position.
+           05  ws-cursor-line                pic 99.
+           05  ws-cursor-col                 pic 99.
+
        01  ws-crt-status. 
            05  ws-key1                       pic x. 
            05  ws-key2                       pic x. 
            05  filler                        pic x. 
            05  filler                        pic x.
 
+       01  ws-mouse-flags                    pic 9(4).       
+
       * Strings to display on help screen.
        01  ws-display-text                   occurs 18 times.
            05  ws-help-text                  pic x(78) value spaces. 
-
 
        01  ws-accept                         pic x.
 
@@ -89,12 +95,31 @@
                    
                    when ws-crt-status = COB-SCR-ESC
                        set ws-exit-true to true 
-                       
+
+      *>   Mouse input handling.                   
+                   when ws-crt-status = COB-SCR-LEFT-RELEASED
+                       perform handle-mouse-click                   
+
+
                end-evaluate
            end-perform
 
            exit paragraph.
 
+
+       handle-mouse-click.
+           if ws-cursor-line = 21 then 
+               evaluate true 
+                   when ws-cursor-col >= 6 and ws-cursor-col < 23
+                       add 1 to ws-page-num 
+                       perform set-page-text 
+                   
+                   when ws-cursor-col >= 35 and ws-cursor-col < 59 
+                       set ws-exit-true to true 
+               end-evaluate
+           end-if 
+
+           exit paragraph.
 
 
        set-page-text.
@@ -341,10 +366,15 @@
            move function concatenate(
            " ", ws-web-url) to ws-display-text(11)
            move spaces to ws-display-text(12)
-           move spaces to ws-display-text(13)
-           move spaces to ws-display-text(14)
-           move spaces to ws-display-text(15)
-           move spaces to ws-display-text(16)
+           move " -----------------------------------------------------" 
+               to ws-display-text(13)
+           move function concatenate(" cobweb-pipes library created by ", 
+           "Brian Tiffin and Simon Sobisch.") to ws-display-text(14)
+           move function concatenate(" URL: ",
+           "https://sourceforge.net/p",
+           "/gnucobol/contrib/HEAD/tree/") to ws-display-text(15)
+           move "      trunk/tools/cobweb/cobweb-pipes/" 
+               to ws-display-text(16)
            move spaces to ws-display-text(17)
            move spaces to ws-display-text(18)
 
