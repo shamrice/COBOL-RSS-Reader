@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2021-08-23
+      * Last Modified: 2021-08-26
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -213,9 +213,11 @@
                    when ws-cursor-col >= 10 and ws-cursor-col < 21
                        perform open-add-feed
 
-                   when ws-cursor-col >= 22 and ws-cursor-col < 36 
-                       display ws-empty-line at 2101
-                       display "Enter RSS feed id to delete: " at 2101
+                   when ws-cursor-col >= 22 and ws-cursor-col < 36                       
+                       display "Enter RSS feed id to delete: " 
+                           with blank line 
+                           at 2101
+                       end-display 
                        accept ws-selected-id at 2130
 
                        call "logger" using function concatenate(
@@ -227,9 +229,11 @@
                    when ws-cursor-col >= 37 and ws-cursor-col < 53
                        perform refresh-feeds
 
-                   when ws-cursor-col >= 54 and ws-cursor-col < 68
-                       display ws-empty-line at 2101
-                       display "Enter RSS feed id to export: " at 2101
+                   when ws-cursor-col >= 54 and ws-cursor-col < 68                       
+                       display "Enter RSS feed id to export: "                            
+                           with blank line 
+                           at 2101
+                       end-display 
                        accept ws-selected-id at 2130
 
                        call "logger" using function concatenate(
