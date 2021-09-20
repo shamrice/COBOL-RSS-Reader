@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-01-09
-      *> Last Updated: 2021-01-12
+      *> Last Updated: 2021-09-20
       *> Purpose: Removes leading spaces from field passed.
       *> Tectonics:
       *>     ./build.sh
@@ -21,18 +21,20 @@
 
        working-storage section.
 
-       local-storage section.
-           01  ls-space-count                  pic 9(5) value zeros.
-           01  ls-length                       pic 9(5) value zeros.
-           01  ls-final-offset                 pic 9(5) value zeros.
+       01  ws-tab-char                     constant as x"09".
 
-           01  ls-non-space-found-sw           pic a.
-               88  ls-non-space-found          value 'Y'.
-               88  ls-non-space-not-found      value 'N'.
+       local-storage section.
+       01  ls-space-count                  pic 9(5) value zeros.
+       01  ls-length                       pic 9(5) value zeros.
+       01  ls-final-offset                 pic 9(5) value zeros.
+
+       01  ls-non-space-found-sw           pic a.
+           88  ls-non-space-found          value 'Y'.
+           88  ls-non-space-not-found      value 'N'.
 
        linkage section.
-           01  l-field                         pic x any length.
-           01  l-updated-record                pic x(:BUFFER-SIZE:) 
+       01  l-field                         pic x any length.
+       01  l-updated-record                pic x(:BUFFER-SIZE:) 
                                                value spaces.
 
        procedure division 
@@ -52,23 +54,22 @@
 
            set ls-non-space-not-found to true 
 
-      * TODO : tabs counted as 2 here but offset is actually just 1. Causes
-      *        some fields to lose a char to two at the beginning.
+           perform varying ls-space-count from 1 by 1 
+           until ls-non-space-found or ls-space-count >= ls-length 
 
-           perform varying ls-space-count 
-               from 1 by 1 until ls-non-space-found
-
-               if l-field(ls-space-count:) greater than space then
-                   set ls-non-space-found to true
-      *  Due to issue above, leaning on side of caution and adding back one space.
-                   subtract 1 from ls-space-count
-               else 
-                   if ls-space-count > ls-length then 
+               if l-field(ls-space-count:1) not = space then 
+                   if l-field(ls-space-count:1) = ws-tab-char then 
+                       add 1 to ls-space-count
+                       call "logger" using function concatenate(
+                           "Found tab at: " ls-space-count 
+                           " tallying character as two spaces")
+                   else  
                        set ls-non-space-found to true 
-                       move 0 to ls-space-count
+                       subtract 1 from ls-space-count
                    end-if 
-               end-if
-           end-perform
+               end-if 
+           end-perform 
+
 
            if ls-space-count > 1 then 
                
@@ -122,8 +123,8 @@
        working-storage section.
 
        linkage section.
-           01  l-field               pic x any length.
-           01  l-updated-record      pic x(:BUFFER-SIZE:) value spaces.
+       01  l-field               pic x any length.
+       01  l-updated-record      pic x(:BUFFER-SIZE:) value spaces.
 
        procedure division 
            using l-field
