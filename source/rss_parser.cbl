@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-09-21
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -54,21 +54,19 @@
        copy "./copybooks/wsrecord/ws-last-id-record.cpy".
      
        01  ls-eof-sw                             pic a value 'N'.
-           88 ls-eof                                 value 'Y'.
-           88 ls-not-eof                             value 'N'.
+           88 ls-eof                                   value 'Y'.
+           88 ls-not-eof                               value 'N'.
 
        77  ls-is-desc-single-line                pic a value 'N'.
        77  ls-in-description                     pic a value 'N'.
        77  ls-in-items                           pic a value 'N'.
-       77  ls-item-idx                           pic 99 value 1.
+       77  ls-item-idx                           pic 999 value 1.
 
-       77  ls-desc-temp                          pic x(255) 
-                                                 value spaces.
 
        77  ls-raw-buffer                         pic x(:BUFFER-SIZE:) 
                                                  value spaces.
 
-       77  ls-counter                            pic 99 value 1.
+       77  ls-counter                            pic 999 value 1.
 
        77  ls-search-count                       pic 999 value zeros.
 
@@ -81,8 +79,8 @@
            01  l-feed-url                        pic x(256).
 
            01  l-parse-status                    pic S9 value zero.
-               88 l-return-status-success           value 1.
-               88 l-return-status-fail              value 2.
+               88 l-return-status-success               value 1.
+               88 l-return-status-fail                  value 2.
 
        procedure division 
            using l-file-name l-feed-url
@@ -136,7 +134,7 @@
                    "Found item end: ", function trim(ls-raw-buffer))
                end-call
                move 'N' to ls-in-items
-               add 1 to ls-item-idx
+               add 1 to ls-item-idx                
            end-if
 
 
@@ -146,6 +144,7 @@
                tallying ls-search-count for all "<item>"
 
            if ls-search-count > 0 then
+               add 1 to ws-num-items
                call "logger" using function concatenate(
                    "Found item start: ", function trim(ls-raw-buffer))
                end-call
@@ -243,7 +242,9 @@
                    call "logger" using "feed desc single"
                    move function trim(ls-raw-buffer) to ws-feed-desc
                else
-                   call "logger" using "item desc single"
+                   call "logger" using function concatenate( 
+                       "item desc single: ", ls-raw-buffer)
+                   end-call
                    move function trim(ls-raw-buffer)
                    to ws-item-desc(ls-item-idx)
                end-if
@@ -258,8 +259,8 @@
 
                if ls-search-count > 0 then
                    call "logger" using "start of multiline description"
-                   move 'Y' to ls-in-description
-                   move spaces to ls-desc-temp
+                   move 'Y' to ls-in-description                  
+                   move spaces to ws-item-desc(ls-item-idx)
                end-if
 
                if ls-in-description = 'Y' then
@@ -273,11 +274,14 @@
                            function trim(ls-raw-buffer))
                        to ws-feed-desc
                    else
-                       call "logger" using "item desc"
+                       call "logger" using "item desc"                        
                        move function concatenate(
                            function trim(ws-item-desc(ls-item-idx)),
                            function trim(ls-raw-buffer))
                        to ws-item-desc(ls-item-idx)
+                       call "logger" using 
+                           by content ws-item-desc(ls-item-idx)
+                       end-call 
                    end-if
                end-if
 
@@ -288,6 +292,9 @@
 
                if ls-search-count > 0 then
                    call "logger" using "end multi line description"
+                   call "logger" using function concatenate( 
+                       "item desc multi" function trim(ls-raw-buffer))
+                   end-call
                    move 'N' to ls-in-description
                end-if
 
@@ -313,30 +320,38 @@
                to ws-feed-desc
 
       * Sanitize rss item fields...
-           perform varying ls-counter from 1 by 1 
-               until ls-counter = ws-max-rss-items
 
-               move function 
-                   sanitize-rss-field(ws-item-title(ls-counter)) 
-                   to ws-item-title(ls-counter)
+           call "logger" using function concatenate(
+               "Sanitizing items.. num items: " ws-num-items)
+           end-call 
 
-               move function 
-                   sanitize-rss-field(ws-item-guid(ls-counter)) 
-                   to ws-item-guid(ls-counter)
+           if ws-num-items > 0 then 
 
-               move function 
-                   sanitize-rss-field(ws-item-pub-date(ls-counter)) 
-                   to ws-item-pub-date(ls-counter)
+               perform varying ls-counter from 1 by 1 
+                   until ls-counter = ws-num-items
 
-               move function 
-                   sanitize-rss-field(ws-item-link(ls-counter)) 
-                   to ws-item-link(ls-counter)
+                   move function 
+                       sanitize-rss-field(ws-item-title(ls-counter)) 
+                       to ws-item-title(ls-counter)
 
-               move function 
-                   sanitize-rss-field(ws-item-desc(ls-counter)) 
-                   to ws-item-desc(ls-counter)
+                   move function 
+                       sanitize-rss-field(ws-item-guid(ls-counter)) 
+                       to ws-item-guid(ls-counter)
 
-           end-perform
+                   move function 
+                       sanitize-rss-field(ws-item-pub-date(ls-counter)) 
+                       to ws-item-pub-date(ls-counter)
+
+                   move function 
+                       sanitize-rss-field(ws-item-link(ls-counter)) 
+                       to ws-item-link(ls-counter)
+
+                   move function 
+                       sanitize-rss-field(ws-item-desc(ls-counter)) 
+                       to ws-item-desc(ls-counter)
+
+               end-perform
+           end-if 
 
            exit paragraph.
 
@@ -357,7 +372,7 @@
            
            call "logger" using "Feed Items:"
            move 1 to ls-counter
-           perform until ls-counter > ws-max-rss-items
+           perform until ls-counter > ws-num-items
                if ws-item-exists(ls-counter) = 'Y' then
                    call "logger" using function concatenate(
                        "Item title: ",
@@ -475,6 +490,9 @@
 
 
            call "logger" using "Saving parsed RSS data to disk...".
+
+           *> HACK : item count is 1 higher than actual number of items.
+           subtract 1 from ws-num-items
 
            open output fd-rss-content-file    
                write f-rss-content-record from ws-rss-record

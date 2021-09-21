@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2021-08-23
+      * Last Modified: 2021-09-21
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       *  Cancel subprogram after each run to ensure that variables are 
       *  reset and loaded fresh at start up.
@@ -45,19 +45,27 @@
        01  ws-eof-sw                                 pic a value 'N'.
            88  ws-eof                                value 'Y'.
            88  ws-not-eof                            value 'N'.
-
+       
+           
        01  ws-exit-sw                                pic a value 'N'.
            88  ws-exit-true                          value 'Y'.
            88  ws-exit-false                         value 'N'.
 
        77  ws-empty-line                             pic x(80) 
                                                      value spaces. 
-       77  ws-selected-id                       pic 9(5) value zeros.
+       77  ws-selected-id                       pic 9(5) value zeros.    
 
       * Value set based on file name passed in linkage section.
        77  ws-rss-content-file-name                  pic x(255) 
                                                      value spaces.
-      
+
+       77  ws-idx                                    pic 999 comp.
+     
+
+       local-storage section. 
+       01  ls-display-item-title                pic x(128) value spaces
+                                                occurs 15 times.
+
        linkage section.
            01  l-rss-content-file-name               pic x(255).
 
@@ -136,9 +144,15 @@
        view-selected-feed-item.
 
       * 4 is line offset to account for header lines.
+           if ws-cursor-line not > 4 then 
+               exit paragraph
+           end-if 
+
            compute ws-selected-id = ws-cursor-line - 4
            
-           if ws-selected-id <= ws-max-rss-items then
+           if ws-selected-id > 0 and ws-selected-id <= ws-max-rss-items 
+           and ws-selected-id <= ws-num-items then
+
                if ws-item-exists(ws-selected-id) = 'Y' then
 
                    call "logger" using function concatenate(
@@ -182,6 +196,17 @@
                    end-read
                end-perform
            close fd-rss-content-file
+
+           *> move item titles from data file if they are present.
+           if ws-num-items > 0 then 
+               perform varying ws-idx from 1 by 1 
+               until ws-idx > ws-num-items or ws-idx > 15
+                   if ws-item-exists(ws-idx) = 'Y' then 
+                       move ws-item-title(ws-idx) 
+                           to ls-display-item-title(ws-idx)
+                   end-if 
+               end-perform 
+           end-if
 
            exit paragraph.
 

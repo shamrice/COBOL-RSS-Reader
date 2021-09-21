@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-09-21
       * Purpose: File description for RSS content files.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -11,7 +11,9 @@
                05  f-feed-title                 pic x(128) value spaces.
                05  f-feed-site-link             pic x(256) value spaces.
                05  f-feed-desc                  pic x(256) value spaces.
-               05  f-items                      occurs 30 times.
+               05  f-num-items                  pic 999 value zeros.
+               05  f-items                     occurs 0 to 999 times 
+                                               depending on f-num-items.
                    10  f-item-exists            pic a value 'N'.
                    10  f-item-title             pic x(128) value spaces.
                    10  f-item-link              pic x(256) value spaces.

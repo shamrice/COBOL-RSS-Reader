@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-16
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-09-21
       * Purpose: Screen definition for rss_reader_view_feed program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -35,67 +35,67 @@
                                    
                10  line 5  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(1).        
+               10  column 4 pic x(70) from ls-display-item-title(1).        
 
 
                10  line 6  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(2).        
+               10  column 4 pic x(70) from ls-display-item-title(2).        
 
 
                10  line 7  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(3).        
+               10  column 4 pic x(70) from ls-display-item-title(3).        
 
 
                10  line 8  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(4).        
+               10  column 4 pic x(70) from ls-display-item-title(4).        
 
 
                10  line 9  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(5).        
+               10  column 4 pic x(70) from ls-display-item-title(5).        
 
                10  line 10  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(6).        
+               10  column 4 pic x(70) from ls-display-item-title(6).        
 
                10  line 11  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(7).        
+               10  column 4 pic x(70) from ls-display-item-title(7).        
 
                10  line 12  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(8).        
+               10  column 4 pic x(70) from ls-display-item-title(8).        
 
                10  line 13  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(9).        
+               10  column 4 pic x(70) from ls-display-item-title(9).        
 
                10  line 14  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(10).                            
+               10  column 4 pic x(70) from ls-display-item-title(10).                            
 
                10  line 15  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(11).                            
+               10  column 4 pic x(70) from ls-display-item-title(11).                            
 
                10  line 16  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(12).                            
+               10  column 4 pic x(70) from ls-display-item-title(12).                            
 
                10  line 17  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(13). 
+               10  column 4 pic x(70) from ls-display-item-title(13). 
 
                10  line 18  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(14). 
+               10  column 4 pic x(70) from ls-display-item-title(14). 
 
                10  line 19  column 2 
                    pic x to ws-accept-item. 
-               10  column 4 pic x(70) from ws-item-title(15). 
+               10  column 4 pic x(70) from ls-display-item-title(15). 
 
                10  s-help-text-1.
                    15  foreground-color cob-color-black 
