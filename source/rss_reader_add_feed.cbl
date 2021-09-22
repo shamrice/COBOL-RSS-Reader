@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-02
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-09-22
       * Purpose: RSS Reader Add Feed - Screen sub program to add feeds
       * Tectonics: ./build.sh
       ******************************************************************
@@ -33,7 +33,7 @@
            05  filler                        pic x. 
            05  filler                        pic x.
 
-       01  ws-rss-url                        pic x(255) value space.
+       01  ws-rss-url                        pic x(256) value space.
 
        01  ws-add-feed-status                pic 9 value zero.
 
