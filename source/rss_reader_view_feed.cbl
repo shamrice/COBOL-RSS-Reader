@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-10
-      * Last Modified: 2021-09-21
+      * Last Modified: 2021-09-23
       * Purpose: RSS Reader Feed Viewer - Displays formatted feed data
       *  Cancel subprogram after each run to ensure that variables are 
       *  reset and loaded fresh at start up.
@@ -59,8 +59,7 @@
        77  ws-rss-content-file-name                  pic x(255) 
                                                      value spaces.
 
-       77  ws-idx                                    pic 999 comp.
-     
+       77  ws-idx                                    pic 9(6) comp.       
 
        local-storage section. 
        01  ls-display-item-title                pic x(128) value spaces
@@ -87,7 +86,7 @@
                "viewing: ", function trim(l-rss-content-file-name))
            end-call
 
-           if not l-rss-content-file-name = spaces then 
+           if l-rss-content-file-name not = spaces then 
                move l-rss-content-file-name to ws-rss-content-file-name
                perform load-feed-data
                perform handle-user-input
@@ -150,33 +149,27 @@
 
            compute ws-selected-id = ws-cursor-line - 4
            
+           move ws-num-items to ws-num-items-disp
+           call "logger" using function concatenate(
+                   "Selected item ID to view is: ", 
+                   ws-selected-id " max: " ws-max-rss-items 
+                   " num items: " ws-num-items-disp)
+           end-call  
+
            if ws-selected-id > 0 and ws-selected-id <= ws-max-rss-items 
            and ws-selected-id <= ws-num-items then
 
-               if ws-item-exists(ws-selected-id) = 'Y' then
+               call "logger" using function concatenate(
+                   "Selected item ID to view is: ", 
+                   ws-selected-id, " Item: ", ws-items(ws-selected-id))
+               end-call
 
-                   call "logger" using function concatenate(
-                       "Selected item ID to view is: ", 
-                       ws-selected-id)
-                   end-call
-
-                   call "logger" using function concatenate(
-                       "Item: ", ws-items(ws-selected-id))
-                   end-call
-
-                   call "rss-reader-view-item" using by content 
-                       ws-feed-title,
-                       ws-feed-site-link,
-                       ws-items(ws-selected-id)
-                   end-call
-                   cancel "rss-reader-view-item"
-
-               else 
-                   call "logger" using function concatenate(
-                       "selected item does not exist:",
-                       ws-selected-id)
-                   end-call 
-               end-if
+               call "rss-reader-view-item" using by content 
+                   ws-feed-title,
+                   ws-feed-site-link,
+                   ws-items(ws-selected-id)
+               end-call
+               cancel "rss-reader-view-item"
            end-if
 
            exit paragraph.
@@ -192,7 +185,7 @@
                        call "logger" using function concatenate(
                            "Viewing feed data items for feed: ",
                            function trim(ws-feed-title))
-                       end-call
+                       end-call                      
                    end-read
                end-perform
            close fd-rss-content-file
@@ -201,10 +194,10 @@
            if ws-num-items > 0 then 
                perform varying ws-idx from 1 by 1 
                until ws-idx > ws-num-items or ws-idx > 15
-                   if ws-item-exists(ws-idx) = 'Y' then 
-                       move ws-item-title(ws-idx) 
-                           to ls-display-item-title(ws-idx)
-                   end-if 
+
+                   move ws-item-title(ws-idx) 
+                       to ls-display-item-title(ws-idx)
+
                end-perform 
            end-if
 

@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-19
-      * Last Modified: 2021-08-23
+      * Last Modified: 2021-09-23
       * Purpose: RSS Reader Item Viewer - Displays formatted feed
       *          item data
       * Tectonics: ./build.sh
@@ -63,8 +63,7 @@
  
        01  l-feed-site-link                  pic x any length.
 
-       01  l-feed-item.
-           05  l-item-exists                 pic a value 'N'.
+       01  l-feed-item.           
            05  l-item-title                  pic x(128) value spaces.
            05  l-item-link                   pic x(256) value spaces.
            05  l-item-guid                   pic x(256) value spaces.

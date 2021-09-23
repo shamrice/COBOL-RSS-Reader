@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-13
-      * Last Modified: 2021-01-14
+      * Last Modified: 2021-09-23
       * Purpose: Generates a report based on url of rss feed to file
       *          name provided.
       * Tectonics: ./build.sh
@@ -40,7 +40,7 @@
        copy "./copybooks/wsrecord/ws-rss-list-record.cpy".
        copy "./copybooks/wsrecord/ws-rss-record.cpy".
 
-       01  ws-counter                        pic 99 value zeros.
+       01  ws-counter                        pic 9(6) comp value zeros.
 
        01  ws-rss-content-file-found-sw      pic x value 'N'.
            88  ws-content-file-found         value 'Y'.
@@ -67,8 +67,7 @@
 
        77  ws-rss-content-file-name          pic x(21) 
                                              value "./feeds/UNSET.dat".                                            
-       78  ws-rss-list-file-name             value "./feeds/list.dat".
-
+       78  ws-rss-list-file-name             value "./feeds/list.dat".       
   
        linkage section.
 
@@ -78,7 +77,9 @@
  
        01  l-create-report-status                pic 9 value zero.
            88  l-return-status-success           value 1.
-           88  l-return-status-bad-param         value 2.
+           88  l-return-status-bad-param         value 2.  
+           88  l-return-status-nothing-to-report value 3.
+           88  l-return-status-data-file-missing value 4.          
 
        report section.
            rd r-rss-report
@@ -92,7 +93,7 @@
                05  line 2.
                    10  column 1 
                        pic x(12) value "RSS REPORT -".
-                   10  column 13 pic x(35) source ws-feed-title. 
+                   10  column 14 pic x(35) source ws-feed-title. 
                05  line plus 1.
                    10  column 1 pic x(5) value "DATE:".
                    10  column 7 pic x(40) source ws-date-record.   
@@ -206,7 +207,23 @@
            perform set-rss-content-file-name
 
            if ws-content-file-not-found then 
+               set l-return-status-data-file-missing to true 
                goback
+           end-if 
+
+           open input fd-rss-content-file
+               read fd-rss-content-file into ws-rss-record
+           close fd-rss-content-file
+
+           if ws-num-items = 0 then 
+               set l-return-status-nothing-to-report to true 
+               call "logger" using function concatenate(
+                   "Nothing to report. Number of items in RSS feed is ",
+                   "currently zero. Exiting report generation with ",
+                   "status code: 3")
+               end-call
+
+               goback 
            end-if 
 
            perform generate-rss-report
@@ -220,6 +237,9 @@
        set-rss-content-file-name.
 
            move l-rss-link to f-rss-link 
+           call "logger" using function concatenate(
+               "l-rss-link: ", l-rss-link, " f-rss-link: ", f-rss-link)
+           end-call 
            open input fd-rss-list-file
                       
                read fd-rss-list-file into ws-rss-list-record
@@ -243,8 +263,13 @@
 
            close fd-rss-list-file               
 
-           exit paragraph.
+           call "logger" using function concatenate(
+               "ws-rss-list-record: ", ws-rss-list-record)
+           end-call 
 
+           exit paragraph.
+      
+       
 
        generate-rss-report.
 
@@ -253,12 +278,17 @@
            initiate r-rss-report
 
            move function current-date to ws-date-record
+          
+           move ws-num-items to ws-num-items-disp
+           call "logger" using function concatenate( 
+               "ws-num-items = " ws-num-items-disp)
+           end-call 
 
-           open input fd-rss-content-file
-               read fd-rss-content-file into ws-rss-record
-           close fd-rss-content-file
-
-           move zeros to ws-counter
+           *> Counter must be initiated above zero before any report 
+           *> generate calls are made as it's used as a table index 
+           *> on the rss items. Reports with no items should be rejected
+           *> in the main-method paragraph before reaching here.
+           move 1 to ws-counter
            move function trim(ws-rss-title) to ws-rss-title
            move function trim(ws-feed-site-link) to ws-feed-site-link
            
@@ -278,55 +308,56 @@
                if ws-feed-desc(196:) not = spaces then  
                    generate r-feed-detail-line-4
                end-if    
-
+                
                generate r-item-line-1
                generate r-item-line-2 
+              
                perform varying ws-counter from 1 by 1 
-                   until ws-counter = ws-max-rss-items
-                   if ws-item-exists(ws-counter) = 'Y' then 
-                       generate r-item-title-line
-                       generate r-publish-date-line
-                       generate r-item-link-line 
-                       generate r-item-guid-line
-                       generate r-item-desc-line-title
+               until ws-counter > ws-num-items
+                 
+                   generate r-item-title-line
+                   generate r-publish-date-line
+                   generate r-item-link-line 
+                   generate r-item-guid-line
+                   generate r-item-desc-line-title
 
-                       if ws-item-desc(ws-counter)(1:70)
-                           not = spaces then 
-                           generate r-item-desc-line-1  
-                       end-if 
-                       if ws-item-desc(ws-counter)(71:70) 
-                           not = spaces then
-                           generate r-item-desc-line-2
-                       end-if
-                       if ws-item-desc(ws-counter)(141:70) 
-                           not = spaces then     
-                           generate r-item-desc-line-3
-                       end-if
-                       if ws-item-desc(ws-counter)(211:70) 
-                           not = spaces then      
-                           generate r-item-desc-line-4
-                       end-if
-                       if ws-item-desc(ws-counter)(281:70) 
-                           not = spaces then  
-                           generate r-item-desc-line-5
-                       end-if
-                       if ws-item-desc(ws-counter)(351:70) 
-                           not = spaces then  
-                           generate r-item-desc-line-6
-                       end-if
-                       if ws-item-desc(ws-counter)(421:70) 
-                           not = spaces then      
-                           generate r-item-desc-line-7
-                       end-if
-                       if ws-item-desc(ws-counter)(491:) 
-                           not = spaces then                        
-                           generate r-item-desc-line-8
-                       end-if
-                           
-                       generate r-item-end-line 
+                   if ws-item-desc(ws-counter)(1:70)
+                       not = spaces then 
+                       generate r-item-desc-line-1  
+                   end-if 
+                   if ws-item-desc(ws-counter)(71:70) 
+                       not = spaces then
+                       generate r-item-desc-line-2
                    end-if
+                   if ws-item-desc(ws-counter)(141:70) 
+                       not = spaces then     
+                       generate r-item-desc-line-3
+                   end-if
+                   if ws-item-desc(ws-counter)(211:70) 
+                       not = spaces then      
+                       generate r-item-desc-line-4
+                   end-if
+                   if ws-item-desc(ws-counter)(281:70) 
+                     not = spaces then  
+                     generate r-item-desc-line-5
+                   end-if
+                   if ws-item-desc(ws-counter)(351:70) 
+                       not = spaces then  
+                       generate r-item-desc-line-6
+                   end-if
+                   if ws-item-desc(ws-counter)(421:70) 
+                       not = spaces then      
+                       generate r-item-desc-line-7
+                   end-if
+                   if ws-item-desc(ws-counter)(491:) 
+                       not = spaces then                        
+                       generate r-item-desc-line-8
+                   end-if
+                           
+                   generate r-item-end-line 
+                
                end-perform
-
+               
            close fd-report-file
 
            terminate r-rss-report

@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-06
-      * Last Modified: 2021-09-21
+      * Last Modified: 2021-09-23
       * Purpose: Parses raw RSS output into RSS records.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -59,20 +59,21 @@
 
        77  ls-is-desc-single-line                pic a value 'N'.
        77  ls-in-description                     pic a value 'N'.
-       77  ls-in-items                           pic a value 'N'.
-       77  ls-item-idx                           pic 999 value 1.
-
+       77  ls-in-items                           pic a value 'N'.      
 
        77  ls-raw-buffer                         pic x(:BUFFER-SIZE:) 
                                                  value spaces.
 
-       77  ls-counter                            pic 999 value 1.
+       77  ls-counter                            pic 9(6) comp value 1.
 
-       77  ls-search-count                       pic 999 value zeros.
+       77  ls-search-count                     pic 999 comp value zeros.
 
-       77  ls-next-rss-id                        pic 9(5) value zeros.
+       77  ls-next-rss-id                     pic 9(5) comp value zeros.
+       
+       77  ls-next-rss-id-display             pic 9(5).
 
        77  ls-id-found                           pic a values 'N'.
+       
 
        linkage section.
            01  l-file-name                       pic x(255).
@@ -108,7 +109,7 @@
            close fd-temp-rss-file.
 
            perform remove-tags-in-record
-           perform print-parsed-record
+           perform log-parsed-record
            perform save-parsed-record
 
            if l-parse-status is zero then     
@@ -133,8 +134,7 @@
                call "logger" using function concatenate(
                    "Found item end: ", function trim(ls-raw-buffer))
                end-call
-               move 'N' to ls-in-items
-               add 1 to ls-item-idx                
+               move 'N' to ls-in-items                       
            end-if
 
 
@@ -148,8 +148,7 @@
                call "logger" using function concatenate(
                    "Found item start: ", function trim(ls-raw-buffer))
                end-call
-               move 'Y' to ls-in-items
-               move 'Y' to ws-item-exists(ls-item-idx)
+               move 'Y' to ls-in-items             
            end-if
 
       *> search for title
@@ -167,7 +166,7 @@
                else
                    call "logger" using "item title"
                    move function trim(ls-raw-buffer)
-                   to ws-item-title(ls-item-idx)
+                   to ws-item-title(ws-num-items)
                end-if
            end-if
 
@@ -187,7 +186,7 @@
                else
                    call "logger" using "item link"
                    move function trim(ls-raw-buffer)
-                   to ws-item-link(ls-item-idx)
+                   to ws-item-link(ws-num-items)
                end-if
            end-if
 
@@ -202,7 +201,7 @@
                end-call
                if ls-in-items = 'Y' then
                    move function trim(ls-raw-buffer)
-                   to ws-item-pub-date(ls-item-idx)
+                   to ws-item-pub-date(ws-num-items)
                end-if
            end-if
 
@@ -221,7 +220,7 @@
                    end-call 
                    
                    move function trim(ls-raw-buffer)
-                   to ws-item-guid(ls-item-idx)
+                   to ws-item-guid(ws-num-items)
                end-if
            end-if
 
@@ -246,7 +245,7 @@
                        "item desc single: ", ls-raw-buffer)
                    end-call
                    move function trim(ls-raw-buffer)
-                   to ws-item-desc(ls-item-idx)
+                   to ws-item-desc(ws-num-items)
                end-if
            end-if
 
@@ -260,7 +259,7 @@
                if ls-search-count > 0 then
                    call "logger" using "start of multiline description"
                    move 'Y' to ls-in-description                  
-                   move spaces to ws-item-desc(ls-item-idx)
+                   move spaces to ws-item-desc(ws-num-items)
                end-if
 
                if ls-in-description = 'Y' then
@@ -276,11 +275,11 @@
                    else
                        call "logger" using "item desc"                        
                        move function concatenate(
-                           function trim(ws-item-desc(ls-item-idx)),
+                           function trim(ws-item-desc(ws-num-items)),
                            function trim(ls-raw-buffer))
-                       to ws-item-desc(ls-item-idx)
+                       to ws-item-desc(ws-num-items)
                        call "logger" using 
-                           by content ws-item-desc(ls-item-idx)
+                           by content ws-item-desc(ws-num-items)
                        end-call 
                    end-if
                end-if
@@ -321,14 +320,15 @@
 
       * Sanitize rss item fields...
 
+           move ws-num-items to ws-num-items-disp
            call "logger" using function concatenate(
-               "Sanitizing items.. num items: " ws-num-items)
+               "Sanitizing items.. num items: " ws-num-items-disp)
            end-call 
 
            if ws-num-items > 0 then 
 
                perform varying ls-counter from 1 by 1 
-                   until ls-counter = ws-num-items
+                   until ls-counter > ws-num-items
 
                    move function 
                        sanitize-rss-field(ws-item-title(ls-counter)) 
@@ -357,7 +357,7 @@
 
 
 
-       print-parsed-record.
+       log-parsed-record.
 
            call "logger" using "RSS Feed Info:"
            call "logger" using function concatenate( 
@@ -370,16 +370,21 @@
                "Feed Description: ", function trim(ws-feed-desc))
            end-call
            
-           call "logger" using "Feed Items:"
-           move 1 to ls-counter
-           perform until ls-counter > ws-num-items
-               if ws-item-exists(ls-counter) = 'Y' then
+           if ws-num-items > 0 then 
+               move ws-num-items to ws-num-items-disp
+               call "logger" using function concatenate( 
+                   "Feed Items: " ws-num-items-disp)
+               end-call
+           
+               perform varying ls-counter from 1 by 1 
+               until ls-counter > ws-num-items
+              
                    call "logger" using function concatenate(
                        "Item title: ",
                        function trim(ws-item-title(ls-counter)))
                    end-call
                    call "logger" using function concatenate(
-                       "Item link: ",
+                          "Item link: ",
                        function trim(ws-item-link(ls-counter)))
                    end-call
                    call "logger" using function concatenate(
@@ -391,12 +396,12 @@
                        function trim(ws-item-pub-date(ls-counter)))
                    end-call
                    call "logger" using function concatenate(
-                       "Item desc: ",
+                          "Item desc: ",
                        function trim(ws-item-desc(ls-counter)))
                    end-call
-               end-if
-               add 1 to ls-counter
-           end-perform
+            
+               end-perform
+           end-if 
 
            exit paragraph.
 
@@ -474,6 +479,8 @@
            end-call
 
            call "logger" using ws-rss-list-record
+           move ws-num-items to ws-num-items-disp
+           call "logger" using ws-num-items-disp
 
            open i-o fd-rss-list-file
                write f-rss-list-record from ws-rss-list-record
@@ -491,8 +498,7 @@
 
            call "logger" using "Saving parsed RSS data to disk...".
 
-           *> HACK : item count is 1 higher than actual number of items.
-           subtract 1 from ws-num-items
+           call "logger" using ws-rss-record
 
            open output fd-rss-content-file    
                write f-rss-content-record from ws-rss-record
@@ -525,16 +531,19 @@
                end-perform
            close fd-rss-last-id-file
 
+           move ls-next-rss-id to ls-next-rss-id-display
+
            call "logger" using function concatenate(
-               "last RSS ID found: ", ls-next-rss-id)
+               "last RSS ID found: ", ls-next-rss-id-display)
            end-call 
            add 1 to ls-next-rss-id
+           move ls-next-rss-id to ls-next-rss-id-display
            call "logger" using function concatenate(
-               "Next new RSS ID: ", ls-next-rss-id)
+               "Next new RSS ID: ", ls-next-rss-id-display)
            end-call
 
            call "logger" using function concatenate( 
-               "Saving new RSS ID ", ls-next-rss-id, 
+               "Saving new RSS ID ", ls-next-rss-id-display,
                " to last id data file.")
            end-call
 
