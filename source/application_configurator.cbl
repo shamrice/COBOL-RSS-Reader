@@ -240,7 +240,7 @@
        78  ws-browser-cmd-key              value "browser".
        78  ws-lynx-cmd-value               value "lynx ".
        78  ws-links-cmd-value              value "links ".
-       78  ws-no-browser-value             value "none".
+       78  ws-no-browser-value             value ws-config-not-set.
 
        78  ws-xmllint-cmd-key              value "xmllint".
        78  ws-xmllint-exists-value         value "xmllint --format ".
