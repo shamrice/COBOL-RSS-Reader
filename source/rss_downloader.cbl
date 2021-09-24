@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-12-21
-      *> Last Updated: 2021-01-12
+      *> Last Updated: 2021-09-24
       *> Purpose: Downloads given RSS feed url and calls rss_parser
       *> Tectonics:
       *>     ./build.sh
@@ -17,6 +17,7 @@
        configuration section.
 
        repository.
+           function get-config 
            function pipe-open
            function pipe-close
            function rss-parser.
@@ -30,10 +31,10 @@
            05 ws-pipe-pointer                  usage pointer.
            05 ws-pipe-return                   usage binary-long.
 
+       01  ws-download-cmd-start               pic x(32).
+
        77  ws-rss-temp-filename                pic x(255)
                                                value "./feeds/temp.rss".
-
-       78  ws-wget                             value "wget -q -O ".
       
        local-storage section.
 
@@ -115,9 +116,11 @@
                "Downloading RSS Feed: ", function trim(ls-rss-feed-url))
            end-call.
 
-      *> Build WGET command...
+           move function get-config("down_cmd") to ws-download-cmd-start
+
+      *> Build WGET/CURL download command...
            move function concatenate(
-               ws-wget,
+               function trim(ws-download-cmd-start), SPACE, 
                function trim(ws-rss-temp-filename), SPACE,
                function trim(ls-rss-feed-url), SPACE)
            to ls-download-cmd
@@ -141,6 +144,9 @@
                        ls-download-status)
                    end-call
                end-if
-           end-if.
+           end-if
+
+           exit paragraph.
+
 
        end function rss-downloader.

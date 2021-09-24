@@ -87,8 +87,8 @@
            end-display
 
            perform set-logging-based-on-config
-      *     call "auto-configure" using ws-auto-configure-status
-      *     call "logger" using ws-auto-configure-status
+           call "auto-configure" using ws-auto-configure-status
+           call "logger" using ws-auto-configure-status
       
 
            accept ws-cmd-args-buffer from command-line 
