@@ -41,6 +41,7 @@ echo Compiling...
 echo 
 BUILD_STRING="cobc -O2 -fstatic-call -x $DEBUG crssr.cbl rss_parser.cbl rss_reader_menu.cbl rss_reader_view_feed.cbl rss_reader_view_item.cbl rss_downloader.cbl browser_launcher.cbl rss_reader_add_feed.cbl rss_reader_delete_feed.cbl rss_reader_help.cbl rss_reader_export_feed.cbl rss_report_writer.cbl remove_rss_record.cbl logger.cbl string_helpers.cbl application_configurator.cbl reset_files.cbl cobweb-pipes.cob -o crssr"
 echo $BUILD_STRING 
+echo 
 $BUILD_STRING
 echo 
 

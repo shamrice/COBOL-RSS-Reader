@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-01-11
-      *> Last Updated: 2021-01-12
+      *> Last Updated: 2021-09-24
       *> Purpose: Sub program to save or update configuration value.
       *> Tectonics:
       *>     ./build.sh
@@ -28,7 +28,7 @@
            FD fd-config-file.
            01  f-config-set.
                05  f-config-name           pic x(8).
-               05  f-config-value          pic x(16).    
+               05  f-config-value          pic x(32).    
 
        working-storage section.
 
@@ -38,7 +38,7 @@
        
        01  ls-config-set.
            05  ls-config-name              pic x(8) value spaces.
-           05  ls-config-value             pic x(16) value spaces.
+           05  ls-config-value             pic x(32) value spaces.
 
        01  ls-record-exists-sw             pic x value 'N'.
            88  ls-record-exists            value 'Y'.
@@ -105,7 +105,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-01-11
-      *> Last Updated: 2021-01-12
+      *> Last Updated: 2021-09-24
       *> Purpose: Function to get configuration value for config 
       *>          name passed.
       *> Tectonics:
@@ -133,7 +133,7 @@
            FD  fd-config-file.
            01  f-config-set.
                05  f-config-name           pic x(8).
-               05  f-config-value          pic x(16).    
+               05  f-config-value          pic x(32).    
 
        working-storage section.
 
@@ -143,12 +143,12 @@
        
        01  ls-config-set.
            05  ls-config-name              pic x(8) value spaces.
-           05  ls-config-value             pic x(16) value spaces.
+           05  ls-config-value             pic x(32) value spaces.
 
        linkage section.
 
        01  l-config-name                   pic x any length.
-       01  l-config-value                  pic x(16).
+       01  l-config-value                  pic x(32).
 
        procedure division 
            using l-config-name
@@ -189,3 +189,256 @@
        
        end function get-config.
 
+
+
+
+
+      *>*****************************************************************
+      *> Author: Erik Eriksen
+      *> Create Date: 2021-09-23
+      *> Last Updated: 2021-09-23
+      *> Purpose: Sub program that attempts to auto configure variables 
+      *>          that rely on external programs installed.
+      *> Tectonics:
+      *>     ./build.sh
+      *>*****************************************************************
+       identification division.
+       program-id. auto-configure.
+
+       environment division.
+
+       configuration section.
+
+       repository.
+           function pipe-open
+           function pipe-close.
+
+       input-output section.
+                   
+       data division.
+
+       file section.
+          
+
+       working-storage section.
+
+       78  ws-config-not-set               value "NOT-SET".
+
+       78  ws-wget-check-cmd               value "wget --version".
+       78  ws-curl-check-cmd               value "curl --version".
+
+       78  ws-lynx-check-cmd               value "lynx --version".
+       78  ws-links-check-cmd              value "links -version".
+
+       78  ws-xmllint-check-cmd            value "xmllint --version".
+
+
+       78  ws-down-cmd-key                 value "down_cmd".
+       78  ws-wget-cmd-value               value "wget -q -O ".
+       78  ws-curl-cmd-value               value "curl -s -o ".
+
+       78  ws-browser-cmd-key              value "browser".
+       78  ws-lynx-cmd-value               value "lynx ".
+       78  ws-links-cmd-value              value "links ".
+       78  ws-no-browser-value             value "none".
+
+       78  ws-xmllint-cmd-key              value "xmllint".
+       78  ws-xmllint-exists-value         value "xmllint --format ".
+       78  ws-xmllint-not-exists-value     value ws-config-not-set.
+
+       local-storage section.
+       
+       01  ls-command-to-test              pic x(128).
+
+       01  ls-config-set.
+           05  ls-config-name              pic x(8) value spaces.
+           05  ls-config-value             pic x(32) value spaces.
+           05  ls-dl-cmd-config-value      redefines ls-config-value  
+                                           pic x(32).
+               88  ls-wget-value           value ws-wget-cmd-value.
+               88  ls-curl-value           value ws-curl-cmd-value.
+
+           05  ls-browser-cmd-config-value redefines ls-config-value  
+                                           pic x(32).
+               88  ls-lynx-value           value ws-lynx-cmd-value.
+               88  ls-links-value          value ws-links-cmd-value.               
+               88  ls-no-browser-value     value ws-no-browser-value.
+
+           05  ls-xmllint-cmd-config-value redefines ls-config-value  
+                                           pic x(32).
+               88  ls-xmllint-found-value  
+                                      value ws-xmllint-exists-value.
+               88  ls-xmllint-not-found-value  
+                                      value ws-xmllint-not-exists-value.               
+
+       01  ls-command-exists-sw            pic x value 'N'.
+           88  ls-command-not-exists       value 'N'.
+           88  ls-command-exists           value 'Y'.
+
+       01  ls-pipe-record.
+           05  ls-pipe-pointer             usage pointer.
+           05  ls-pipe-return              usage binary-long.
+
+       77  ls-launch-status                pic 9 value 9.
+
+
+       linkage section.
+
+       01  l-return-status                 pic 9 value 0.
+           88  l-return-status-success     value 0.
+           88  l-return-status-failure     value 1.
+
+       procedure division using by reference l-return-status.           
+
+       main-procedure.
+
+           call "logger" using "Running auto-configuration..." end-call           
+
+           perform configure-download-command
+           perform configure-browser-command
+           perform configure-xmllint-command
+
+           goback.
+       
+
+
+       check-program-exists.
+           move 9 to ls-launch-status
+           move 255 to ls-pipe-return 
+           set ls-command-not-exists to true
+
+           move pipe-open(ls-command-to-test, "w") to ls-pipe-record
+           
+           call "logger" using "pipe open called..."
+
+           if ls-pipe-return not equal 255 then
+               call "logger" using "pipe return value check."
+               move pipe-close(ls-pipe-record) to ls-launch-status
+               
+               if ls-launch-status is zero then
+                   call "logger" using function concatenate(
+                       "Launch success. Status=", ls-launch-status)
+                   end-call 
+                   set ls-command-exists to true
+               else
+                   call "logger" using function concatenate(
+                       "Error launching ", 
+                       function trim(ls-command-to-test), 
+                       ".. Status=", ls-launch-status)
+                   end-call
+               end-if
+           end-if
+           
+           exit paragraph.
+
+
+      
+      *> Configure either wget or curl to download feeds. If none found
+      *> auto configure fails.
+       configure-download-command.
+      
+           call "logger" using "Checking if wget exists"
+           move ws-wget-check-cmd to ls-command-to-test
+
+           perform check-program-exists
+
+           if ls-command-exists then 
+               call "logger" using "Command exists! wget will be used."
+               set ls-wget-value to true
+
+           else 
+               call "logger" using "wget not found. Checking for curl."
+               move ws-curl-check-cmd to ls-command-to-test
+
+               perform check-program-exists
+
+               if ls-command-exists then 
+                   call "logger" using "Using curl for downloading." 
+                   set ls-curl-value to true                   
+               else 
+                   call "logger" using function concatenate(
+                       "Failed to find application to download feeds. "
+                       "Auto-configuration has failed.")
+                   end-call 
+                   set l-return-status-failure to true 
+                   goback 
+               end-if 
+           end-if 
+                      
+           call "save-config" using ws-down-cmd-key ls-config-value 
+           
+           exit paragraph.
+
+
+      *> Configure either lynx or links as the browser to open feed
+      *> items. If neither exist, set to "none" and the option will be
+      *> removed from the view item screen.
+       configure-browser-command.
+      
+           call "logger" using "Checking if lynx exists"
+           move ws-lynx-check-cmd to ls-command-to-test
+
+           perform check-program-exists
+
+           if ls-command-exists then 
+
+               call "logger" using "Command exists! lynx will be used."
+               set ls-lynx-value to true
+
+           else 
+               
+               call "logger" using "lynx not found. Checking for links."
+               
+               move ws-links-check-cmd to ls-command-to-test
+               perform check-program-exists
+
+               if ls-command-exists then 
+                   call "logger" using "Using links for browser." 
+                   set ls-links-value to true    
+
+               else 
+                   call "logger" using function concatenate(
+                       "Failed to find application to browse feeds. "
+                       "Open feed in browser option will be disabled.")
+                   end-call 
+
+                   set ls-no-browser-value to true   
+
+               end-if 
+           end-if 
+                      
+           call "save-config" using ws-browser-cmd-key ls-config-value 
+           
+           exit paragraph.   
+
+
+      *> Configure if xmllint is installed. If it's installed, a second
+      *> pass will be attempted parsing feeds to format them. Feeds
+      *> that were minified, should successfully parse this second 
+      *> attempt. If not installed, only one pass will be attempted on
+      *> whatever is returned from the download command.
+       configure-xmllint-command.
+      
+           call "logger" using "Checking if xmllint exists"
+           move ws-xmllint-check-cmd to ls-command-to-test
+
+           perform check-program-exists
+
+           if ls-command-exists then 
+               call "logger" using "Cmd exists! xmllint will be used."
+               set ls-xmllint-found-value to true
+
+           else 
+               call "logger" using function concatenate(
+                   "Failed to find xmllint installation. Retrying of "
+                   "formatted feeds will be disabled. ")
+               end-call 
+                       
+               set ls-xmllint-not-found-value to true                
+           end-if 
+                      
+           call "save-config" using ws-xmllint-cmd-key ls-config-value 
+           
+           exit paragraph.                    
+
+       end program auto-configure.

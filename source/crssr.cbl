@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2021-02-04
+      *> Last Updated: 2021-09-24
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -60,7 +60,7 @@
 
        77  ws-download-status                  pic 9 value zero.
 
-       77  ws-log-config-value                 pic x(16) value spaces.
+       77  ws-log-config-value                 pic x(32) value spaces.
 
        78  ws-new-line                         value x"0a".
        78  ws-log-enabled-switch               value "==ENABLE-LOG==".
@@ -70,6 +70,8 @@
        78  ws-web-url 
                value __SOURCE_URL.
        78  ws-build-date                       value __BUILD_DATE.
+
+       01  ws-auto-configure-status            pic 9 value 0.
 
        procedure division.
 
@@ -83,6 +85,11 @@
                ws-new-line "Web: " ws-web-url
                ws-new-line "Build Date: " ws-build-date ws-new-line 
            end-display
+
+           perform set-logging-based-on-config
+      *     call "auto-configure" using ws-auto-configure-status
+      *     call "logger" using ws-auto-configure-status
+      
 
            accept ws-cmd-args-buffer from command-line 
            perform parse-cmd-args
