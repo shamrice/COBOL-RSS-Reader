@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-19
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-09-27
       * Purpose: Screen definition for rss_reader_view_item program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -82,18 +82,22 @@
                       pic x(70) from ws-desc-line(8).
 
                10  s-help-text-1.
-                   15  foreground-color cob-color-black 
-                   background-color cob-color-white line 21 column 6
-                   value " Enter ".
+                   15  foreground-color ws-browser-key-fore-color 
+                       background-color ws-browser-key-back-color 
+                       line 21 column 3
+                       pic x(7) from ws-browser-key-text.                   
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 14
-                   value "Open In Lynx Browser".
+                       background-color cob-color-black 
+                       line 21 column 11
+                       pic x(25) from ws-browser-text.                   
 
                    15  foreground-color cob-color-black 
-                   background-color cob-color-white line 21 column 35
-                   value " ESC ".
+                       background-color cob-color-white 
+                       line 21 column 35
+                       value " ESC ".
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 41
-                   value "Return to Item List".
+                       background-color cob-color-black 
+                       line 21 column 41
+                       value "Return to Item List".

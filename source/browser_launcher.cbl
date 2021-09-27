@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-12-30
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-09-27
       * Purpose: Launches url in lynx web browser
       * Tectonics: ./build.sh
       ******************************************************************
@@ -13,6 +13,7 @@
        configuration section.
 
        repository.
+           function get-config 
            function pipe-open
            function pipe-close.
 
@@ -28,11 +29,17 @@
            05  ws-pipe-return                   usage binary-long.
 
        01  ws-web-cmd.
-           05  ws-browser-cmd                   pic x(5) value "lynx ".
-           05  ws-url                           pic x(255) value spaces.
+           05  ws-web-cmd-start                 pic x(32) value spaces.
+           05  ws-browser-cmd                   pic x(32) value "lynx ".
+           05  ws-url                           pic x(255) value spaces. 
+           05  ws-web-cmd-end                   pic x(10) value spaces.
 
        77  ws-launch-status                     pic 9 value 9.
       
+       local-storage section.
+
+       01  ls-config-val-temp                   pic x(32) value spaces.
+
        linkage section.
 
        01  l-item-link                          pic x any length.
@@ -49,12 +56,31 @@
 
       * TODO : currently breaks user input. needs work.... tab shift+Tab still work. not arrow keys.
       *        invalid url causes the input to be all wonky. currenlty urls are wonky.
+      * NOTE : This is only the case if browser is not opened in a new terminal window!     
 
-           display s-blank-screen 
+           display spaces blank screen 
+
+           move function get-config("browser") to ws-browser-cmd           
+
+           if ws-browser-cmd = "NOT-SET" then 
+               call "logger" using function concatenate(
+                   "browser configuration is currently set to 'NOT-SET'"
+                   ". Cannot launch item link: " l-item-link)
+               end-call 
+               goback 
+           end-if 
 
            move function trim(l-item-link) to ws-url
 
-           move function substitute(ws-url, "&", "\&") to ws-url
+           move function substitute(ws-url, "&", "\&") to ws-url          
+
+           move function get-config("newwin") to ls-config-val-temp
+           if ls-config-val-temp = "true" then 
+               move function get-config("newwin_s") to ws-web-cmd-start
+               move function get-config("newwin_e") to ws-web-cmd-end
+           end-if 
+
+           call "logger" using ws-url 
 
            call "logger" using function concatenate(
                "Launching item in browser using command: ",
@@ -81,7 +107,7 @@
                end-if
            end-if
 
-           accept s-blank-screen 
+           display spaces blank screen       
 
            goback.
 

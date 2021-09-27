@@ -196,7 +196,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-09-23
-      *> Last Updated: 2021-09-23
+      *> Last Updated: 2021-09-27
       *> Purpose: Sub program that attempts to auto configure variables 
       *>          that rely on external programs installed.
       *> Tectonics:
@@ -210,6 +210,7 @@
        configuration section.
 
        repository.
+           function get-config 
            function pipe-open
            function pipe-close.
 
@@ -232,6 +233,7 @@
 
        78  ws-xmllint-check-cmd            value "xmllint --version".
 
+       78  ws-xterm-check-cmd              value "xterm -version".
 
        78  ws-down-cmd-key                 value "down_cmd".
        78  ws-wget-cmd-value               value "wget -q -O ".
@@ -246,6 +248,13 @@
        78  ws-xmllint-exists-value         value "xmllint --format ".
        78  ws-xmllint-not-exists-value     value ws-config-not-set.
 
+       78  ws-new-window-cmd-key           value "newwin".
+       78  ws-new-window-start-cmd-key     value "newwin_s".
+       78  ws-new-window-end-cmd-key       value "newwin_e".
+       78  ws-new-window-start-cmd-value   value 'xterm -hold -e "'.
+       78  ws-new-window-end-cmd-value     value '" & '.
+       
+
        local-storage section.
        
        01  ls-command-to-test              pic x(128).
@@ -257,6 +266,11 @@
                                            pic x(32).
                88  ls-wget-value           value ws-wget-cmd-value.
                88  ls-curl-value           value ws-curl-cmd-value.
+
+           05  ls-new-window-cmd-config-value redefines ls-config-value
+                                           pic x(32).
+               88  ls-no-new-win-value     value "false".
+               88  ls-use-new-win-value    value "true".
 
            05  ls-browser-cmd-config-value redefines ls-config-value  
                                            pic x(32).
@@ -295,6 +309,7 @@
            call "logger" using "Running auto-configuration..." end-call           
 
            perform configure-download-command
+           perform configure-browser-in-new-window-command
            perform configure-browser-command
            perform configure-xmllint-command
 
@@ -370,6 +385,55 @@
            exit paragraph.
 
 
+
+       configure-browser-in-new-window-command.
+      
+           call "logger" using "Checking if xterm exists"
+           move ws-xterm-check-cmd to ls-command-to-test
+
+           perform check-program-exists
+
+           if ls-command-exists then 
+               call "logger" using "Cmd exists! xterm will be used."
+               set ls-use-new-win-value to true
+
+           else 
+               call "logger" using function concatenate(
+                   "Failed to find xterm installation. RSS items will "
+                   "attempt to be opened in current terminal window.")
+               end-call 
+                       
+               set ls-no-new-win-value to true                
+           end-if 
+                      
+           call "save-config" using 
+               ws-new-window-cmd-key ls-config-value 
+           end-call 
+
+      *> set new window launch command config if new window will be used.
+      *> otherwise, values will be set to "NOT-SET"
+           if ls-use-new-win-value then 
+               move ws-new-window-start-cmd-value to ls-config-value
+               call "save-config" using 
+                   ws-new-window-start-cmd-key ls-config-value 
+               end-call 
+               move ws-new-window-end-cmd-value to ls-config-value
+               call "save-config" using 
+                   ws-new-window-end-cmd-key ls-config-value 
+               end-call 
+           else 
+               move ws-config-not-set to ls-config-value
+               call "save-config" using 
+                   ws-new-window-start-cmd-key ls-config-value
+               end-call                
+               call "save-config" using 
+                   ws-new-window-end-cmd-key ls-config-value 
+               end-call 
+           end-if 
+           
+           exit paragraph.  
+
+
       *> Configure either lynx or links as the browser to open feed
       *> items. If neither exist, set to "none" and the option will be
       *> removed from the view item screen.
@@ -386,6 +450,28 @@
                set ls-lynx-value to true
 
            else 
+
+      *> If xterm is not found and lynx is not found, Links cannot be
+      *> used as a browser. Set value to NOT-SET in this case.
+               move function get-config(ws-new-window-cmd-key)  
+                   to ls-config-value
+               if ls-config-value = "false" then 
+
+                   call "logger" using function concatenate(
+                       "Xterm was not found so browser cannot be opened"
+                       " in a new window. Lynx is the only compatible "
+                       "browser for this configuration and is not "
+                       "present. Setting browser value to NOT-SET")
+                   end-call 
+                   
+                   set ls-no-browser-value to true 
+                   call "save-config" using 
+                       ws-browser-cmd-key ls-config-value
+                   end-call 
+                   exit paragraph 
+               end-if 
+
+
                
                call "logger" using "lynx not found. Checking for links."
                
