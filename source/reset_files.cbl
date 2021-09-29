@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-02-04
-      *> Last Updated: 2021-02-04
+      *> Last Updated: 2021-09-29
       *> Purpose: Deletes all feed related data files.
       *> Tectonics:
       *>     ./build.sh
@@ -40,7 +40,7 @@
                status is ws-dat-file-status.
 
                select fd-temp-rss-file
-               assign to dynamic ws-rss-temp-file-name
+               assign to dynamic ws-rss-working-temp-file-name
                organization is line sequential
                status is ws-temp-file-status.
 
@@ -75,7 +75,14 @@
 
        78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
        78  ws-rss-list-file-name             value "./feeds/list.dat".
+       
+       01  ws-rss-working-temp-file-name     pic x(128).
+       
        78  ws-rss-temp-file-name             value "./feeds/temp.rss".
+       
+       78  ws-rss-temp-retry-file-name       value "./feeds/temp1.rss".
+
+       78  ws-file-status-not-found          value 35.
 
        local-storage section.
 
@@ -150,7 +157,11 @@
                        to ws-rss-dat-file-name 
 
                    delete file fd-rss-content-file
-                   if ws-dat-file-status <> zero then 
+
+                   if ws-dat-file-status <> zero 
+                   and ws-dat-file-status <> ws-file-status-not-found 
+                   then 
+
                        display "Error deleting " 
                            function trim(ws-rss-dat-file-name) 
                            ". Delete status: " ws-dat-file-status
@@ -174,68 +185,99 @@
 
       * Delete list file
            display "Deleting RSS record list data file..."
+
            delete file fd-rss-list-file
-           if ws-list-file-status <> zero then
-                   display "Error deleting " 
-                       function trim(ws-rss-list-file-name) 
-                       ". Delete status: " ws-list-file-status
-                   end-display
-                   call "logger" using function concatenate(
-                       "Failed to delete file: ", 
-                       function trim(ws-rss-list-file-name),
-                       " : Delete status: " ws-list-file-status)
-                   end-call
-               else
-                   call "logger" using function concatenate(
-                       "Successfully deleted: ", 
-                       function trim(ws-rss-list-file-name),
-                       " : Delete status: " ws-list-file-status)
-                   end-call                
+           
+           if ws-list-file-status <> zero 
+           and ws-list-file-status <> ws-file-status-not-found then
+
+               display "Error deleting " 
+                   function trim(ws-rss-list-file-name) 
+                   ". Delete status: " ws-list-file-status
+               end-display
+               call "logger" using function concatenate(
+                   "Failed to delete file: ", 
+                   function trim(ws-rss-list-file-name),
+                   " : Delete status: " ws-list-file-status)
+               end-call
+           else
+               call "logger" using function concatenate(
+                   "Successfully deleted: ", 
+                   function trim(ws-rss-list-file-name),
+                   " : Delete status: " ws-list-file-status)
+               end-call                
            end-if
 
       * Delete last id file.
            display "Deleting last id data file..."
            delete file fd-rss-last-id-file
-           if ws-last-id-file-status <> zero then
-                   display "Error deleting " 
-                       function trim(ws-rss-last-id-file-name) 
-                       ". Delete status: " ws-last-id-file-status
-                   end-display
-                   call "logger" using function concatenate(
-                       "Failed to delete file: ", 
-                       function trim(ws-rss-last-id-file-name),
-                       " : Delete status: " ws-last-id-file-status)
-                   end-call
-               else
-                   call "logger" using function concatenate(
-                       "Successfully deleted: ", 
-                       function trim(ws-rss-last-id-file-name),
-                       " : Delete status: " ws-last-id-file-status)
-                   end-call                
+
+           if ws-last-id-file-status <> zero
+           and ws-last-id-file-status <> ws-file-status-not-found then
+
+               display "Error deleting " 
+                   function trim(ws-rss-last-id-file-name) 
+                   ". Delete status: " ws-last-id-file-status
+               end-display
+               call "logger" using function concatenate(
+                   "Failed to delete file: ", 
+                   function trim(ws-rss-last-id-file-name),
+                   " : Delete status: " ws-last-id-file-status)
+               end-call
+           else
+               call "logger" using function concatenate(
+                   "Successfully deleted: ", 
+                   function trim(ws-rss-last-id-file-name),
+                   " : Delete status: " ws-last-id-file-status)
+               end-call                
            end-if
 
 
 
       * Delete temp file.
-           display "Deleting temp data file..."
+           display "Deleting temp data file(s)..."
+
+           move ws-rss-temp-file-name to ws-rss-working-temp-file-name
+           perform delete-temp-files
+
+           move ws-rss-temp-retry-file-name 
+               to ws-rss-working-temp-file-name
+           perform delete-temp-files
+
+           exit paragraph.
+
+
+
+       delete-temp-files.
+
+           if ws-rss-working-temp-file-name = spaces then 
+               call "logger" using 
+                   "Cannot delete temp file. No file name has been set."
+               end-call 
+               exit paragraph
+           end-if 
+
            delete file fd-temp-rss-file
-           if ws-temp-file-status <> zero then
-                   display "Error deleting " 
-                       function trim(ws-rss-temp-file-name) 
-                       ". Delete status: " ws-temp-file-status
-                   end-display
-                   call "logger" using function concatenate(
-                       "Failed to delete file: ", 
-                       function trim(ws-rss-temp-file-name),
-                       " : Delete status: " ws-temp-file-status)
-                   end-call
-               else
-                   call "logger" using function concatenate(
-                       "Successfully deleted: ", 
-                       function trim(ws-rss-temp-file-name),
-                       " : Delete status: " ws-temp-file-status)
-                   end-call                
-           end-if               
+
+           if ws-temp-file-status <> 0 
+           and ws-temp-file-status <> ws-file-status-not-found then
+
+               display "Error deleting " 
+                   function trim(ws-rss-working-temp-file-name) 
+                   ". Delete status: " ws-temp-file-status
+               end-display
+               call "logger" using function concatenate(
+                   "Failed to delete file: ", 
+                   function trim(ws-rss-working-temp-file-name),
+                   " : Delete status: " ws-temp-file-status)
+               end-call
+           else
+               call "logger" using function concatenate(
+                   "Successfully deleted: ", 
+                   function trim(ws-rss-working-temp-file-name),
+                   " : Delete status: " ws-temp-file-status)
+               end-call                
+           end-if                      
            exit paragraph.
 
        end program reset-files.
