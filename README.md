@@ -3,7 +3,7 @@
 Console RSS reader application written in GnuCOBOL
 
 ## Building 
-Run the shell script "build.sh" in the source directory.
+Run the shell script "build.sh" in the source directory. (Optional "--debug" parameter to create a debug build)
 
 ## Running
 * Open application in interactive mode and refresh feeds at start:
@@ -29,13 +29,17 @@ Run the shell script "build.sh" in the source directory.
   * cobweb-pipes - https://sourceforge.net/p/gnucobol/contrib/HEAD/tree/trunk/tools/cobweb/cobweb-pipes/
   
 ## Build/Run Prerequisites 
-  * GnuCOBOL installed
-  * wget installed
-  * lynx installed - optional - used to open RSS item in browser
+  * GnuCOBOL installed >= 3.1.2.0
+  * wget or curl installed  
+  * lynx or links installed - optional - used to open RSS item in web browser  
+  * xterm installed - optional - used to open web browser in new terminal window
+  * xmllint installed - optional - will be used if exists to attempt to format minified RSS feed XML to reparse.
   * Linux(?) - Build script is written for Linux but can be modified to compile on other operating systems if needed.
   
 ## Current Limitations:
-RSS Feeds must be properly formatted application/rss+xml. Some RSS feeds will minify the data into a single line. This application cannot currently handle RSS feeds that are minified and do not have a new line after each tag. 
+RSS Feeds must be properly formatted application/rss+xml. Some RSS feeds will minify the data into a single line. 
+If xmllint is installed, a second parse attempt will be attempted to properly format the RSS XML so that it can be 
+parsed. If xmllint is not installed, RSS XML must be formatted correctly in order to be parsed.
 
 Example of a properly formatted RSS feed: https://www.rssboard.org/files/sample-rss-2.xml
 
