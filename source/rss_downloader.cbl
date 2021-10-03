@@ -22,7 +22,14 @@
            function pipe-close
            function rss-parser.
 
+       input-output section.
+           file-control.           
+               copy "./copybooks/filecontrol/rss_list_file.cpy".
+
        data division.
+
+       file section.
+           copy "./copybooks/filedescriptor/fd_rss_list_file.cpy".
 
        working-storage section.
 
@@ -40,9 +47,12 @@
       
        77  ws-rss-temp-filename-retry         pic x(255)
                                               value "./feeds/temp1.rss".
-                                                  
+       
+       78  ws-rss-list-file-name             value "./feeds/list.dat".
+
       
        local-storage section.
+       
 
        77  ls-download-cmd                    pic x(:BUFFER-SIZE:).
 
@@ -57,6 +67,8 @@
        77  ls-format-status                   pic 9 value 0.
 
        77  ls-url-prefix                      pic x(4).
+
+       77  ls-download-parse-status-temp      pic 9 value 0.
 
        linkage section.
            01  l-feed-url                         pic x(256).
@@ -125,7 +137,9 @@
 
                end-if                                                 
            end-if
-                    
+
+           perform save-rss-feed-status
+
            goback.
 
 
@@ -240,6 +254,49 @@
                set l-return-status-parse-fail to true 
            end-if          
 
+           exit paragraph.
+
+
+      *> Save latest download and parse status to the list index file
+      *> for the feed.
+       save-rss-feed-status.
+
+           move ls-rss-feed-url to f-rss-link 
+           move l-download-and-parse-status 
+               to ls-download-parse-status-temp
+
+           open i-o fd-rss-list-file 
+           
+               read fd-rss-list-file
+                   invalid key 
+                       call "logger" using function concatenate( 
+                           "No RSS list record to update for key: "
+                           ls-rss-feed-url)
+                       end-call 
+                       close fd-rss-list-file
+                       exit paragraph                   
+               end-read 
+
+               move ls-download-parse-status-temp to f-rss-feed-status 
+
+               rewrite f-rss-list-record 
+                   invalid key 
+                       call "logger" using function concatenate(
+                           "Unable to save RSS feed status: " 
+                           ls-download-parse-status-temp
+                           ". Key is invalid: " 
+                           ls-rss-feed-url)
+                       end-call
+                   not invalid key 
+                       call "logger" using function concatenate(
+                           "Successfully updated RSS feed status: "
+                           ls-download-parse-status-temp
+                           " for RSS list key: " 
+                           ls-rss-feed-url)
+                       end-call 
+               end-rewrite
+
+           close fd-rss-list-file 
            exit paragraph.
 
        end function rss-downloader.
