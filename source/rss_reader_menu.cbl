@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2021-08-26
+      * Last Modified: 2021-10-03
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -69,9 +69,11 @@
            88  ws-exit-false                    value 'N'.
 
       * String to display on menu screen.
-       01  ws-display-text                     occurs 17 times.
+       01  ws-display-text                     occurs 17 times.           
            05  ws-display-rss-id               pic 9(5) value zeros. 
            05  ws-display-list-title           pic x(70) value spaces.
+           05  ws-display-text-color           pic 9 
+                                               value cob-color-white.
       
        01  ws-refresh-items-sw                 pic a value 'Y'.
            88  ws-is-refresh-items             value 'Y'.
@@ -97,6 +99,8 @@
        77  ws-rss-content-file-name          pic x(255) value spaces.
        78  ws-rss-list-file-name             value "./feeds/list.dat".
        78  ws-rss-last-id-file-name          value "./feeds/lastid.dat".
+
+       78  ws-feed-status-success            value 1.
 
        linkage section.
 
@@ -413,7 +417,10 @@
                            to ws-display-rss-id(ws-counter)
 
                            move ws-rss-title
-                           to ws-display-list-title(ws-counter)                           
+                           to ws-display-list-title(ws-counter)    
+
+                           move f-rss-feed-status 
+                               to ws-download-and-parse-status                       
                           
       *                Only refresh items if switch is set.                     
                            if ws-is-refresh-items then 
@@ -425,6 +432,16 @@
                                    to ws-download-and-parse-status   
 
                                display s-message-screen                             
+                           end-if
+
+                           *> Set text color based on feed status
+                           if ws-download-and-parse-status 
+                           = ws-feed-status-success then                                
+                               move cob-color-white
+                               to ws-display-text-color(ws-counter)
+                           else 
+                               move cob-color-red
+                               to ws-display-text-color(ws-counter)
                            end-if
                            
                            add 1 to ws-counter 
