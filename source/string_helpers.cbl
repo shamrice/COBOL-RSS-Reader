@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-01-09
-      *> Last Updated: 2021-09-20
+      *> Last Updated: 2021-10-05
       *> Purpose: Removes leading spaces from field passed.
       *> Tectonics:
       *>     ./build.sh
@@ -21,16 +21,10 @@
 
        working-storage section.
 
-       01  ws-tab-char                     constant as x"09".
-
-       local-storage section.
-       01  ls-space-count                  pic 9(5) value zeros.
+       local-storage section.       
        01  ls-length                       pic 9(5) value zeros.
-       01  ls-final-offset                 pic 9(5) value zeros.
 
-       01  ls-non-space-found-sw           pic a.
-           88  ls-non-space-found          value 'Y'.
-           88  ls-non-space-not-found      value 'N'.
+       01  ls-temp-record                  pic x(:BUFFER-SIZE:).
 
        linkage section.
        01  l-field                         pic x any length.
@@ -52,46 +46,8 @@
                function trim(l-field), " Length: ", ls-length)
            end-call
 
-           set ls-non-space-not-found to true 
-
-           perform varying ls-space-count from 1 by 1 
-           until ls-non-space-found or ls-space-count >= ls-length 
-
-               if l-field(ls-space-count:1) not = space then 
-                   if l-field(ls-space-count:1) = ws-tab-char then 
-                       add 1 to ls-space-count
-                       call "logger" using function concatenate(
-                           "Found tab at: " ls-space-count 
-                           " tallying character as two spaces")
-                   else  
-                       set ls-non-space-found to true 
-                       subtract 1 from ls-space-count
-                   end-if 
-               end-if 
-           end-perform 
-
-
-           if ls-space-count > 1 then 
-               
-               compute ls-final-offset = ls-length - ls-space-count
-
-               call "logger" using function concatenate("Found ", 
-                   ls-space-count, " leading spaces in field. Length: ",
-                   ls-length, " : Final offset: ", ls-final-offset)
-               end-call
-               
-               move l-field(ls-space-count:ls-final-offset) 
-                   to l-updated-record
-
-           else              
-               call "logger" using function concatenate(
-                   "No leading spaces in field. Length: ",
-                   ls-length)
-               end-call
-               
-               move l-field to l-updated-record
-           end-if
-           
+           move function trim(l-field) to ls-temp-record
+           move ls-temp-record to l-updated-record
            goback.
 
        end function remove-leading-spaces.
@@ -100,7 +56,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-01-09
-      *> Last Updated: 2021-01-12
+      *> Last Updated: 2021-10-05
       *> Purpose: Removes tags and converts HTML encoded string values.
       *>          Also calls function to remove leading spaces from field.
       *> Tectonics:
@@ -168,6 +124,10 @@
                "&lt;b&gt;", space,
                "&lt;/b&gt;", space,
                "&lt;a", space,
+               "&lt;/p", space,
+               "&lt;p", space   
+               "&lt;span", space,
+               "&lt;/span", space,              
                "target=&quot;_blank&quot;", space,
                "href=&quot;", space,
                "&quot;&gt;", space,
@@ -195,7 +155,10 @@
                "<u>", space,
                "</u>", space,
                "<b>", space,
-               "</b>", space
+               "</b>", space,
+               "&lt;", space,
+               "/&gt;", space,
+               "&gt;", space
                ) to l-field  
 
            move function remove-leading-spaces(l-field) 
