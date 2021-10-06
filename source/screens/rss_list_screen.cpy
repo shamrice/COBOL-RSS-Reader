@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-11
-      * Last Modified: 2021-09-29
+      * Last Modified: 2021-10-05
       * Purpose: Screen definition for rss_reader_menu program.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -144,20 +144,28 @@
 
                    15  foreground-color cob-color-white 
                    background-color cob-color-black line 21 column 40
-                   value "Refresh Feeds".
+                   value "Refresh".
 
                    15  foreground-color cob-color-black 
-                   background-color cob-color-white line 21 column 54
+                   background-color cob-color-white line 21 column 48
                    value "F8".
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 57
-                   value "Export Feed".
+                   background-color cob-color-black line 21 column 51
+                   value "Export".
 
                    15  foreground-color cob-color-black
-                   background-color cob-color-white line 21 column 69
+                   background-color cob-color-white line 21 column 58
+                   value "F9".
+
+                   15  foreground-color cob-color-white
+                   background-color cob-color-black line 21 column 61
+                   value "Config".
+
+                   15  foreground-color cob-color-black
+                   background-color cob-color-white line 21 column 68
                    value "F10".
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 73
+                   background-color cob-color-black line 21 column 72
                    value "Exit".

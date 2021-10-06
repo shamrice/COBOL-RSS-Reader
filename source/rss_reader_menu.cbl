@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2020-11-07
-      * Last Modified: 2021-10-03
+      * Last Modified: 2021-10-05
       * Purpose: RSS Reader for parsed feeds.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -184,7 +184,10 @@
                        compute ws-selected-id = 
                            ws-display-rss-id(ws-cursor-line - 2)
                        end-compute
-                       perform open-export-feed              
+                       perform open-export-feed  
+
+                   when ws-crt-status = COB-SCR-F9
+                       perform open-configuration            
                         
                    when ws-crt-status = COB-SCR-F10
                        set ws-exit-true to true 
@@ -230,10 +233,10 @@
                        end-call
                        perform open-delete-feed
 
-                   when ws-cursor-col >= 37 and ws-cursor-col < 53
+                   when ws-cursor-col >= 37 and ws-cursor-col < 47
                        perform refresh-feeds
 
-                   when ws-cursor-col >= 54 and ws-cursor-col < 68                       
+                   when ws-cursor-col >= 48 and ws-cursor-col < 57                       
                        display "Enter RSS feed id to export: "                            
                            with blank line 
                            at 2101
@@ -246,7 +249,10 @@
                        end-call                       
                        perform open-export-feed
 
-                   when ws-cursor-col >= 69 and ws-cursor-col < 77 
+                   when ws-cursor-col >= 58 and ws-cursor-col < 68
+                       perform open-configuration
+
+                   when ws-cursor-col >= 69 and ws-cursor-col < 76 
                        set ws-exit-true to true 
 
                end-evaluate
@@ -311,6 +317,11 @@
            end-if            
            exit paragraph.
 
+
+       open-configuration.
+           call "rss-reader-configuration"
+           cancel "rss-reader-configuration"
+           exit paragraph.
 
        open-selected-in-reader-view-feed.
            compute ws-selected-id = 
