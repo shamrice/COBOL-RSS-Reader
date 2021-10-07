@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-10-05
-      * Last Modified: 2021-10-06
+      * Last Modified: 2021-10-07
       * Purpose: RSS Reader Configuration. Sub program to manually set
       *          the configuration values or call auto configurator.
       * Tectonics: ./build.sh
@@ -144,18 +144,21 @@
            and (ws-cursor-col >= 42 and ws-cursor-col <= 48) 
            then 
                perform save-download-command-wget
+               perform save-auto-config-disabled
            end-if 
 
            if ws-cursor-line = 11 
            and (ws-cursor-col >= 42 and ws-cursor-col <= 48) 
            then
                perform save-download-command-curl
+               perform save-auto-config-disabled
            end-if 
 
            if ws-cursor-line = 13 
            and (ws-cursor-col >= 42 and ws-cursor-col <= 48) 
            then 
                perform save-browser-command-lynx
+               perform save-auto-config-disabled
            end-if 
 
            if ws-cursor-line = 14 
@@ -174,6 +177,7 @@
                    display space blank screen 
                else 
                    perform save-browser-command-links
+                   perform save-auto-config-disabled
                end-if 
            end-if 
 
@@ -181,12 +185,14 @@
            and (ws-cursor-col >= 42 and ws-cursor-col <= 48) 
            then 
                perform save-browser-command-no-browser
+               perform save-auto-config-disabled
            end-if 
 
            if ws-cursor-line = 17 
            and (ws-cursor-col >= 42 and ws-cursor-col <= 47) 
            then
                perform save-xterm-command-enabled
+               perform save-auto-config-disabled
            end-if 
            
            if ws-cursor-line = 17 
@@ -205,6 +211,7 @@
                    display space blank screen 
                else            
                    perform save-xterm-command-disabled
+                   perform save-auto-config-disabled
                end-if 
            end-if 
            
@@ -212,12 +219,14 @@
            and (ws-cursor-col >= 42 and ws-cursor-col <= 47) 
            then
                perform save-xmllint-command-enabled
+               perform save-auto-config-disabled
            end-if 
            
            if ws-cursor-line = 19
            and (ws-cursor-col >= 50 and ws-cursor-col <= 54) 
            then
                perform save-xmllint-command-disabled
+               perform save-auto-config-disabled
            end-if 
 
       *> Bottom row action items.
@@ -249,9 +258,11 @@
            move "Auto Configuration" to ws-msg-title
 
            if ls-auto-config-return-val = 0 then 
+               perform save-auto-config-enabled
                move "Auto configuration success." 
                    to ws-msg-body-text(1)   
            else 
+               perform save-auto-config-disabled
                move function concatenate(
                    "Auto configuration failure. Status: ", 
                    ls-auto-config-return-val)
@@ -490,6 +501,9 @@
                perform save-xmllint-command-disabled
            end-if 
 
+      *> Disable auto config when user specifies settings.
+           perform save-auto-config-disabled
+
            move "Saving Configuration" to ws-msg-title                      
            move "Configuration changes saved successfully." 
                to ws-msg-body-text(1)                       
@@ -542,5 +556,13 @@
            call "save-config" using "xmllint" "NOT-SET"
            exit paragraph.
 
+
+       save-auto-config-enabled.
+           call "save-config" using "autoconf" "true"
+           exit paragraph.
+
+       save-auto-config-disabled.
+           call "save-config" using "autoconf" "false"
+           exit paragraph.
 
        end program rss-reader-configuration.

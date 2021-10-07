@@ -1,7 +1,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2020-11-05
-      *> Last Updated: 2021-09-24
+      *> Last Updated: 2021-10-07
       *> Purpose: Application entry point
       *> Tectonics:
       *>     ./build.sh
@@ -45,7 +45,10 @@
                88  ws-not-interactive             value 'N'. 
            05  ws-reset-files-sw                  pic a value 'N'.
                88  ws-is-reset-files              value 'Y'.
-               88  ws-not-reset-files             value 'N'.          
+               88  ws-not-reset-files             value 'N'.   
+           05  ws-run-auto-config-sw              pic a value 'N'.
+               88  ws-run-auto-config             value 'Y'.
+               88  ws-not-run-auto-config         value 'N'.       
 
        01  ws-export-args.
            05  ws-export-name                  pic x(512) value spaces.
@@ -60,7 +63,7 @@
 
        77  ws-download-status                  pic 9 value zero.
 
-       77  ws-log-config-value                 pic x(32) value spaces.
+       77  ws-temp-config-value                 pic x(32) value spaces.       
 
        78  ws-new-line                         value x"0a".
        78  ws-log-enabled-switch               value "==ENABLE-LOG==".
@@ -84,12 +87,7 @@
                ws-new-line "By: Erik Eriksen"
                ws-new-line "Web: " ws-web-url
                ws-new-line "Build Date: " ws-build-date ws-new-line 
-           end-display
-
-           perform set-logging-based-on-config
-           call "auto-configure" using ws-auto-configure-status
-           call "logger" using ws-auto-configure-status
-      
+           end-display      
 
            accept ws-cmd-args-buffer from command-line 
            perform parse-cmd-args
@@ -100,6 +98,16 @@
            end-if
      
            perform set-logging-based-on-config
+
+      *> Run auto configuration if cmd line arg specified or 
+      *> config is set to true or no config value exists.
+           move function get-config("autoconf") to ws-temp-config-value           
+
+           if ws-run-auto-config 
+           or (ws-temp-config-value = "true" or spaces)
+           then 
+               perform run-auto-configuration
+           end-if            
 
            if ws-is-add-feed then 
                if ws-cmd-args-buffer(4:4) not = "http" and "HTTP" then
@@ -246,6 +254,13 @@
                set ws-is-reset-files to true
                exit paragraph
            end-if 
+           
+      *> Enable and run auto configuration
+           if ws-cmd-args-buffer = "--auto-configure" then 
+               set ws-is-valid-param to true
+               set ws-run-auto-config to true 
+               exit paragraph 
+           end-if 
 
            if ws-cmd-args-buffer = spaces  then
                set ws-is-valid-param to true 
@@ -261,14 +276,31 @@
        set-logging-based-on-config.
 
       * Enable / disable logging based on config.    
-           move function get-config("logging") to ws-log-config-value
-           if ws-log-config-value = "true" then 
+           move function get-config("logging") to ws-temp-config-value
+           if ws-temp-config-value = "true" then 
                display "Logging is enabled in config. Turning on."
                call "logger" using ws-log-enabled-switch
            else 
                display "Logging disabled in config. Turning off."
                call "logger" using ws-log-disabled-switch
            end-if
+
+           exit paragraph.
+
+
+       run-auto-configuration.
+           call "auto-configure" using ws-auto-configure-status
+           call "logger" using function concatenate(
+               "auto-configuration status: " ws-auto-configure-status)
+           end-call
+           display ws-new-line
+           
+           if ws-auto-configure-status = 0 then 
+               display "Auto configuration completed successfully."
+           else 
+               display "Auto configuration failed. Please check logs."
+           end-if 
+           display ws-new-line
 
            exit paragraph.
 
@@ -289,7 +321,9 @@
                "    --logging=false       Start interactive "
                "mode and disables logging." ws-new-line
                "    --reset               Remove all feeds by deleting "
-               "application's data files. " ws-new-line
+               "application's data files." ws-new-line
+               "    --auto-configure      Enable and run auto "
+               "configuration." ws-new-line  ws-new-line            
                "    -a [url of rss feed]  Add a new RSS feed "
                "to RSS feed list."
                ws-new-line

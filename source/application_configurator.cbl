@@ -196,7 +196,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-09-23
-      *> Last Updated: 2021-09-27
+      *> Last Updated: 2021-10-07
       *> Purpose: Sub program that attempts to auto configure variables 
       *>          that rely on external programs installed.
       *> Tectonics:
@@ -254,6 +254,8 @@
        78  ws-new-window-start-cmd-value   value 'xterm -hold -e "'.
        78  ws-new-window-end-cmd-value     value '" & '.
        
+       78  ws-use-autoconf-key             value "autoconf".
+       78  ws-use-autoconf-value           value "true".
 
        local-storage section.
        
@@ -312,6 +314,12 @@
            perform configure-browser-in-new-window-command
            perform configure-browser-command
            perform configure-xmllint-command
+
+           if l-return-status-success then 
+               call "save-config" using 
+                   ws-use-autoconf-key ws-use-autoconf-value
+               end-call 
+           end-if 
 
            goback.
        
