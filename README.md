@@ -56,4 +56,4 @@ Example of a properly formatted RSS feed: https://www.rssboard.org/files/sample-
 ![Feed Item](https://i.imgur.com/6R7msIE.png)
 
 *Add feed window:*
-![Add feed window](https://i.imgur.com/2Fyjerp.png)
+![Add feed window](https://i.imgur.com/7rymwLU.png)
