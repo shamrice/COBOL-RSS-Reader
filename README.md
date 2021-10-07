@@ -16,6 +16,8 @@ Run the shell script "build.sh" in the source directory. (Optional "--debug" par
   ```./crssr --logging=false```
 * Remove all current feeds by deleting data files in feeds directory:
   ```./crssr --reset```
+* Run and enable auto configuration. This is turned on by default but is turned off if settings are manually modified on the configuration screen. Running with this command line arg will re-run and enable it. This can also be done through the configuration screen.
+  ```./crssr --auto-configuration```
 * Download and parse an RSS feed into feed list: 
   ```./crssr -a [url of rss feed]```
 * Delete existing RSS feed from feed list:
