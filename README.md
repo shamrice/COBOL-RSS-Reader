@@ -47,7 +47,7 @@ Example of a properly formatted RSS feed: https://www.rssboard.org/files/sample-
 
 ## Screen Shots:
 *Main RSS Feed List:*
-![RSS Feed List](https://i.imgur.com/875Qg6z.png)
+![RSS Feed List](https://i.imgur.com/zUWXhD7.png)
 
 *Viewing items in feed:*
 ![RSS Feed Items](https://i.imgur.com/eHJeVhL.png)
