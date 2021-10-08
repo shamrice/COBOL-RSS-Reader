@@ -9,7 +9,7 @@
 #
 
 
-APP_VERSION=\"v0.48\"
+APP_VERSION=\"v0.49\"
 SOURCE_URL=\"https\\:\\/\\/github.com\\/shamrice\\/COBOL-RSS-Reader\"
 CUR_BUILD_DATE=\"$(date +%Y-%m-%d)\"
 

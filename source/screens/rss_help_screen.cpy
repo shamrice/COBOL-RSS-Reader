@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-10
-      * Last Modified: 2021-01-12
+      * Last Modified: 2021-10-08
       * Purpose: Screen definition for help.
       * Tectonics: ./build.sh
       ******************************************************************
@@ -51,19 +51,33 @@
                    15  line 2 column 2 pic x to ws-accept. 
  
                10  s-help-text-1.
-                   15  foreground-color cob-color-black 
-                   background-color cob-color-white line 21 column 6
-                   value " Enter ".
 
-                   15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 14
+                   15  foreground-color ws-prev-page-cmd-fg-color
+                   background-color ws-prev-page-cmd-bg-color
+                   line 21 column 4
+                   value " PgUp ".
+
+                   15  foreground-color ws-prev-page-text-fg-color
+                   background-color ws-prev-page-text-bg-color
+                   line 21 column 11
+                   value "Previous Page".
+                    
+
+                   15  foreground-color ws-next-page-cmd-fg-color 
+                   background-color ws-next-page-cmd-bg-color 
+                   line 21 column 26
+                   value " PgDn/Enter ".
+
+                   15  foreground-color ws-next-page-text-fg-color 
+                   background-color ws-next-page-text-bg-color 
+                   line 21 column 39
                    value "Next Page".
 
                    15  foreground-color cob-color-black 
-                   background-color cob-color-white line 21 column 35
+                   background-color cob-color-white line 21 column 50
                    value " ESC ".
 
                    15  foreground-color cob-color-white 
-                   background-color cob-color-black line 21 column 41
+                   background-color cob-color-black line 21 column 56
                    value "Return to RSS List".
                    

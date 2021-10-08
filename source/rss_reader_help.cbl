@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-01-10
-      * Last Modified: 2021-08-23
+      * Last Modified: 2021-10-08
       * Purpose: RSS Reader Help - Screen sub program to show help
       * Tectonics: ./build.sh
       ******************************************************************
@@ -50,6 +50,22 @@
            88  ws-exit-true                  value 'Y'.
            88  ws-exit-false                 value 'N'.
 
+       01  ws-last-page-sw                   pic a value 'N'.
+           88  ws-last-page                  value 'Y'.
+           88  ws-not-last-page              value 'N'.
+
+       01  ws-next-page-text-colors.
+           05  ws-next-page-cmd-fg-color     pic 9 value 0.
+           05  ws-next-page-cmd-bg-color     pic 9 value 7.           
+           05  ws-next-page-text-fg-color    pic 9 value 7.
+           05  ws-next-page-text-bg-color    pic 9 value 0.
+
+       01  ws-prev-page-text-colors.
+           05  ws-prev-page-cmd-fg-color     pic 9 value 0.
+           05  ws-prev-page-cmd-bg-color     pic 9 value 0.           
+           05  ws-prev-page-text-fg-color    pic 9 value 0.
+           05  ws-prev-page-text-bg-color    pic 9 value 0.           
+
        77  ws-empty-line                     pic x(80) value spaces. 
 
        78  ws-program-version                value __APP_VERSION.
@@ -60,8 +76,7 @@
        linkage section.
 
        screen section.
-       
-       copy "./screens/blank_screen.cpy".
+              
        copy "./screens/rss_help_screen.cpy".
 
        procedure division.
@@ -72,10 +87,10 @@
 
            perform set-page-text 
 
-           display s-blank-screen
+           display spaces blank screen 
            perform handle-user-input
 
-           display s-blank-screen 
+           display spaces blank screen 
            goback.
 
 
@@ -83,17 +98,26 @@
 
            perform until ws-exit-true
 
-               accept s-rss-help-screen 
+               accept s-rss-help-screen with auto-skip
+
+               call "logger" using ws-crt-status
 
                evaluate true 
                       
-                   when ws-key1 = COB-SCR-OK
+                   when (ws-key1 = COB-SCR-OK 
+                   or ws-crt-status = COB-SCR-PAGE-DOWN)
+                   and ws-not-last-page
                        add 1 to ws-page-num
                        perform set-page-text
                         
-                   
+                   when ws-crt-status = COB-SCR-PAGE-UP
+                   and ws-page-num > 1
+                       set ws-not-last-page to true 
+                       subtract 1 from ws-page-num
+                       perform set-page-text
+
                    when ws-crt-status = COB-SCR-ESC
-                       set ws-exit-true to true 
+                       set ws-exit-true to true                        
 
       *>   Mouse input handling.                   
                    when ws-crt-status = COB-SCR-LEFT-RELEASED
@@ -109,11 +133,17 @@
        handle-mouse-click.
            if ws-cursor-line = 21 then 
                evaluate true 
-                   when ws-cursor-col >= 6 and ws-cursor-col < 23
+                   when ws-cursor-col >= 4 and ws-cursor-col < 25
+                   and ws-page-num > 1 
+                       subtract 1 from ws-page-num
+                       perform set-page-text
+
+                   when ws-cursor-col >= 26 and ws-cursor-col < 49
+                   and ws-not-last-page
                        add 1 to ws-page-num 
                        perform set-page-text 
                    
-                   when ws-cursor-col >= 35 and ws-cursor-col < 59 
+                   when ws-cursor-col >= 50 and ws-cursor-col < 74 
                        set ws-exit-true to true 
                end-evaluate
            end-if 
@@ -121,7 +151,9 @@
            exit paragraph.
 
 
-       set-page-text.
+       set-page-text.          
+           
+
            evaluate true
 
                when ws-page-num = 1  
@@ -142,10 +174,35 @@
                when ws-page-num = 6
                    perform set-page-6-text
 
+               when ws-page-num = 7
+                   perform set-page-7-text
+
+               when ws-page-num = 8
+                   perform set-page-8-text                   
+
                when other
                    set ws-exit-true to true 
 
            end-evaluate
+
+           if ws-not-last-page then 
+               move cob-color-white to ws-next-page-cmd-bg-color
+               move cob-color-black to ws-next-page-cmd-fg-color
+               move cob-color-white to ws-next-page-text-fg-color
+               move cob-color-black to ws-next-page-text-bg-color
+           else 
+               move zeros to ws-next-page-text-colors
+           end-if   
+
+           if ws-page-num > 1 then 
+               move cob-color-white to ws-prev-page-cmd-bg-color
+               move cob-color-black to ws-prev-page-cmd-fg-color
+               move cob-color-white to ws-prev-page-text-fg-color
+               move cob-color-black to ws-prev-page-text-bg-color
+           else 
+               move zeros to ws-prev-page-text-colors
+           end-if   
+
 
            exit paragraph.
 
@@ -236,15 +293,16 @@
 
            move function concatenate(
            "  When viewing an item, you can open the item link URL in ",
-           "the Lynx browser") to ws-display-text(1) 
+           "the currently") to ws-display-text(1) 
            move function concatenate(
-           "  if it is installed on your system by pressing the Enter ",
-           "key. Once") to ws-display-text(2) 
+           "  configured browser (Lynx or Links) by pressing the Enter "
+           "key. ") to ws-display-text(2) 
            move function concatenate(
-           "  the browser is exited, you will be returned back to the ",
-           "item screen") to ws-display-text(3) 
-           move "  where the browser was launched from. "
-               to ws-display-text(4)
+           "  If neither of these browsers are installed, this option "
+           "will not be") to ws-display-text(3) 
+           move function concatenate(
+           "  available. If Xterm is installed, it will open in a new "
+           "terminal window.") to ws-display-text(4)
            move spaces to ws-display-text(5) 
            move "Exiting a screen:" to ws-display-text(6)
            move function concatenate(
@@ -338,14 +396,106 @@
                to ws-display-text(12)
            move spaces to ws-display-text(13)
            move spaces to ws-display-text(14)
-           move spaces to ws-display-text(15)
-           move spaces to ws-display-text(16)
-           move spaces to ws-display-text(17)
+           move "Configuration" to ws-display-text(15)           
+           move function concatenate(
+           "  The configuration screen can be accessed by pressing the " 
+           "F9 button on the") to ws-display-text(16)
+           move function concatenate(
+           "  main feed menu. To change settings, place an 'x' next to "
+           " the options") to ws-display-text(17)
            move spaces to ws-display-text(18)
 
            exit paragraph.
 
        set-page-6-text.
+           move function concatenate(
+           "  you would like to set. Once these values are set, press "
+           "the Enter key to") to ws-display-text(1)
+           move function concatenate(
+           "  save the selected values. The F5 key can be used to auto "
+           "configure settings.") to ws-display-text(2)
+           move spaces to ws-display-text(3)
+           move function concatenate(
+           "  Note: Manually changing settings will turn off auto "
+           "configuration at") to ws-display-text(4) 
+           move 
+           "        start up until auto configuration is re-ran."
+           to ws-display-text(5)
+           move spaces to ws-display-text(6)
+           move "Auto Configuration" to ws-display-text(7)
+           move function concatenate(
+           "  Running auto configuration via the command line option"
+           " --auto-configure") to ws-display-text(8)
+           move function concatenate( 
+           "  or through the configuration screen will attempt to set "
+           "the configuration") to ws-display-text(9)
+           move function concatenate( 
+           "  values based on what is currently installed on your "
+           "computer. This process")
+               to ws-display-text(10)
+           move function concatenate(
+           "  will run at every application start up until a "
+           "configuration value is") to ws-display-text(11)
+           move function concatenate(
+           "  manually changed on the configuration screen. It is also "
+           "ran by default in") to ws-display-text(12)
+           move function concatenate( 
+           "  the case where no configuration file currently  exists.")
+           to ws-display-text(13)
+           move spaces to ws-display-text(14)
+           move "Mouse Input" to ws-display-text(15)
+           move function concatenate(
+           "  Interacting with this application can be done with either"
+           " the keyboard or") to ws-display-text(16)
+           move function concatenate(
+           "  the mouse. When using the mouse, simply click on the feed"
+           " item you would") to ws-display-text(17)
+           move spaces to ws-display-text(18)                   
+           
+           exit paragraph.
+
+       set-page-7-text.
+           move function concatenate( 
+           "  would like to open. You can also interact with the "
+           "function key actions") to ws-display-text(1)
+           move 
+           "  by clicking on the text on the bottom bar." 
+               to ws-display-text(2) 
+           move spaces to ws-display-text(3) 
+           move function concatenate(
+           "  When using the configuration screen, you can click on "
+           "the setting") to ws-display-text(4) 
+           move function concatenate(
+           "  you would like to set. The clicked setting will be saved "
+           "automatically") to ws-display-text(5)
+           move spaces to ws-display-text(6)  
+           move "  upon selection." to ws-display-text(6) 
+           move spaces to ws-display-text(7)  
+           move "RSS Feed Colors" to ws-display-text(8)  
+           move function concatenate(
+           "  RSS feeds in the main RSS feed list will be displayed in "
+           "white if") to ws-display-text(9)  
+           move function concatenate(
+           "  the last time the feed was downloaded and parsed was "
+           "successful. If") to ws-display-text(10)  
+           move function concatenate(
+           "  there was any errors in the last download and parse "
+           "attempt, the feed") to ws-display-text(11)  
+           move function concatenate(
+           "  will be displayed in red until the errors are cleared."
+           "(Usually through")  to ws-display-text(12)  
+           move 
+           "  refreshing or trying different configuration settings.)"
+               to ws-display-text(13)  
+           move spaces to ws-display-text(14)  
+           move spaces to ws-display-text(15) 
+           move spaces to ws-display-text(16)  
+           move spaces to ws-display-text(17)  
+           move spaces to ws-display-text(18)   
+           exit paragraph. 
+
+       set-page-8-text.           
+
            move spaces to ws-display-text(1) 
            move "About:" to ws-display-text(2) 
            move "        By: Erik Eriksen" to ws-display-text(3) 
@@ -376,6 +526,8 @@
                to ws-display-text(16)
            move spaces to ws-display-text(17)
            move spaces to ws-display-text(18)
+           
+           set ws-last-page to true 
 
            exit paragraph.
        end program rss-reader-help.
