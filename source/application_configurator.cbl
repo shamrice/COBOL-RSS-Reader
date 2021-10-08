@@ -196,7 +196,7 @@
       *>*****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-09-23
-      *> Last Updated: 2021-10-07
+      *> Last Updated: 2021-10-08
       *> Purpose: Sub program that attempts to auto configure variables 
       *>          that rely on external programs installed.
       *> Tectonics:
@@ -225,15 +225,16 @@
 
        78  ws-config-not-set               value "NOT-SET".
 
-       78  ws-wget-check-cmd               value "wget --version".
-       78  ws-curl-check-cmd               value "curl --version".
+       78  ws-wget-check-cmd   value "wget --version > /dev/null 2>&1".
+       78  ws-curl-check-cmd   value "curl --version > /dev/null 2>&1".
 
-       78  ws-lynx-check-cmd               value "lynx --version".
-       78  ws-links-check-cmd              value "links -version".
+       78  ws-lynx-check-cmd   value "lynx --version > /dev/null 2>&1".
+       78  ws-links-check-cmd  value "links -version > /dev/null 2>&1".
 
-       78  ws-xmllint-check-cmd            value "xmllint --version".
+       78  ws-xmllint-check-cmd            
+                            value "xmllint --version > /dev/null 2>&1".
 
-       78  ws-xterm-check-cmd              value "xterm -version".
+       78  ws-xterm-check-cmd  value "xterm -version > /dev/null 2>&1".
 
        78  ws-down-cmd-key                 value "down_cmd".
        78  ws-wget-cmd-value               value "wget -q -O ".
