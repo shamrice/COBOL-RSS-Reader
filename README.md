@@ -3,7 +3,12 @@
 Console RSS reader application written in GnuCOBOL
 
 ## Building 
-Run the shell script "build.sh" in the source directory. (Optional "--debug" parameter to create a debug build)
+
+Navigate to the source directory and run ```make```. 
+If that doesn't work you can also run the shell script ```build.sh``` in the source directory. (Optional "--debug" parameter to create a debug build)
+
+This will create the ```crssr``` executable in the bin directory off the root of the repo as well as the necessary feeds directory.
+
 
 ## Running
 * Open application in interactive mode and refresh feeds at start:
