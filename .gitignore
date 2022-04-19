@@ -5,4 +5,6 @@ source/feeds/*.dat.*
 source/crssr
 source/*.log
 source/*.conf
+source/build 
+bin/**
 
